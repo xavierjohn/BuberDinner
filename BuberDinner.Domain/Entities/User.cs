@@ -1,4 +1,4 @@
-namespace BuberDinner.Domain.Entities;
+﻿namespace BuberDinner.Domain.Entities;
 
 public class User
 {

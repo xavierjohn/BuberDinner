@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSharpFunctionalExtensions.Errors\CSharpFunctionalExtensions.Errors.csproj" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.36.1" />
   </ItemGroup>
 
 </Project>

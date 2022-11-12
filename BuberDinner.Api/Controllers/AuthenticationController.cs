@@ -1,33 +1,34 @@
 ﻿namespace BuberDinner.Api.Controllers;
 
 using Buber.Dinner.Contracts.Authentication;
-using BuberDinner.Application.Services.Authentication;
+using BuberDinner.Application.Services.Authentication.Commands;
+using BuberDinner.Application.Services.Authentication.Common;
+using BuberDinner.Application.Services.Authentication.Queries;
+using CSharpFunctionalExtensions.Asp;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("auth")]
-public class AuthenticationController : ControllerBase
+public class AuthenticationController : CSharpFunctionalBase
 {
-    private readonly IAuthenticationService _authenticationService;
+    private readonly ISender _sender;
 
-    public AuthenticationController(IAuthenticationService authenticationService)
-    {
-        _authenticationService = authenticationService;
-    }
+    public AuthenticationController(ISender sender) => _sender = sender;
 
     [HttpPost("register")]
-    public IActionResult Register(RegisterRequest request)
+    public async Task<ActionResult<AuthenticationResult>> Register(RegisterRequest request)
     {
-        var authResult = _authenticationService.Register(request.FirstName, request.LastName, request.Email, request.Password);
-        AuthenticationResponse response = new(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName, authResult.User.Email, authResult.Token);
-        return Ok(response);
+        var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
+        var result = await _sender.Send(command);
+        return MapToOkObjectResult(result);
     }
 
     [HttpPost("login")]
-    public IActionResult Login(LoginRequest request)
+    public async Task<ActionResult<AuthenticationResult>> Login(LoginRequest request)
     {
-        var authResult = _authenticationService.Login(request.Email, request.Password);
-        AuthenticationResponse response = new(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName, authResult.User.Email, authResult.Token);
-        return Ok(response);
+        var command = new LoginQuery(request.Email, request.Password);
+        var result = await _sender.Send(command);
+        return MapToOkObjectResult(result);
     }
 }

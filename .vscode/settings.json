@@ -1,0 +1,12 @@
+{
+    "rest-client.environmentVariables": {
+
+        "$shared": {},
+        "dev" : {
+          "host":"https://localhost:7059"
+        },
+        "prod" : {
+          "host":"https://localhost:7059"
+        }
+    }
+}

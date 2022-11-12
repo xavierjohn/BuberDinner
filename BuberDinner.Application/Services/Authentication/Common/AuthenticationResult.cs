@@ -1,4 +1,4 @@
-﻿namespace BuberDinner.Application.Services.Authentication;
+﻿namespace BuberDinner.Application.Services.Authentication.Common;
 
 using BuberDinner.Domain.Entities;
 

@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="11.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BuberDinner.Domain\BuberDinner.Domain.csproj" />
+    <ProjectReference Include="..\CSharpFunctionalExtensions.Errors\CSharpFunctionalExtensions.Errors.csproj" />
   </ItemGroup>
 
 </Project>

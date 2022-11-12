@@ -11,6 +11,7 @@
     <ProjectReference Include="..\BuberDinner.Application\BuberDinner.Application.csproj" />
     <ProjectReference Include="..\BuberDinner.Contracts\BuberDinner.Contracts.csproj" />
     <ProjectReference Include="..\BuberDinner.Infrastructure\BuberDinner.Infrastructure.csproj" />
+    <ProjectReference Include="..\CSharpFunctionalExtensions.Asp\CSharpFunctionalExtensions.Asp.csproj" />
   </ItemGroup>
 
 </Project>
