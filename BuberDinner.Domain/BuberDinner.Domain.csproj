@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+
   <ItemGroup>
     <ProjectReference Include="..\CSharpFunctionalExtensions.Errors\CSharpFunctionalExtensions.Errors.csproj" />
   </ItemGroup>

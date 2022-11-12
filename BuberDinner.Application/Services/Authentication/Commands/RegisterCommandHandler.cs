@@ -34,18 +34,9 @@ public class RegisterCommandHandler :
             });
     }
 
-    private Result<User, ErrorList> CreateUser(RegisterCommand command)
-    {
-        var user = new User
-        {
-            FirstName = command.FirstName,
-            LastName = command.LastName,
-            Email = command.Email,
-            Password = command.Password
-        };
-        _userRepository.Add(user);
-        return Result.Success<User, ErrorList>(user);
-    }
+    private Result<User, ErrorList> CreateUser(RegisterCommand command) =>
+        User.Create(command.FirstName, command.LastName, command.Email, command.Password)
+            .Tap(user => _userRepository.Add(user));
 
     private async Task<Result<string, ErrorList>> ValidateUserDoesNotExist(string email)
     {

@@ -1,10 +1,38 @@
 ﻿namespace BuberDinner.Domain.Entities;
 
-public class User
+using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions.Errors;
+using FluentValidation;
+
+public class User : Entity<Guid>
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string FirstName { get; set; } = null!;
-    public string LastName { get; set; } = null!;
-    public string Email { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public string FirstName { get; }
+    public string LastName { get; }
+    public string Email { get; }
+    public string Password { get; }
+
+    public static Result<User, ErrorList> Create(string firstName, string lastName, string email, string password)
+    {
+        var user = new User(firstName, lastName, email, password);
+        return s_validator.Validate(user).ToResult(user);
+    }
+
+
+    private User(string firstName, string lastName, string email, string password)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+        Password = password;
+    }
+
+    static readonly InlineValidator<User> s_validator = new()
+    {
+        v => v.RuleFor(x => x.FirstName).NotEmpty(),
+        v => v.RuleFor(x => x.LastName).NotEmpty(),
+        v => v.RuleFor(x => x.Email).NotEmpty().EmailAddress(),
+        v => v.RuleFor(x => x.Password).NotEmpty()
+    };
+
+
 }
