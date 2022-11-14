@@ -33,6 +33,4 @@ public class User : Entity<Guid>
         v => v.RuleFor(x => x.Email).NotEmpty().EmailAddress(),
         v => v.RuleFor(x => x.Password).NotEmpty()
     };
-
-
 }

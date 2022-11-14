@@ -5,7 +5,7 @@ using BuberDinner.Application.Services.Authentication.Commands;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Application.Services.Authentication.Queries;
 using CSharpFunctionalExtensions.Asp;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]

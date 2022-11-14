@@ -3,7 +3,7 @@
 using BuberDinner.Application.Services.Authentication.Common;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.Errors;
-using MediatR;
+using Mediator;
 
 public record RegisterCommand(string FirstName, string LastName, string Email, string Password)
     : IRequest<Result<AuthenticationResult, ErrorList>>;

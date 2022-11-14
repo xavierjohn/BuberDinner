@@ -8,7 +8,8 @@ using BuberDinner.Domain.Entities;
 using BuberDinner.Domain.Errors;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.Errors;
-using MediatR;
+using CSharpFunctionalExtensions.ValueTasks;
+using Mediator;
 
 
 public class RegisterCommandHandler :
@@ -23,7 +24,7 @@ public class RegisterCommandHandler :
         _userRepository = userRepository;
     }
 
-    public Task<Result<AuthenticationResult, ErrorList>> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public ValueTask<Result<AuthenticationResult, ErrorList>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         return ValidateUserDoesNotExist(request.Email)
             .Bind(email => CreateUser(request))
@@ -38,7 +39,7 @@ public class RegisterCommandHandler :
         User.Create(command.FirstName, command.LastName, command.Email, command.Password)
             .Tap(user => _userRepository.Add(user));
 
-    private async Task<Result<string, ErrorList>> ValidateUserDoesNotExist(string email)
+    private async ValueTask<Result<string, ErrorList>> ValidateUserDoesNotExist(string email)
     {
         var maybeUser = await _userRepository.GetUserByEmail(email);
         if (maybeUser.HasValue)
