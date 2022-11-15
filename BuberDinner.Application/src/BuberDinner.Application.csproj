@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuberDinner.Domain\BuberDinner.Domain.csproj" />
+    <ProjectReference Include="..\..\BuberDinner.Domain\src\BuberDinner.Domain.csproj" />
   </ItemGroup>
 
 </Project>

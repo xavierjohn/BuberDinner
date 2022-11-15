@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuberDinner.Application\BuberDinner.Application.csproj" />
+    <ProjectReference Include="..\..\BuberDinner.Application\src\BuberDinner.Application.csproj" />
   </ItemGroup>
   
 </Project>
