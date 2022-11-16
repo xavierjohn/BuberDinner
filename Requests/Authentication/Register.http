@@ -1,5 +1,5 @@
 
-POST {{host}}/auth/register
+POST {{host}}/authentication/register
 Content-Type: application/json
 
 {
