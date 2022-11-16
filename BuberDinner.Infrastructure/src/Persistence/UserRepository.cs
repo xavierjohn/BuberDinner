@@ -8,10 +8,10 @@ using System.Linq;
 
 internal class UserRepository : IUserRepository
 {
-    private static readonly List<User> _users = new();
+    private static readonly List<User> s_users = new();
 
-    public void Add(User user) => _users.Add(user);
+    public void Add(User user) => s_users.Add(user);
 
     public Task<Maybe<User>> GetUserByEmail(string email) =>
-        Task.FromResult(_users.SingleOrDefault(u => u.Email == email) ?? Maybe<User>.None);
+        Task.FromResult(s_users.SingleOrDefault(u => u.Email == email) ?? Maybe<User>.None);
 }

@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNetCore.Mvc;
 
-    
     [ApiController]
     public class ErrorController : ControllerBase
     {

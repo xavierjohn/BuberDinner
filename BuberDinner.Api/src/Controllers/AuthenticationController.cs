@@ -4,13 +4,12 @@ using Buber.Dinner.Contracts.Authentication;
 using BuberDinner.Application.Services.Authentication.Commands;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Application.Services.Authentication.Queries;
-using CSharpFunctionalExtensions.Asp;
 using Mediator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("auth")]
-public class AuthenticationController : CSharpFunctionalBase
+[AllowAnonymous]
+public class AuthenticationController : ApiControllerBase
 {
     private readonly ISender _sender;
 

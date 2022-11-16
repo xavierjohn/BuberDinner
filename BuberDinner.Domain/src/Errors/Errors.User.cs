@@ -8,7 +8,7 @@ public partial class Errors
     {
         public static Error AlreadyExists(string email) => Error.Conflict(
             code: "User.DuplicateEmail",
-            message: $"User with this email (email) already exists.");
+            message: $"User with this email {email} already exists.");
 
         public static Error DoesNotExist(string email) => Error.NotFound(
         code: "User.DoesNotExist",
