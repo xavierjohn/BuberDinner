@@ -26,7 +26,7 @@ public class RegisterCommandHandler :
 
     public ValueTask<Result<AuthenticationResult, ErrorList>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        return ValidateUserDoesNotExist(request.Email)
+        return ValidateUserDoesNotExist(request.Email, cancellationToken)
             .Bind(email => CreateUser(request))
             .Bind(user =>
             {
@@ -39,9 +39,9 @@ public class RegisterCommandHandler :
         User.Create(command.FirstName, command.LastName, command.Email, command.Password)
             .Tap(user => _userRepository.Add(user));
 
-    private async ValueTask<Result<string, ErrorList>> ValidateUserDoesNotExist(string email)
+    private async ValueTask<Result<string, ErrorList>> ValidateUserDoesNotExist(string email, CancellationToken cancellationToken)
     {
-        var maybeUser = await _userRepository.GetUserByEmail(email);
+        var maybeUser = await _userRepository.GetUserByEmail(email, cancellationToken);
         if (maybeUser.HasValue)
             return Result.Failure<string, ErrorList>(new ErrorList { Errors.User.AlreadyExists(email) });
         return Result.Success<string, ErrorList>(email);

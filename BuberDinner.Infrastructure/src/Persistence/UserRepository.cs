@@ -12,6 +12,6 @@ internal class UserRepository : IUserRepository
 
     public void Add(User user) => s_users.Add(user);
 
-    public Task<Maybe<User>> GetUserByEmail(string email) =>
+    public Task<Maybe<User>> GetUserByEmail(string email, CancellationToken cancellationToken) =>
         Task.FromResult(s_users.SingleOrDefault(u => u.Email == email) ?? Maybe<User>.None);
 }

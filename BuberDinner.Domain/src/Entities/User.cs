@@ -14,7 +14,7 @@ public class User : Entity<Guid>
     public static Result<User, ErrorList> Create(string firstName, string lastName, string email, string password)
     {
         var user = new User(firstName, lastName, email, password);
-        return s_validator.Validate(user).ToResult(user);
+        return s_validator.ValidateToResult(user);
     }
 
 
