@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Application.Services.Authentication.Common;
 
-using BuberDinner.Domain.Entities;
+using BuberDinner.Domain.User.Entities;
 
 public record AuthenticationResult
 (

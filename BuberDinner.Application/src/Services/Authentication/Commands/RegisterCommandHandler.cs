@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
-using BuberDinner.Domain.Entities;
+using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Errors;
+using BuberDinner.Domain.User.Entities;
+using BuberDinner.Domain.User.ValueObjects;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.Errors;
 using CSharpFunctionalExtensions.ValueTasks;
@@ -35,9 +37,16 @@ public class RegisterCommandHandler :
             });
     }
 
-    private Result<User, ErrorList> CreateUser(RegisterCommand command) =>
-        User.Create(command.FirstName, command.LastName, command.Email, command.Password)
-            .Tap(user => _userRepository.Add(user));
+    private Result<User, ErrorList> CreateUser(RegisterCommand command)
+    {
+        var rFirstName = FirstName.Create(command.FirstName);
+        var rLastName = LastName.Create(command.LastName);
+        var rEmail = EmailAddress.Create(command.Email);
+
+        return ErrorList.Combine(rFirstName, rLastName, rEmail)
+            .Bind(x => User.Create(rFirstName.Value, rLastName.Value, rEmail.Value, command.Password))
+            .Tap(_userRepository.Add);
+    }
 
     private async ValueTask<Result<string, ErrorList>> ValidateUserDoesNotExist(string email, CancellationToken cancellationToken)
     {

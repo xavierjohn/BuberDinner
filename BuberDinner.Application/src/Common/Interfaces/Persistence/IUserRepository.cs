@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Application.Common.Interfaces.Persistence;
 
-using BuberDinner.Domain.Entities;
+using BuberDinner.Domain.User.Entities;
 using CSharpFunctionalExtensions;
 
 public interface IUserRepository

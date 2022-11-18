@@ -16,8 +16,8 @@
         public HostId HostId { get; }
         public IReadOnlyList<DinnerId> DinnerIds => _dinnerIds.AsReadOnly();
 
-        private List<MenuSection> _menuSections = new();
-        private List<DinnerId> _dinnerIds = new();
+        private readonly List<MenuSection> _menuSections = new();
+        private readonly List<DinnerId> _dinnerIds = new();
 
         public static Result<Menu, ErrorList> Create(string name, string description, HostId host)
         {

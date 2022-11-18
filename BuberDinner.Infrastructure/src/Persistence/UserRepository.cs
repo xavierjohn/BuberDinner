@@ -1,7 +1,7 @@
 ﻿namespace BuberDinner.Infrastructure.Persistence;
 
 using BuberDinner.Application.Common.Interfaces.Persistence;
-using BuberDinner.Domain.Entities;
+using BuberDinner.Domain.User.Entities;
 using CSharpFunctionalExtensions;
 using System.Collections.Generic;
 using System.Linq;
