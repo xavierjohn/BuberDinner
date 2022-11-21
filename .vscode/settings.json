@@ -8,5 +8,8 @@
         "prod" : {
           "host":"https://localhost:7059"
         }
-    }
+    },
+    "cSpell.words": [
+      "Xunit"
+    ]
 }

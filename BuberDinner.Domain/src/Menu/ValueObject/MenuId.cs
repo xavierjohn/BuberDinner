@@ -19,6 +19,6 @@
         }
 
         internal static MenuId CreateUnique() =>
-            new MenuId(Guid.NewGuid());
+            new(Guid.NewGuid());
     }
 }
