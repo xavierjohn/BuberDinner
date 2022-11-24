@@ -4,7 +4,7 @@
     </ItemGroup>
 
     <ItemGroup Label="test">
-        <ProjectReference Include="tests\DomainTests.csproj" />
+        <ProjectReference Include="tests\BuberDinner.Domain.Tests.csproj" />
     </ItemGroup>
 
 </Project>

@@ -12,7 +12,7 @@ public partial class EmailAddress : SimpleValueObject<string>
         var isEmail = EmailRegEx().IsMatch(emailString);
         if (isEmail) return new EmailAddress(emailString);
 
-        return Result.Failure<EmailAddress, ErrorList>(Error.Validation(fieldName ?? nameof(emailString), "Bad email address"));
+        return Result.Failure<EmailAddress, ErrorList>(Error.Validation(fieldName ?? "email", "Email is not valid"));
     }
 
     [GeneratedRegex("\\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\\Z", RegexOptions.IgnoreCase, "en-US")]

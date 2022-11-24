@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mediator.Abstractions" Version="2.0.27-rc" />
-    <PackageReference Include="Mediator.SourceGenerator" Version="2.0.27-rc">
+    <PackageReference Include="Mediator.Abstractions" Version="2.1.0-preview.2" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="2.1.0-preview.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

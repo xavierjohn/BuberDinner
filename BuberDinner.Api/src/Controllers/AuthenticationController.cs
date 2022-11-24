@@ -4,6 +4,7 @@ using Buber.Dinner.Contracts.Authentication;
 using BuberDinner.Application.Services.Authentication.Commands;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Application.Services.Authentication.Queries;
+using CSharpFunctionalExtensions;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,18 +17,16 @@ public class AuthenticationController : ApiControllerBase
     public AuthenticationController(ISender sender) => _sender = sender;
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthenticationResult>> Register(RegisterRequest request)
-    {
-        var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
-        var result = await _sender.Send(command);
-        return MapToOkObjectResult(result);
-    }
+    public async Task<ActionResult<AuthenticationResult>> Register(RegisterRequest request) =>
+        await RegisterCommand.Create(request.FirstName, request.LastName, request.Email, request.Password)
+            .Bind(async command => await _sender.Send(command))
+            .Finally(result => MapToActionResult(result));
 
     [HttpPost("login")]
     public async Task<ActionResult<AuthenticationResult>> Login(LoginRequest request)
     {
         var command = new LoginQuery(request.Email, request.Password);
         var result = await _sender.Send(command);
-        return MapToOkObjectResult(result);
+        return MapToActionResult(result);
     }
 }

@@ -15,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, ConfigurationManager configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuth(configuration);
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
@@ -24,7 +24,7 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddAuth(this IServiceCollection services, ConfigurationManager configuration)
+    private static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
     {
         JwtSettings jwtSettings = new();
         configuration.Bind(nameof(JwtSettings), jwtSettings);
