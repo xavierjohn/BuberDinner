@@ -1,9 +1,8 @@
 ﻿namespace BuberDinner.Application.Services.Authentication.Queries;
 
 using BuberDinner.Application.Services.Authentication.Common;
-using CSharpFunctionalExtensions;
-using CSharpFunctionalExtensions.Errors;
+using FunctionalDDD;
 using Mediator;
 
 public record LoginQuery(string Email, string Password)
-    : IRequest<Result<AuthenticationResult, ErrorList>>;
+    : IRequest<Result<AuthenticationResult>>;

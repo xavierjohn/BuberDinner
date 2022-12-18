@@ -1,23 +1,23 @@
 ﻿namespace BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
-using CSharpFunctionalExtensions;
-using CSharpFunctionalExtensions.Errors;
 using FluentValidation;
+using FunctionalDDD;
+using FunctionalDDD.FluentValidation;
 
 public class MenuItem : Entity<MenuItemId>
 {
     public string Name { get; }
     public string Description { get; }
 
-    public static Result<MenuItem, ErrorList> Create(string name, string description)
+    public static Result<MenuItem> Create(string name, string description)
     {
         MenuItem menuItem = new(MenuItemId.CreateUnique(), name, description);
         return s_validator.ValidateToResult(menuItem);
     }
 
     private MenuItem(MenuItemId menuItemId, string name, string description)
+        : base(menuItemId)
     {
-        Id = menuItemId;
         Name = name;
         Description = description;
     }

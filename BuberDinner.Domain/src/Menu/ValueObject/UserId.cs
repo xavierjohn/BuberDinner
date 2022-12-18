@@ -2,6 +2,6 @@
 
 using FunctionalDDD.CommonValueObjects;
 
-public partial class MenuItemId : RequiredGuid<MenuItemId>
+public partial class UserId : RequiredGuid<UserId>
 {
 }

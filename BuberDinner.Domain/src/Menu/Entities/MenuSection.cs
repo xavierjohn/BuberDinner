@@ -1,8 +1,8 @@
 ﻿namespace BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
-using CSharpFunctionalExtensions;
-using CSharpFunctionalExtensions.Errors;
 using FluentValidation;
+using FunctionalDDD;
+using FunctionalDDD.FluentValidation;
 
 public class MenuSection : Entity<MenuSectionId>
 {
@@ -13,15 +13,15 @@ public class MenuSection : Entity<MenuSectionId>
 
     private readonly List<MenuItem> _menuItems = new();
 
-    public static Result<MenuSection, ErrorList> Create(string name, string description)
+    public static Result<MenuSection> Create(string name, string description)
     {
         MenuSection menuItem = new(MenuSectionId.CreateUnique(), name, description);
         return s_validator.ValidateToResult(menuItem);
     }
 
     private MenuSection(MenuSectionId menuItemId, string name, string description)
+        : base(menuItemId)
     {
-        Id = menuItemId;
         Name = name;
         Description = description;
     }

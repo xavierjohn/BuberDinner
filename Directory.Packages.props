@@ -1,0 +1,30 @@
+<Project>
+  <!-- Runtime -->
+  <ItemGroup>
+    <PackageVersion Include="FluentValidation" Version="11.3.0" />
+    <PackageVersion Include="FunctionalDDD" Version="0.0.1-alpha" />
+    <PackageVersion Include="FunctionalDDD.Asp" Version="0.0.1-alpha" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="0.0.1-alpha" />
+    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="0.0.1-alpha" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="0.0.1-alpha" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="6.25.0" />
+    <PackageVersion Include="Mediator.Abstractions" Version="2.1.0-preview.2" />
+    <PackageVersion Include="Mediator.SourceGenerator" Version="2.1.0-preview.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+  <!-- Test -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageVersion Include="xunit" Version="2.4.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageVersion Include="Xunit.DependencyInjection" Version="8.6.1" />
+    <PackageVersion Include="coverlet.collector" Version="3.1.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.8.0" />
+  </ItemGroup>
+</Project>

@@ -6,16 +6,15 @@ using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Errors;
+using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
-using CSharpFunctionalExtensions;
-using CSharpFunctionalExtensions.Errors;
-using CSharpFunctionalExtensions.ValueTasks;
+using FunctionalDDD;
 using Mediator;
 
 
 public class RegisterCommandHandler :
-    IRequestHandler<RegisterCommand, Result<AuthenticationResult, ErrorList>>
+    IRequestHandler<RegisterCommand, Result<AuthenticationResult>>
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUserRepository _userRepository;
@@ -26,34 +25,27 @@ public class RegisterCommandHandler :
         _userRepository = userRepository;
     }
 
-    public ValueTask<Result<AuthenticationResult, ErrorList>> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public ValueTask<Result<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         return ValidateUserDoesNotExist(request.Email, cancellationToken)
-            .Bind(email => CreateUser(request))
-            .Bind(user =>
+            .BindAsync(email => CreateUser(request))
+            .BindAsync(user =>
             {
                 var token = _jwtTokenGenerator.GenerateToken(user);
-                return Result.Success<AuthenticationResult, ErrorList>(new AuthenticationResult(user, token));
+                return Result.Success<AuthenticationResult>(new AuthenticationResult(user, token));
             });
     }
 
-    private Result<User, ErrorList> CreateUser(RegisterCommand command)
-    {
-        var rFirstName = FirstName.Create(command.FirstName);
-        var rLastName = LastName.Create(command.LastName);
-        var rEmail = EmailAddress.Create(command.Email);
+    private Result<User> CreateUser(RegisterCommand command) =>
+        User.Create(UserId.CreateUnique(), command.FirstName, command.LastName, command.Email, command.Password)
+        .Tap(_userRepository.Add);
 
-        return ErrorList.Combine(rFirstName, rLastName, rEmail)
-            .Bind(x => User.Create(rFirstName.Value, rLastName.Value, rEmail.Value, command.Password))
-            .Tap(_userRepository.Add);
-    }
-
-    private async ValueTask<Result<string, ErrorList>> ValidateUserDoesNotExist(string email, CancellationToken cancellationToken)
+    private async ValueTask<Result<string>> ValidateUserDoesNotExist(string email, CancellationToken cancellationToken)
     {
         var maybeUser = await _userRepository.GetUserByEmail(email, cancellationToken);
         if (maybeUser.HasValue)
-            return Result.Failure<string, ErrorList>(new ErrorList { Errors.User.AlreadyExists(email) });
-        return Result.Success<string, ErrorList>(email);
+            return Result.Failure<string>(new ErrorList { Errors.User.AlreadyExists(email) });
+        return Result.Success<string>(email);
     }
 
 }

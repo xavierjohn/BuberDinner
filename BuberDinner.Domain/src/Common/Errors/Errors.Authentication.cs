@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Domain.Errors;
 
-using CSharpFunctionalExtensions.Errors;
+using FunctionalDDD;
 
 public partial class Errors
 {

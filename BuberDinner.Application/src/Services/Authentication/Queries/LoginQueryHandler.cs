@@ -2,16 +2,15 @@
 {
     using System.Threading.Tasks;
     using BuberDinner.Application.Services.Authentication.Common;
-    using CSharpFunctionalExtensions.Errors;
-    using CSharpFunctionalExtensions;
     using Mediator;
     using System.Threading;
     using BuberDinner.Application.Common.Interfaces.Authentication;
     using BuberDinner.Application.Common.Interfaces.Persistence;
     using BuberDinner.Domain.Errors;
+    using FunctionalDDD;
 
     internal class LoginQueryHandler :
-        IRequestHandler<LoginQuery, Result<AuthenticationResult, ErrorList>>
+        IRequestHandler<LoginQuery, Result<AuthenticationResult>>
     {
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IUserRepository _userRepository;
@@ -22,14 +21,14 @@
             _userRepository = userRepository;
         }
 
-        public async ValueTask<Result<AuthenticationResult, ErrorList>> Handle(LoginQuery request, CancellationToken cancellationToken) =>
+        public async ValueTask<Result<AuthenticationResult>> Handle(LoginQuery request, CancellationToken cancellationToken) =>
             await _userRepository.GetUserByEmail(request.Email, cancellationToken)
-                .ToResult(new ErrorList { Errors.User.DoesNotExist(request.Email) })
-                .Ensure(user => user.Password == request.Password, new ErrorList { Errors.Authentication.InvalidCredentials })
-                .Bind(user =>
+                .ToResultAsync(Errors.User.DoesNotExist(request.Email))
+                .EnsureAsync(user => user.Password == request.Password, Errors.Authentication.InvalidCredentials)
+                .BindAsync(user =>
                 {
                     var token = _jwtTokenGenerator.GenerateToken(user);
-                    return Result.Success<AuthenticationResult, ErrorList>(new AuthenticationResult(user, token));
+                    return Result.Success(new AuthenticationResult(user, token));
                 });
     }
 }

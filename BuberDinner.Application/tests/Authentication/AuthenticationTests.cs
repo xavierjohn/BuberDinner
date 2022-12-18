@@ -4,8 +4,8 @@
     using BuberDinner.Application.Services.Authentication.Commands;
     using BuberDinner.Domain.Common.ValueObjects;
     using BuberDinner.Domain.User.ValueObjects;
-    using CSharpFunctionalExtensions.Errors;
     using FluentAssertions;
+    using FunctionalDDD;
     using Mediator;
     using Xunit;
 
@@ -34,8 +34,8 @@
 
             // Assert
             result.IsFailure.Should().BeTrue();
-            result.Error.Should().HaveCount(1);
-            result.Error[0].Should().BeOfType(typeof(Validation));
+            result.Errors.Should().HaveCount(1);
+            result.Error.Should().BeOfType(typeof(Validation));
         }
 
         [Fact]
@@ -51,11 +51,11 @@
 
             // Assert
             result.IsFailure.Should().BeTrue();
-            result.Error.Should().HaveCount(2);
-            result.Error[0].Should().BeOfType(typeof(Validation));
-            result.Error[0].Should().Be(badFirstName);
-            result.Error[1].Should().BeOfType(typeof(Validation));
-            result.Error[1].Should().Be(badEmail);
+            result.Errors.Should().HaveCount(2);
+            result.Errors[0].Should().BeOfType(typeof(Validation));
+            result.Errors[0].Should().Be(badFirstName);
+            result.Errors[1].Should().BeOfType(typeof(Validation));
+            result.Errors[1].Should().Be(badEmail);
         }
 
 

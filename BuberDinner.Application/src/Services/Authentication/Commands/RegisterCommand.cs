@@ -3,20 +3,17 @@
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.User.ValueObjects;
-using CSharpFunctionalExtensions;
-using CSharpFunctionalExtensions.Errors;
+using FunctionalDDD;
 using Mediator;
 
 public record RegisterCommand(FirstName FirstName, LastName LastName, EmailAddress Email, string Password)
-    : IRequest<Result<AuthenticationResult, ErrorList>>
+    : IRequest<Result<AuthenticationResult>>
 {
-    public static Result<RegisterCommand, ErrorList> Create(string firstName, string lastName, string email, string password)
+    public static Result<RegisterCommand> Create(string firstName, string lastName, string email, string password)
     {
-        var rFirstName = FirstName.Create(firstName);
-        var rLastName = LastName.Create(lastName);
-        var rEmail = EmailAddress.Create(email);
-
-        return ErrorList.Combine(rFirstName, rLastName, rEmail)
-            .Map(x => new RegisterCommand(rFirstName.Value, rLastName.Value, rEmail.Value, password));
+        return FirstName.Create(firstName)
+            .Combine(LastName.Create(lastName))
+            .Combine(EmailAddress.Create(email))
+            .Map((firstName, lastName, email) => new RegisterCommand(firstName, lastName, email, password));
     }
 }
