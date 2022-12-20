@@ -34,7 +34,7 @@
 	  <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ImportGroup Condition=" '$(IsTestProject)' == 'true' ">
-    <Import Project="$(MSBuildThisFileDirectory)shared/commontest.props"/>
+    <Import Project="$(MSBuildThisFileDirectory)sharedTest/commontest.props"/>
   </ImportGroup>
  
 </Project>

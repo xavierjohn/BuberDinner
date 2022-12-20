@@ -42,7 +42,7 @@
         public void Multiple_parameters_are_validated()
         {
             // Arrange
-            var badFirstName = new Validation("firstName", "First name cannot be empty");
+            var badFirstName = new Validation("firstName", "First Name cannot be empty");
             var badEmail = new Validation("email", "Email is not valid");
 
 
