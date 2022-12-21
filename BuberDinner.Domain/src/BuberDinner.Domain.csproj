@@ -2,7 +2,7 @@
    <ItemGroup>
       <PackageReference Include="FunctionalDDD" />
       <PackageReference Include="FunctionalDDD.CommonValueObjectGenerator" />
-      <PackageReference Include="FunctionalDDD.FluentValidation" />
+      <PackageReference Include="FunctionalDDD.FluentValidationExt" />
       <PackageReference Include="FunctionalDDD.CommonValueObjects" />
    </ItemGroup>
 </Project>

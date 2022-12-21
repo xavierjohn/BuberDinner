@@ -5,7 +5,7 @@ using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.ValueObjects;
 using FluentValidation;
 using FunctionalDDD;
-using FunctionalDDD.FluentValidation;
+using FunctionalDDD.FluentValidationExt;
 
 public class User : Entity<UserId>
 {

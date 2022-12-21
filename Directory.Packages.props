@@ -1,12 +1,15 @@
 <Project>
+ <PropertyGroup>
+   <FunctionalDDDVersion>0.1.0-alpha.0</FunctionalDDDVersion>
+ </PropertyGroup>
   <!-- Runtime -->
   <ItemGroup>
     <PackageVersion Include="FluentValidation" Version="11.3.0" />
-    <PackageVersion Include="FunctionalDDD" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.Asp" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="0.0.1-alpha" />
+    <PackageVersion Include="FunctionalDDD" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.Asp" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.FluentValidationExt" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="$(FunctionalDDDVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
