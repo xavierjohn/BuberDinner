@@ -3,9 +3,9 @@
     using System.Collections.Generic;
     using BuberDinner.Domain.Menu.Entities;
     using BuberDinner.Domain.Menu.ValueObject;
-    using CSharpFunctionalExtensions.Errors;
-    using CSharpFunctionalExtensions;
     using FluentValidation;
+    using FunctionalDDD;
+    using FunctionalDDD.FluentValidation;
 
     public class Menu : AggregateRoot<MenuId>
     {
@@ -19,7 +19,7 @@
         private readonly List<MenuSection> _menuSections = new();
         private readonly List<DinnerId> _dinnerIds = new();
 
-        public static Result<Menu, ErrorList> Create(string name, string description, HostId host)
+        public static Result<Menu> Create(string name, string description, HostId host)
         {
             Menu menu = new(MenuId.CreateUnique(), name, description, host);
             return s_validator.ValidateToResult(menu);

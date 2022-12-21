@@ -1,9 +1,9 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup Label="General">
-    <Company>Xavier John</Company>
-    <Authors>$(Company)</Authors>
-    <Copyright>Copyright © $(Company) 2022. All rights reserved.</Copyright>
+	  <Authors>Xavier John</Authors>
+	  <Company>$(Authors)</Company>
+	  <Copyright>Copyright © $(Company) 2022. All rights reserved.</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
     <DefaultLanguage>en-US</DefaultLanguage>
     <SolutionDir Condition=" '$(SolutionDir)' == '' OR '$(SolutionDir)' == '*Undefined if not building a solution or within Visual Studio*' ">$(MSBuildThisFileDirectory)</SolutionDir>
@@ -13,19 +13,28 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <PropertyGroup  Label="Version">
-    <Version>0.0.1-alpha</Version>
-  </PropertyGroup>
+	<PropertyGroup  Label="Version">
+		<Version>0.0.1-alpha</Version>
+	</PropertyGroup>
 
   <PropertyGroup  Label="Build">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <!-- Enable linter -->
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(IsTestProject)' == 'false' ">
+	  <RootNamespace>FunctionalDDD.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+	  <AssemblyName>FunctionalDDD.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
   <!-- Test projects. -->
-  <ItemGroup Condition=" '$(IsTestProject)' == 'true' ">
-        <None Include="$(MSBuildThisFileDirectory)xunit.runner.json" Link="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" Visible="false" />
-  </ItemGroup>
+  <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ImportGroup Condition=" '$(IsTestProject)' == 'true' ">
+    <Import Project="$(MSBuildThisFileDirectory)sharedTest/commontest.props"/>
+  </ImportGroup>
  
 </Project>

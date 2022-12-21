@@ -1,24 +1,9 @@
 ﻿namespace BuberDinner.Domain.Menu.ValueObject
 {
     using System;
-    using CSharpFunctionalExtensions;
-    using CSharpFunctionalExtensions.Errors;
+    using FunctionalDDD.CommonValueObjects;
 
-    public class MenuId : SimpleValueObject<Guid>
+    public partial class MenuId : RequiredGuid<MenuId>
     {
-        private MenuId(Guid value) : base(value)
-        {
-        }
-
-        public static Result<MenuId, ErrorList> Create(Guid id)
-        {
-            if (id == Guid.Empty)
-                return Result.Failure<MenuId, ErrorList>(Error.Validation(nameof(id), "Id cannot be empty"));
-
-            return new MenuId(id);
-        }
-
-        internal static MenuId CreateUnique() =>
-            new(Guid.NewGuid());
     }
 }
