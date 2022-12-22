@@ -1,4 +1,6 @@
 ﻿namespace BuberDinner.Api.Controllers;
+
+using FunctionalDDD.BuberDinner.Api;
 using Microsoft.AspNetCore.Mvc;
 
 public class DinnersController : ApiControllerBase

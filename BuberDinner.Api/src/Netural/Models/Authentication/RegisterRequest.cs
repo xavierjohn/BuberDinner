@@ -1,8 +1,8 @@
-namespace Buber.Dinner.Contracts.Authentication;
+﻿namespace BuberDinner.Api.Netural.Models.Authentication;
 
 public record RegisterRequest(
     string FirstName,
     string LastName,
-    string Email,
+    string EmailAddress,
     string Password
 );

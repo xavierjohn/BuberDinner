@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
-using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Errors;
 using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.Entities;
-using BuberDinner.Domain.User.ValueObjects;
 using FunctionalDDD;
 using Mediator;
 
@@ -27,7 +25,7 @@ public class RegisterCommandHandler :
 
     public ValueTask<Result<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        return ValidateUserDoesNotExist(request.Email, cancellationToken)
+        return ValidateUserDoesNotExist(request.EmailAddress, cancellationToken)
             .BindAsync(email => CreateUser(request))
             .BindAsync(user =>
             {
@@ -37,7 +35,7 @@ public class RegisterCommandHandler :
     }
 
     private Result<User> CreateUser(RegisterCommand command) =>
-        User.Create(UserId.CreateUnique(), command.FirstName, command.LastName, command.Email, command.Password)
+        User.Create(UserId.CreateUnique(), command.FirstName, command.LastName, command.EmailAddress, command.Password)
         .Tap(_userRepository.Add);
 
     private async ValueTask<Result<string>> ValidateUserDoesNotExist(string email, CancellationToken cancellationToken)

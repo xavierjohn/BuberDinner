@@ -1,11 +1,11 @@
 ﻿namespace DomainTests;
 
-using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
 using FluentAssertions;
 using FunctionalDDD;
+using FunctionalDDD.CommonValueObjects;
 using Xunit;
 #pragma warning disable IDE0007 // Use var keyword
 

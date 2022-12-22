@@ -1,4 +1,4 @@
-﻿namespace BuberDinner.Api.Controllers;
+﻿namespace BuberDinner.Api;
 
 using FunctionalDDD.Asp;
 using Microsoft.AspNetCore.Authorization;
