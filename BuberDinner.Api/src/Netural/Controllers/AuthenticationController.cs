@@ -1,9 +1,7 @@
 ﻿namespace BuberDinner.Api.Netural.Controllers;
 
 using BuberDinner.Api.Netural.Models.Authentication;
-using BuberDinner.Application.Services.Authentication.Commands;
 using BuberDinner.Application.Services.Authentication.Common;
-using BuberDinner.Application.Services.Authentication.Queries;
 using FunctionalDDD;
 
 using Mediator;
@@ -24,10 +22,8 @@ public class AuthenticationController : ApiControllerBase
             .FinallyAsync(result => MapToActionResult(result));
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthenticationResult>> Login(LoginRequest request)
-    {
-        return await LoginQuery.Create(request.Email, request.Password)
-    .BindAsync(command => _sender.Send(command))
-    .FinallyAsync(result => MapToActionResult(result));
-    }
+    public async Task<ActionResult<AuthenticationResult>> Login(LoginRequest request) =>
+        await request.ToLoginQuery()
+            .BindAsync(command => _sender.Send(command))
+            .FinallyAsync(result => MapToActionResult(result));
 }

@@ -6,7 +6,7 @@ using FunctionalDDD;
 using FunctionalDDD.CommonValueObjects;
 using Xunit;
 
-public class RegisterRequestDtoTests
+public class RegisterRequestTests
 {
     [Theory]
     [InlineData(nameof(FirstName))]
@@ -67,7 +67,7 @@ public class RegisterRequestDtoTests
         var registerCommand = result.Value;
         registerCommand.FirstName.Should().Be(FirstName.Create("Xavier").Value);
         registerCommand.LastName.Should().Be(LastName.Create("John").Value);
-        registerCommand.EmailAddress.Should().Be(EmailAddress.Create("xavier@somewhere.com").Value);
+        registerCommand.Email.Should().Be(EmailAddress.Create("xavier@somewhere.com").Value);
         registerCommand.Password.Should().Be(Password.Create("password").Value);
     }
 }
