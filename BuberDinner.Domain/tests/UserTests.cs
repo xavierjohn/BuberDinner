@@ -5,7 +5,6 @@ using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
 using FluentAssertions;
 using FunctionalDDD;
-using FunctionalDDD.CommonValueObjects;
 using Xunit;
 #pragma warning disable IDE0007 // Use var keyword
 
@@ -33,5 +32,39 @@ public class UserTests
         caseResult.IsFailure.Should().BeTrue();
         caseResult.Error.Should().BeOfType<Validation>();
         caseResult.Error.Message.Should().EndWith($" must not be empty."); ;
+    }
+
+    [Fact]
+    public void Different_passwords_are_not_the_same()
+    {
+        // Arrange
+        Password pwd1 = Password.Create("Hello").Value;
+        Password pwd2 = Password.Create("There").Value;
+
+        // Act
+        bool result1 = pwd1 == pwd2;
+        bool result2 = pwd1.Equals(pwd2);
+
+        // Assert
+        result1.Should().BeFalse();
+        result2.Should().BeFalse();
+
+    }
+
+    [Fact]
+    public void Two_passwords_of_the_same_content_are_equal()
+    {
+        // Arrange
+        Password pwd1 = Password.Create("Hello").Value;
+        Password pwd2 = Password.Create("Hello").Value;
+
+        // Act
+        bool result1 = pwd1 == pwd2;
+        bool result2 = pwd1.Equals(pwd2);
+
+        // Assert
+        result1.Should().BeTrue();
+        result2.Should().BeTrue();
+
     }
 }

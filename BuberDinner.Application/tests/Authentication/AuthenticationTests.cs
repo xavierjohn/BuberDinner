@@ -3,11 +3,7 @@
     using System.Threading.Tasks;
     using BuberDinner.Application.Services.Authentication.Commands;
     using BuberDinner.Domain.User.ValueObjects;
-    using FluentAssertions;
-    using FunctionalDDD;
-    using FunctionalDDD.CommonValueObjects;
     using Mediator;
-    using Xunit;
 
     public class AuthenticationTests
     {

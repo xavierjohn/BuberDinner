@@ -2,8 +2,6 @@
 
 using BuberDinner.Application.Services.Authentication.Queries;
 using BuberDinner.Domain.User.ValueObjects;
-using FunctionalDDD;
-using FunctionalDDD.CommonValueObjects;
 
 public record LoginRequest(
     string email,

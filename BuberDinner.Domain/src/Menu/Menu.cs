@@ -5,8 +5,6 @@
     using BuberDinner.Domain.Menu.ValueObject;
     using FluentValidation;
     using FunctionalDDD;
-    using FunctionalDDD.FluentValidationExt;
-
     public class Menu : AggregateRoot<MenuId>
     {
         public string Name { get; }

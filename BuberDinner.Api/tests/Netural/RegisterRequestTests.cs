@@ -2,9 +2,6 @@
 
 using BuberDinner.Api.Netural.Models.Authentication;
 using BuberDinner.Domain.User.ValueObjects;
-using FunctionalDDD;
-using FunctionalDDD.CommonValueObjects;
-using Xunit;
 
 public class RegisterRequestTests
 {

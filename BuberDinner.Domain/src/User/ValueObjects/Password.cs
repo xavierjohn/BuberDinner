@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Domain.User.ValueObjects;
 
-using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD;
 
 public partial class Password : RequiredString<Password>
 {

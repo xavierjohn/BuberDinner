@@ -20,6 +20,9 @@
     <!-- Enable linter -->
   </PropertyGroup>
 
+  <ItemGroup Condition=" '$(IsTestProject)' != 'true' ">
+    <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" Link="Usings.cs" Visible="true" />
+  </ItemGroup>
 
   <!-- Test projects. -->
   <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">

@@ -1,9 +1,5 @@
-﻿namespace BuberDinner.Domain.Menu.ValueObject
-{
-    using System;
-    using FunctionalDDD.CommonValueObjects;
+﻿namespace BuberDinner.Domain.Menu.ValueObject;
 
-    public partial class MenuId : RequiredGuid<MenuId>
-    {
-    }
+public partial class MenuId : RequiredGuid<MenuId>
+{
 }
