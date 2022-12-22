@@ -23,7 +23,7 @@
 
         public async ValueTask<Result<AuthenticationResult>> Handle(LoginQuery request, CancellationToken cancellationToken) =>
             await _userRepository.GetUserByEmail(request.Email, cancellationToken)
-                .ToResultAsync(Errors.User.DoesNotExist(request.Email))
+                .ToResultAsync(Errors.Authentication.InvalidCredentials)
                 .EnsureAsync(user => user.Password == request.Password, Errors.Authentication.InvalidCredentials)
                 .BindAsync(user =>
                 {

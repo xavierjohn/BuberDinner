@@ -14,8 +14,7 @@
   </ItemGroup>
 
    <ItemGroup>
-      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-         <_Parameter1>BuberDinner.Api.Tests</_Parameter1>
-      </AssemblyAttribute>
+      <InternalsVisibleTo Include="BuberDinner.Api.Tests" />
    </ItemGroup>
+
 </Project>
