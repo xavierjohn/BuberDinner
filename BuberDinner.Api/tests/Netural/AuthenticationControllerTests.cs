@@ -58,17 +58,7 @@ public class AuthenticationControllerTests
         var response = await client.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
 
         // Assert
-        response.EnsureSuccessStatusCode();
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        response.Content.Headers.ContentType.ToString().Should().Be("application/json; charset=utf-8");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        var registeredUser = await response.Content.ReadAsExample(new { firstName = default(string), lastName = default(string), email = default(string) });
-        registeredUser.Should().BeEquivalentTo(new
-        {
-            firstName = "Xavier",
-            lastName = "John",
-            email = "someone@somewhere.com"
-        });
+        await ValidateAuthenticationResponse(response);
     }
 
     [Fact, Priority(3)]
@@ -88,16 +78,25 @@ public class AuthenticationControllerTests
         var response = await client.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        await ValidateAuthenticationResponse(response);
+    }
+
+    private static async Task ValidateAuthenticationResponse(HttpResponseMessage response)
+    {
+        response.EnsureSuccessStatusCode();
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         response.Content.Headers.ContentType.ToString().Should().Be("application/json; charset=utf-8");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.        
-        var registeredUser = await response.Content.ReadAsExample(new { firstName = default(string), lastName = default(string), email = default(string) });
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+        var registeredUser = await response.Content.ReadAsExample(new { userId = default(string), firstName = default(string), lastName = default(string), email = default(string) });
         registeredUser.Should().BeEquivalentTo(new
         {
             firstName = "Xavier",
             lastName = "John",
             email = "someone@somewhere.com"
         });
+
+        if (registeredUser == null) return;
+        Guid.TryParse(registeredUser.userId, out var parsedUserId).Should().BeTrue();
     }
 }
