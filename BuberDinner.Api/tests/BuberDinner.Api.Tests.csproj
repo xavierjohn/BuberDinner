@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+   <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+      <PackageReference Include="Xunit.Priority" />
+   </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\src\BuberDinner.Api.csproj" />
+   </ItemGroup>
+</Project>

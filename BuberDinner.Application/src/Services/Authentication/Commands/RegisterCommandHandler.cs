@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
-using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Errors;
 using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.Entities;
-using BuberDinner.Domain.User.ValueObjects;
 using FunctionalDDD;
 using Mediator;
 

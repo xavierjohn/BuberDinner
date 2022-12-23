@@ -13,10 +13,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-	<PropertyGroup  Label="Version">
-		<Version>0.0.1-alpha</Version>
-	</PropertyGroup>
-
   <PropertyGroup  Label="Build">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -24,10 +20,13 @@
     <!-- Enable linter -->
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(IsTestProject)' == 'false' ">
-	  <RootNamespace>FunctionalDDD.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-	  <AssemblyName>FunctionalDDD.$(MSBuildProjectName)</AssemblyName>
-  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(IsTestProject)' != 'true' ">
+    <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" Link="Usings.cs" Visible="true" />
+  </ItemGroup>
 
   <!-- Test projects. -->
   <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">

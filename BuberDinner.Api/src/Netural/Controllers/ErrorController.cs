@@ -1,4 +1,4 @@
-﻿namespace BuberDinner.Api.Controllers
+﻿namespace FunctionalDDD.BuberDinner.Api.Netural.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
 

@@ -1,22 +1,30 @@
 <Project>
+  <PropertyGroup>
+    <FunctionalDDDVersion>0.0.1-alpha.3</FunctionalDDDVersion>
+  </PropertyGroup>
   <!-- Runtime -->
   <ItemGroup>
     <PackageVersion Include="FluentValidation" Version="11.3.0" />
-    <PackageVersion Include="FunctionalDDD" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.Asp" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="0.0.1-alpha" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="0.0.1-alpha" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
+    <PackageVersion Include="FunctionalDDD" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.Asp" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.FluentValidationExt" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="Mapster" Version="7.3.0" />
+    <PackageVersion Include="Mapster.DependencyInjection" Version="1.0.0" />
     <PackageVersion Include="Mediator.Abstractions" Version="2.1.0-preview.5" />
     <PackageVersion Include="Mediator.SourceGenerator" Version="2.1.0-preview.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.5.119" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
+    <PackageVersion Include="Xunit.Priority" Version="1.1.6" />
   </ItemGroup>
   <!-- Test -->
   <ItemGroup>
