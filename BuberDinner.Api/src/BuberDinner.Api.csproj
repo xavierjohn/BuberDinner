@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="FunctionalDDD.Asp" />
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="Mapster.DependencyInjection" />
   </ItemGroup>
 
     <ItemGroup>

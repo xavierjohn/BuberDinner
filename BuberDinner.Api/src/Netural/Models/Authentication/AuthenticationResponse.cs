@@ -1,9 +1,10 @@
 ﻿namespace BuberDinner.Api.Netural.Models.Authentication;
 
-public record AuthenticationResponse(
-    Guid UserId,
-    string FirstName,
-    string LastName,
-    string Email,
-    string Token
-);
+public class AuthenticationResponse
+{
+    //public Guid Id { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? Email { get; set; }
+    public string? Token { get; set; }
+}

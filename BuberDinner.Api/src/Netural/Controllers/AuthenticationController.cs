@@ -1,9 +1,7 @@
 ﻿namespace BuberDinner.Api.Netural.Controllers;
 
 using BuberDinner.Api.Netural.Models.Authentication;
-using BuberDinner.Application.Services.Authentication.Common;
-using FunctionalDDD;
-
+using MapsterMapper;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,18 +10,25 @@ using Microsoft.AspNetCore.Mvc;
 public class AuthenticationController : ApiControllerBase
 {
     private readonly ISender _sender;
+    private readonly IMapper _mapper;
 
-    public AuthenticationController(ISender sender) => _sender = sender;
+    public AuthenticationController(ISender sender, IMapper mapper)
+    {
+        _sender = sender;
+        _mapper = mapper;
+    }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthenticationResult>> Register(RegisterRequest request) =>
+    public async Task<ActionResult<AuthenticationResponse>> Register(RegisterRequest request) =>
         await request.ToRegisterCommand()
-            .BindAsync(command => _sender.Send(command))
-            .FinallyAsync(result => MapToActionResult(result));
+        .BindAsync(command => _sender.Send(command))
+        .MapAsync(authResult => _mapper.Map<AuthenticationResponse>(authResult))
+        .FinallyAsync(result => MapToActionResult(result));
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthenticationResult>> Login(LoginRequest request) =>
+    public async Task<ActionResult<AuthenticationResponse>> Login(LoginRequest request) =>
         await request.ToLoginQuery()
-            .BindAsync(command => _sender.Send(command))
-            .FinallyAsync(result => MapToActionResult(result));
+        .BindAsync(command => _sender.Send(command))
+        .MapAsync(authResult => _mapper.Map<AuthenticationResponse>(authResult))
+        .FinallyAsync(result => MapToActionResult(result));
 }
