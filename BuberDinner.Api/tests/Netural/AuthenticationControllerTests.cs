@@ -92,5 +92,12 @@ public class AuthenticationControllerTests
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         response.Content.Headers.ContentType.ToString().Should().Be("application/json; charset=utf-8");
 #pragma warning restore CS8602 // Dereference of a possibly null reference.        
+        var registeredUser = await response.Content.ReadAsExample(new { firstName = default(string), lastName = default(string), email = default(string) });
+        registeredUser.Should().BeEquivalentTo(new
+        {
+            firstName = "Xavier",
+            lastName = "John",
+            email = "someone@somewhere.com"
+        });
     }
 }
