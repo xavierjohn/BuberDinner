@@ -17,6 +17,6 @@
 
    <ItemGroup>
       <InternalsVisibleTo Include="BuberDinner.Api.Tests" />
+      <AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.ApiController" />
    </ItemGroup>
-
 </Project>
