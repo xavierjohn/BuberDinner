@@ -3,7 +3,7 @@
 using BuberDinner.Application.Services.Authentication.Common;
 using Mapster;
 
-public class AuthenticationMappingConfig : IRegister
+internal class AuthenticationMappingConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {

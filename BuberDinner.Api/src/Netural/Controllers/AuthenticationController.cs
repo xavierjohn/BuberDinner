@@ -1,23 +1,38 @@
 ﻿namespace BuberDinner.Api.Netural.Controllers;
 
+using Asp.Versioning;
 using BuberDinner.Api.Netural.Models.Authentication;
 using MapsterMapper;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+/// <summary>
+/// Authentication Controller
+/// </summary>
 [AllowAnonymous]
+[ApiVersionNeutral]
 public class AuthenticationController : ApiControllerBase
 {
     private readonly ISender _sender;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="mapper"></param>
     public AuthenticationController(ISender sender, IMapper mapper)
     {
         _sender = sender;
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Register a new user.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("register")]
     public async Task<ActionResult<AuthenticationResponse>> Register(RegisterRequest request) =>
         await request.ToRegisterCommand()
@@ -25,6 +40,11 @@ public class AuthenticationController : ApiControllerBase
         .MapAsync(_mapper.Map<AuthenticationResponse>)
         .FinallyAsync(result => MapToActionResult(result));
 
+    /// <summary>
+    /// Login for existing user.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("login")]
     public async Task<ActionResult<AuthenticationResponse>> Login(LoginRequest request) =>
         await request.ToLoginQuery()

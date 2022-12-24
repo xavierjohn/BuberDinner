@@ -2,12 +2,15 @@
 
   <PropertyGroup>
     <UserSecretsId>56db5788-9ea3-4265-858d-0a347e105439</UserSecretsId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="FunctionalDDD.Asp" />
     <PackageReference Include="Mapster" />
     <PackageReference Include="Mapster.DependencyInjection" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
     <ItemGroup>

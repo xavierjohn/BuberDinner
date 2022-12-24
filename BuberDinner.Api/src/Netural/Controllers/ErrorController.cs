@@ -1,14 +1,23 @@
-﻿namespace FunctionalDDD.BuberDinner.Api.Netural.Controllers
-{
-    using Microsoft.AspNetCore.Mvc;
+﻿namespace BuberDinner.Api.Netural.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
-    [ApiController]
-    public class ErrorController : ControllerBase
+/// <summary>
+/// Unhandled error controller.
+/// </summary>
+[ApiVersionNeutral]
+[ApiExplorerSettings(IgnoreApi = true)]
+public class ErrorController : ControllerBase
+{
+    /// <summary>
+    /// Show error
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("/error")]
+    public IActionResult Error()
     {
-        [Route("/error")]
-        public IActionResult Error()
-        {
-            return Problem();
-        }
+        return Problem();
     }
 }
+
