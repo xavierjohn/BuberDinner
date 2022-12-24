@@ -9,6 +9,7 @@ public class AuthenticationMappingConfig : IRegister
     {
         config.NewConfig<AuthenticationResult, AuthenticationResponse>()
             .Map(dest => dest.Token, src => src.Token)
+            .Map(dest => dest.UserId, src => src.User.Id)
             .Map(dest => dest, src => src.User);
     }
 }
