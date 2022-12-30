@@ -1,7 +1,6 @@
 ﻿namespace BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
 using FluentValidation;
-using FunctionalDDD;
 
 public class MenuSection : Entity<MenuSectionId>
 {

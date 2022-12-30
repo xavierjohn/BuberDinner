@@ -3,7 +3,6 @@
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit;
 using Xunit.Priority;
 
 [TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]

@@ -1,9 +1,9 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup Label="General">
-	  <Authors>Xavier John</Authors>
-	  <Company>$(Authors)</Company>
-	  <Copyright>Copyright © $(Company) 2022. All rights reserved.</Copyright>
+    <Authors>Xavier John</Authors>
+    <Company>$(Authors)</Company>
+    <Copyright>Copyright © $(Company) 2022. All rights reserved.</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
     <DefaultLanguage>en-US</DefaultLanguage>
     <SolutionDir Condition=" '$(SolutionDir)' == '' OR '$(SolutionDir)' == '*Undefined if not building a solution or within Visual Studio*' ">$(MSBuildThisFileDirectory)</SolutionDir>
@@ -22,18 +22,15 @@
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(IsTestProject)' != 'true' ">
-    <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" Link="Usings.cs" Visible="true" />
+    <Using Include="FunctionalDDD" />
   </ItemGroup>
 
   <!-- Test projects. -->
   <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">
-	  <IsPackable>false</IsPackable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ImportGroup Condition=" '$(IsTestProject)' == 'true' ">
-    <Import Project="$(MSBuildThisFileDirectory)sharedTest/commontest.props"/>
+    <Import Project="$(MSBuildThisFileDirectory)build/test.props"/>
   </ImportGroup>
- 
+
 </Project>

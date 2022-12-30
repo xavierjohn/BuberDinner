@@ -1,7 +1,5 @@
 ﻿namespace BuberDinner.Domain.Errors;
 
-using FunctionalDDD;
-
 public partial class Errors
 {
     public static class Authentication
