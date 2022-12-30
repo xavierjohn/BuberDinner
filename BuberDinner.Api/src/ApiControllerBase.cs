@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Api;
 
-using FunctionalDDD.Asp;
+using FunctionalDDD;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,10 +1,11 @@
 {
-    "rest-client.environmentVariables": {
-        "$shared": {
-          "host":"https://localhost:7059"
-        },
+  "rest-client.environmentVariables": {
+    "dev": {
+      "host": "https://localhost:7059"
     },
-    "cSpell.words": [
-      "Xunit"
-    ]
+    "$shared": {}
+  },
+  "cSpell.words": [
+    "Xunit"
+  ]
 }

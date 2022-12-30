@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
    <ItemGroup>
-      <PackageReference Include="FunctionalDDD" />
+      <PackageReference Include="FunctionalDDD.DomainDrivenDesign" />
       <PackageReference Include="FunctionalDDD.CommonValueObjectGenerator" />
-      <PackageReference Include="FunctionalDDD.FluentValidationExt" />
+      <PackageReference Include="FunctionalDDD.FluentValidation" />
       <PackageReference Include="FunctionalDDD.CommonValueObjects" />
    </ItemGroup>
 </Project>
