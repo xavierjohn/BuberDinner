@@ -7,7 +7,6 @@
     using BuberDinner.Application.Common.Interfaces.Authentication;
     using BuberDinner.Application.Common.Interfaces.Persistence;
     using BuberDinner.Domain.Errors;
-    using FunctionalDDD;
 
     internal class LoginQueryHandler :
         IRequestHandler<LoginQuery, Result<AuthenticationResult>>

@@ -2,7 +2,6 @@
 
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Domain.User.Entities;
-using FunctionalDDD;
 using System.Collections.Generic;
 using System.Linq;
 

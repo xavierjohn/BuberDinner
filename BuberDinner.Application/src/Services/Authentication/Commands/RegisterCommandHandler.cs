@@ -7,7 +7,6 @@ using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.Errors;
 using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.Entities;
-using FunctionalDDD;
 using Mediator;
 
 
