@@ -13,6 +13,7 @@ internal static class DependencyInjection
     {
         services.AddControllers();
         services.AddMappings();
+        services.AddProblemDetails();
         services.AddApiVersioning(
                     options =>
                     {

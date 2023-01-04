@@ -7,6 +7,7 @@ using Asp.Versioning;
 /// </summary>
 [ApiVersionNeutral]
 [ApiExplorerSettings(IgnoreApi = true)]
+[Route("[controller]")]
 public class ErrorController : ControllerBase
 {
     /// <summary>
