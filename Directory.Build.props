@@ -26,9 +26,6 @@
   </ItemGroup>
 
   <!-- Test projects. -->
-  <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
   <ImportGroup Condition=" '$(IsTestProject)' == 'true' ">
     <Import Project="$(MSBuildThisFileDirectory)build/test.props"/>
   </ImportGroup>
