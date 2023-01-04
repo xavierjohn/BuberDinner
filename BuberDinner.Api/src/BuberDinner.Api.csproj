@@ -5,6 +5,11 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
+   <ItemGroup>
+      <InternalsVisibleTo Include="BuberDinner.Api.Tests" />
+      <AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.ApiController" />
+   </ItemGroup>
+   
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="FunctionalDDD.Asp" />
@@ -18,8 +23,4 @@
     <ProjectReference Include="..\..\BuberDinner.Infrastructure\src\BuberDinner.Infrastructure.csproj" />
   </ItemGroup>
 
-   <ItemGroup>
-      <InternalsVisibleTo Include="BuberDinner.Api.Tests" />
-      <AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.ApiController" />
-   </ItemGroup>
 </Project>

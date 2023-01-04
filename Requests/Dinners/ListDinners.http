@@ -1,3 +1,4 @@
-GET {{host}}/dinners
+@token=yourtoken
+GET {{host}}/dinners?api-version=2022-10-01
 Authorization: Bearer {{token}}
 

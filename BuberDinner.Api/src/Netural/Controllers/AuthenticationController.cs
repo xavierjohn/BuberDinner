@@ -12,7 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [AllowAnonymous]
 [ApiVersionNeutral]
-public class AuthenticationController : ApiControllerBase
+[Route("[controller]")]
+public class AuthenticationController : ControllerBase
 {
     private readonly ISender _sender;
     private readonly IMapper _mapper;
@@ -38,7 +39,7 @@ public class AuthenticationController : ApiControllerBase
         await request.ToRegisterCommand()
         .BindAsync(command => _sender.Send(command))
         .MapAsync(_mapper.Map<AuthenticationResponse>)
-        .FinallyAsync(result => MapToActionResult(result));
+        .ToActionResultAsync(this);
 
     /// <summary>
     /// Login for existing user.
@@ -50,5 +51,5 @@ public class AuthenticationController : ApiControllerBase
         await request.ToLoginQuery()
         .BindAsync(command => _sender.Send(command))
         .MapAsync(_mapper.Map<AuthenticationResponse>)
-        .FinallyAsync(result => MapToActionResult(result));
+        .ToActionResultAsync(this);
 }
