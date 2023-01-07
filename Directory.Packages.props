@@ -5,6 +5,7 @@
   <!-- Runtime -->
   <ItemGroup>
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.0" />
+    <PackageVersion Include="Azure.Identity" Version="1.8.0" />
     <PackageVersion Include="FluentValidation" Version="11.3.0" />
     <PackageVersion Include="FunctionalDDD.Asp" Version="$(FunctionalDDDVersion)" />
     <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="$(FunctionalDDDVersion)" />
@@ -28,7 +29,6 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
   </ItemGroup>
-
   <!-- Test -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="3.2.0" />
