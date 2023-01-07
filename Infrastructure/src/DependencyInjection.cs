@@ -20,7 +20,7 @@ public static class DependencyInjection
         services.AddAuth(configuration)
             .AddSingleton<IDateTimeProvider, DateTimeProvider>();
         if (configuration.GetValue<string>("Persistence") == "CosmosDb")
-            services.AddCosmosDb();
+            services.AddCosmosDb(configuration);
         else
             services.AddInMemoryDb();
 
@@ -47,10 +47,13 @@ public static class DependencyInjection
                 });
         return services;
     }
-    private static IServiceCollection AddCosmosDb(this IServiceCollection services)
+    private static IServiceCollection AddCosmosDb(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<CosmosDbClientSettings>(configuration.GetSection(nameof(CosmosDbClientSettings)));
         services.AddSingleton<UserCosmosDbContainerSettings>();
-        services.AddSingleton(CosmosClientFactory.InitializeCosmosClientInstance());
+        var cosmosDbClientSettings = new CosmosDbClientSettings();
+        configuration.Bind(nameof(CosmosDbClientSettings), cosmosDbClientSettings);
+        services.AddSingleton(CosmosClientFactory.InitializeCosmosClientInstance(cosmosDbClientSettings));
         services.AddScoped<IUserRepository, UserCosmosDbRepository>();
         return services;
     }
