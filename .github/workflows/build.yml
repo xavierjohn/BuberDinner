@@ -32,4 +32,4 @@ jobs:
       run: dotnet build --no-restore -c Release
 
     - name: Test
-      run: dotnet test --no-build  -l "console;verbosity=normal" -c Release
+      run: dotnet test --no-build  -l "console;verbosity=normal" -c Release --filter "Category!=Integration"

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+   <ItemGroup>
+      <PackageReference Include="xunit.categories" />
+      <PackageReference Include="Xunit.Priority" />
+   </ItemGroup>
+   <ItemGroup>
+    <ProjectReference Include="..\src\BuberDinner.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

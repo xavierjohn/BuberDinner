@@ -5,8 +5,8 @@ using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.Errors;
-using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.Entities;
+using BuberDinner.Domain.User.ValueObjects;
 using Mediator;
 
 
@@ -22,22 +22,20 @@ public class RegisterCommandHandler :
         _userRepository = userRepository;
     }
 
-    public ValueTask<Result<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken)
-    {
-        return ValidateUserDoesNotExist(request.Email, cancellationToken)
-            .BindAsync(email => CreateUser(request))
+    public ValueTask<Result<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken) =>
+        ValidateUserDoesNotExist(request.Email, cancellationToken)
+            .BindAsync(email => CreateUser(request, cancellationToken))
             .BindAsync(user =>
             {
                 var token = _jwtTokenGenerator.GenerateToken(user);
-                return Result.Success<AuthenticationResult>(new AuthenticationResult(user, token));
+                return Result.Success(new AuthenticationResult(user, token));
             });
-    }
 
-    private Result<User> CreateUser(RegisterCommand command) =>
-        User.Create(UserId.CreateUnique(), command.FirstName, command.LastName, command.Email, command.Password)
-        .Tap(_userRepository.Add);
+    private Result<User> CreateUser(RegisterCommand command, CancellationToken cancellationToken) =>
+        User.Create(command.FirstName, command.LastName, command.Email, command.Password)
+        .Tap(user => _userRepository.Add(user, cancellationToken));
 
-    private async ValueTask<Result<string>> ValidateUserDoesNotExist(string email, CancellationToken cancellationToken)
+    private async ValueTask<Result<string>> ValidateUserDoesNotExist(EmailAddress email, CancellationToken cancellationToken)
     {
         var maybeUser = await _userRepository.GetUserByEmail(email, cancellationToken);
         if (maybeUser.HasValue)

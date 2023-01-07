@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.Build.Traversal">
+    <ItemGroup Label="source">
+        <ProjectReference Include="src\BuberDinner.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Label="test">
+        <ProjectReference Include="tests\BuberDinner.Infrastructure.Tests.csproj" />
+    </ItemGroup>
+
+</Project>

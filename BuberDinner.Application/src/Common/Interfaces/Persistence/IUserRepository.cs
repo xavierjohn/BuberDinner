@@ -4,7 +4,7 @@ using BuberDinner.Domain.User.Entities;
 
 public interface IUserRepository
 {
-    Task<Maybe<User>> GetUserByEmail(string email, CancellationToken cancellationToken);
+    Task<Maybe<User>> GetUserByEmail(EmailAddress email, CancellationToken cancellationToken);
 
-    void Add(User user);
+    Task Add(User user, CancellationToken cancellationToken);
 }

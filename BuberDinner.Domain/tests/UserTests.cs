@@ -1,6 +1,5 @@
 ﻿namespace DomainTests;
 
-using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
 #pragma warning disable IDE0007 // Use var keyword
@@ -22,13 +21,13 @@ public class UserTests
 
         // Act
 #pragma warning disable CS8604 // Possible null reference argument.
-        var caseResult = User.Create(UserId.CreateUnique(), firstName, lastName, email, password);
+        var userResult = User.Create(firstName, lastName, email, password);
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
-        caseResult.IsFailure.Should().BeTrue();
-        caseResult.Error.Should().BeOfType<Validation>();
-        caseResult.Error.Message.Should().EndWith($" must not be empty."); ;
+        userResult.IsFailure.Should().BeTrue();
+        userResult.Error.Should().BeOfType<Validation>();
+        userResult.Error.Message.Should().EndWith($" must not be empty."); ;
     }
 
     [Fact]

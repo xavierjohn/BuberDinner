@@ -17,10 +17,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAuth(configuration);
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddAuth(configuration)
+            .AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        if (configuration.GetValue<string>("Persistence") == "CosmosDb")
+            services.AddCosmosDb();
+        else
+            services.AddInMemoryDb();
 
-        services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 
@@ -42,6 +45,19 @@ public static class DependencyInjection
                     ValidAudience = jwtSettings.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
                 });
+        return services;
+    }
+    private static IServiceCollection AddCosmosDb(this IServiceCollection services)
+    {
+        services.AddSingleton<UserCosmosDbContainerSettings>();
+        services.AddSingleton(CosmosClientFactory.InitializeCosmosClientInstance());
+        services.AddScoped<IUserRepository, UserCosmosDbRepository>();
+        return services;
+    }
+
+    private static IServiceCollection AddInMemoryDb(this IServiceCollection services)
+    {
+        services.AddScoped<IUserRepository, UserInMemoryRepository>();
         return services;
     }
 }
