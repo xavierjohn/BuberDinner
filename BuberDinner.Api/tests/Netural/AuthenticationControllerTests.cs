@@ -96,6 +96,6 @@ public class AuthenticationControllerTests
         });
 
         if (registeredUser == null) return;
-        Guid.TryParse(registeredUser.userId, out var parsedUserId).Should().BeTrue();
+        registeredUser.userId.Should().Be("someone@somewhere.com");
     }
 }
