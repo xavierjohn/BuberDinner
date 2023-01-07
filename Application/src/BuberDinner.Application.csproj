@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BuberDinner.Domain\src\BuberDinner.Domain.csproj" />
+    <ProjectReference Include="..\..\Domain\src\BuberDinner.Domain.csproj" />
   </ItemGroup>
 
 </Project>

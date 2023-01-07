@@ -5,9 +5,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BuberDinner.Infrastructure\src\BuberDinner.Infrastructure.csproj" />
-    <ProjectReference Include="..\src\BuberDinner.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\src\BuberDinner.Infrastructure.csproj" />
   </ItemGroup>
+
 
   <ItemGroup>
     <None Update="appsettings.json">

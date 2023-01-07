@@ -8,7 +8,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BuberDinner.Application\src\BuberDinner.Application.csproj" />
+    <ProjectReference Include="..\..\Application\src\BuberDinner.Application.csproj" />
   </ItemGroup>
   
 </Project>
