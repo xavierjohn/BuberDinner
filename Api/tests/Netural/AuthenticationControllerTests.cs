@@ -23,7 +23,7 @@ public class AuthenticationControllerTests
         var url = @"authentication/login";
         var json = """
             {
-                "email":"someone@somewhere.com",
+                "userId":"xavierjohn2023",
                 "password":"Amiko1232!"
             }
             """;
@@ -33,9 +33,7 @@ public class AuthenticationControllerTests
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        response.Content.Headers.ContentType.ToString().Should().Be("application/json; charset=utf-8");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.        
+        response.Content.Headers.ContentType!.ToString().Should().Be("application/json; charset=utf-8");
     }
 
     [Fact, Priority(2)]
@@ -46,6 +44,7 @@ public class AuthenticationControllerTests
         var url = @"authentication/register";
         var json = """
             {
+                "userId":"xavierjohn2023",
                 "firstName":"Xavier",
                 "lastName":"John",
                 "email":"someone@somewhere.com",
@@ -68,7 +67,7 @@ public class AuthenticationControllerTests
         var url = @"authentication/login";
         var json = """
             {
-                "email":"someone@somewhere.com",
+                "userId":"xavierjohn2023",
                 "password":"Amiko1232!"
             }
             """;
@@ -92,10 +91,10 @@ public class AuthenticationControllerTests
         {
             firstName = "Xavier",
             lastName = "John",
-            email = "someone@somewhere.com"
+            userId = "xavierjohn2023"
         });
 
         if (registeredUser == null) return;
-        registeredUser.userId.Should().Be("someone@somewhere.com");
+        registeredUser.userId.Should().Be("xavierjohn2023");
     }
 }

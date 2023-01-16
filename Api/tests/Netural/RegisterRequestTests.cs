@@ -6,6 +6,7 @@ using BuberDinner.Domain.User.ValueObjects;
 public class RegisterRequestTests
 {
     [Theory]
+    [InlineData(nameof(UserId))]
     [InlineData(nameof(FirstName))]
     [InlineData(nameof(LastName))]
     [InlineData(nameof(EmailAddress))]
@@ -14,6 +15,7 @@ public class RegisterRequestTests
     {
         // Arrange
         var request = new RegisterRequest(
+        field == nameof(UserId) ? string.Empty : "XavierJohn2013",
         field == nameof(FirstName) ? string.Empty : "Xavier",
         field == nameof(LastName) ? string.Empty : "John",
         field == nameof(EmailAddress) ? "bad email" : "xavier@somewhere.com",
@@ -36,7 +38,7 @@ public class RegisterRequestTests
         var badFirstName = new Validation("firstName", "First Name cannot be empty");
         var badEmail = new Validation("email", "Email address is not valid");
 
-        var request = new RegisterRequest(string.Empty, "John", "bad email", "password");
+        var request = new RegisterRequest("id", string.Empty, "John", "bad email", "password");
 
         // Act
         var result = request.ToRegisterCommand();
@@ -54,7 +56,7 @@ public class RegisterRequestTests
     public void Can_create_RegisterCommand()
     {
         // Arrange
-        var request = new RegisterRequest("Xavier", "John", "xavier@somewhere.com", "password");
+        var request = new RegisterRequest("id", "Xavier", "John", "xavier@somewhere.com", "password");
 
         // Act
         var result = request.ToRegisterCommand();
@@ -62,6 +64,7 @@ public class RegisterRequestTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         var registerCommand = result.Value;
+        registerCommand.UserId.Should().Be(UserId.Create("id").Value);
         registerCommand.FirstName.Should().Be(FirstName.Create("Xavier").Value);
         registerCommand.LastName.Should().Be(LastName.Create("John").Value);
         registerCommand.Email.Should().Be(EmailAddress.Create("xavier@somewhere.com").Value);

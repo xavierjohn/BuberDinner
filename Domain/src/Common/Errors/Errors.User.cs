@@ -4,12 +4,12 @@ public partial class Errors
 {
     public static class User
     {
-        public static Error AlreadyExists(string email) => Error.Conflict(
-            code: "User.DuplicateEmail",
-            message: $"User with this email {email} already exists.");
+        public static Error AlreadyExists(string id) => Error.Conflict(
+            code: "User.DuplicateUserId",
+            message: $"User with this id {id} already exists.");
 
-        public static Error DoesNotExist(string email) => Error.NotFound(
+        public static Error DoesNotExist(string id) => Error.NotFound(
         code: "User.DoesNotExist",
-        message: $"User with this email {email} does not exist.");
+        message: $"User with this id {id} does not exist.");
     }
 }

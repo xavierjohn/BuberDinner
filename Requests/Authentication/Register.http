@@ -3,6 +3,7 @@ POST {{host}}/authentication/register
 Content-Type: application/json
 
 {
+    "userId": "xavierjohn2023",
     "firstName":"Xavier",
     "lastName":"John",
     "email":"someone@somewhere.com",

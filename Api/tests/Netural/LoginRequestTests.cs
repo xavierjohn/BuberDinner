@@ -6,13 +6,13 @@ using BuberDinner.Domain.User.ValueObjects;
 public class LoginRequestTests
 {
     [Theory]
-    [InlineData(nameof(EmailAddress))]
+    [InlineData(nameof(UserId))]
     [InlineData(nameof(Password))]
     public void Required_parameters_are_validated(string field)
     {
         // Arrange
         var request = new LoginRequest(
-        field == nameof(EmailAddress) ? "bad email" : "xavier@somewhere.com",
+        field == nameof(UserId) ? string.Empty : "xavierjohn2023",
         field == nameof(Password) ? string.Empty : "SuperStrongPassword"
         );
 
@@ -29,7 +29,7 @@ public class LoginRequestTests
     public void Can_create_LoginQuery()
     {
         // Arrange
-        var request = new LoginRequest("xavier@somewhere.com", "password");
+        var request = new LoginRequest("xavierjohn2023", "password");
 
         // Act
         var result = request.ToLoginQuery();
@@ -37,7 +37,7 @@ public class LoginRequestTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         var registerCommand = result.Value;
-        registerCommand.Email.Should().Be(EmailAddress.Create("xavier@somewhere.com").Value);
+        registerCommand.UserId.Should().Be(UserId.Create("xavierjohn2023").Value);
         registerCommand.Password.Should().Be(Password.Create("password").Value);
     }
 }

@@ -11,7 +11,7 @@ class User
 
 ```json
 {
-    "id": { "value": "00000000-0000-0000-0000-000000000000" },
+    "id": "someid",
     "firstName": "Tiffany",
     "lastName": "Doe",
     "email": "user@gmail.com",

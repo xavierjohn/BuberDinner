@@ -13,4 +13,8 @@
     <ProjectReference Include="..\..\Domain\src\BuberDinner.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Abstractions\Services\" />
+  </ItemGroup>
+
 </Project>

@@ -6,15 +6,15 @@ using BuberDinner.Domain.User.ValueObjects;
 /// <summary>
 /// Login request model.
 /// </summary>
-/// <param name="email">Email address</param>
+/// <param name="userId">User Id</param>
 /// <param name="password">Password</param>
 public record LoginRequest(
-    string email,
+    string userId,
     string password
 )
 {
     internal Result<LoginQuery> ToLoginQuery() =>
-        EmailAddress.Create(email)
+        UserId.Create(userId)
         .Combine(Password.Create(password))
-        .Bind((email, pwd) => LoginQuery.Create(email, pwd));
+        .Bind((userId, pwd) => LoginQuery.Create(userId, pwd));
 }

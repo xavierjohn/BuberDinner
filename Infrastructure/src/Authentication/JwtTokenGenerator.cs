@@ -1,7 +1,7 @@
 ﻿namespace BuberDinner.Infrastructure.Authentication;
 
-using BuberDinner.Application.Common.Interfaces.Authentication;
-using BuberDinner.Application.Common.Interfaces.Services;
+using BuberDinner.Application.Abstractions;
+using BuberDinner.Application.Abstractions.Authentication;
 using BuberDinner.Domain.User.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

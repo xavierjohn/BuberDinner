@@ -6,15 +6,15 @@ using Mediator;
 
 public class LoginQuery : IRequest<Result<AuthenticationResult>>
 {
-    private LoginQuery(EmailAddress email, Password password)
+    private LoginQuery(UserId userId, Password password)
     {
-        Email = email;
+        UserId = userId;
         Password = password;
     }
 
-    public EmailAddress Email { get; }
+    public UserId UserId { get; }
     public Password Password { get; }
 
-    public static Result<LoginQuery> Create(EmailAddress email, Password password) =>
-        new LoginQuery(email, password);
+    public static Result<LoginQuery> Create(UserId userId, Password password) =>
+        new LoginQuery(userId, password);
 }

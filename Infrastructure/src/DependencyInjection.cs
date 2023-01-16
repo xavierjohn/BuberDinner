@@ -1,9 +1,10 @@
 ﻿namespace BuberDinner.Infrastructure;
 
 using System.Text;
-using BuberDinner.Application.Common.Interfaces.Authentication;
-using BuberDinner.Application.Common.Interfaces.Persistence;
-using BuberDinner.Application.Common.Interfaces.Services;
+using BuberDinner.Application.Abstractions;
+using BuberDinner.Application.Abstractions.Authentication;
+using BuberDinner.Application.Abstractions.Persistence;
+using BuberDinner.Domain.User.Entities;
 using BuberDinner.Infrastructure.Authentication;
 using BuberDinner.Infrastructure.Persistence;
 using BuberDinner.Infrastructure.Services;
@@ -54,13 +55,13 @@ public static class DependencyInjection
         var cosmosDbClientSettings = new CosmosDbClientSettings();
         configuration.Bind(nameof(CosmosDbClientSettings), cosmosDbClientSettings);
         services.AddSingleton(CosmosClientFactory.InitializeCosmosClientInstance(cosmosDbClientSettings));
-        services.AddScoped<IUserRepository, UserCosmosDbRepository>();
+        services.AddScoped<IRepository<User>, UserCosmosDbRepository>();
         return services;
     }
 
     private static IServiceCollection AddInMemoryDb(this IServiceCollection services)
     {
-        services.AddScoped<IUserRepository, UserInMemoryRepository>();
+        services.AddScoped<IRepository<User>, UserInMemoryRepository>();
         return services;
     }
 }

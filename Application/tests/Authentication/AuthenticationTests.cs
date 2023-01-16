@@ -19,11 +19,12 @@
         public async Task Can_Register_new_User()
         {
             // Arrange
+            var userId = UserId.Create("xavierjohn2023").Value;
             var firstName = FirstName.Create("Xavier").Value;
             var lastName = LastName.Create("John").Value;
             var email = EmailAddress.Create("xavier@somewhere.com").Value;
             var password = Password.Create("SuperStrongPassword").Value;
-            var command = RegisterCommand.Create(firstName, lastName, email, password).Value;
+            var command = RegisterCommand.Create(userId, firstName, lastName, email, password).Value;
 
             // Act
             Result<Services.Authentication.Common.AuthenticationResult> result = await _sender.Send(command);
