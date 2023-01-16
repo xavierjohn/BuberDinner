@@ -3,21 +3,21 @@
 using BuberDinner.Domain.User.ValueObjects;
 using FluentValidation;
 
-public class User : Entity<EmailAddress>
+public class User : Entity<UserId>
 {
     public FirstName FirstName { get; }
     public LastName LastName { get; }
     public EmailAddress Email { get; }
     public Password Password { get; }
 
-    public static Result<User> Create(FirstName firstName, LastName lastName, EmailAddress email, Password password)
+    public static Result<User> Create(UserId id, FirstName firstName, LastName lastName, EmailAddress email, Password password)
     {
-        var user = new User(firstName, lastName, email, password);
+        var user = new User(id, firstName, lastName, email, password);
         return s_validator.ValidateToResult(user);
     }
 
-    private User(FirstName firstName, LastName lastName, EmailAddress email, Password password)
-        : base(email)
+    private User(UserId id, FirstName firstName, LastName lastName, EmailAddress email, Password password)
+        : base(id)
     {
         FirstName = firstName;
         LastName = lastName;

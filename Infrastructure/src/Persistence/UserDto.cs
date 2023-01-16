@@ -28,6 +28,7 @@ public static class UserDtoExtentions
         userDto is null
         ? Maybe.None<User>()
         : User.Create(
+            UserId.Create(userDto.Id).Value,
             FirstName.Create(userDto.FirstName).Value,
             LastName.Create(userDto.LastName).Value,
             EmailAddress.Create(userDto.Email).Value,

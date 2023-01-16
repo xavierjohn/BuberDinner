@@ -7,6 +7,7 @@ using BuberDinner.Domain.User.ValueObjects;
 public class UserTests
 {
     [Theory]
+    [InlineData(nameof(User.Id))]
     [InlineData(nameof(User.FirstName))]
     [InlineData(nameof(User.LastName))]
     [InlineData(nameof(User.Email))]
@@ -14,6 +15,7 @@ public class UserTests
     public void Required_parameters_are_validated(string field)
     {
         // Arrange
+        UserId? id = field == nameof(User.Id) ? default : UserId.Create("xavierjohn2023").Value;
         FirstName? firstName = field == nameof(User.FirstName) ? default : FirstName.Create("Xavier").Value;
         LastName? lastName = field == nameof(User.LastName) ? default : LastName.Create("John").Value;
         EmailAddress? email = field == nameof(User.Email) ? default : EmailAddress.Create("xavier@somewhere.com").Value;
@@ -21,7 +23,7 @@ public class UserTests
 
         // Act
 #pragma warning disable CS8604 // Possible null reference argument.
-        var userResult = User.Create(firstName, lastName, email, password);
+        var userResult = User.Create(id, firstName, lastName, email, password);
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
