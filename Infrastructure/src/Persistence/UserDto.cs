@@ -27,10 +27,10 @@ public static class UserDtoExtentions
     public static Maybe<User> ToUser(this UserDto? userDto) =>
         userDto is null
         ? Maybe.None<User>()
-        : User.Create(
-            UserId.Create(userDto.Id).Value,
-            FirstName.Create(userDto.FirstName).Value,
-            LastName.Create(userDto.LastName).Value,
-            EmailAddress.Create(userDto.Email).Value,
-            Password.Create(userDto.Password).Value).Value;
+        : User.New(
+            UserId.New(userDto.Id).Value,
+            FirstName.New(userDto.FirstName).Value,
+            LastName.New(userDto.LastName).Value,
+            EmailAddress.New(userDto.Email).Value,
+            Password.New(userDto.Password).Value).Value;
 }

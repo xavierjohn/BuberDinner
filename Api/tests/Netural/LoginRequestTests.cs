@@ -21,8 +21,7 @@ public class LoginRequestTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().HaveCount(1);
-        result.Error.Should().BeOfType(typeof(Validation));
+        result.Error.Should().BeOfType(typeof(ValidationError));
     }
 
     [Fact]
@@ -37,7 +36,7 @@ public class LoginRequestTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         var registerCommand = result.Value;
-        registerCommand.UserId.Should().Be(UserId.Create("xavierjohn2023").Value);
-        registerCommand.Password.Should().Be(Password.Create("password").Value);
+        registerCommand.UserId.Should().Be(UserId.New("xavierjohn2023").Value);
+        registerCommand.Password.Should().Be(Password.New("password").Value);
     }
 }

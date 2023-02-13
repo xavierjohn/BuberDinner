@@ -27,16 +27,15 @@ public class RegisterRequestTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().HaveCount(1);
-        result.Error.Should().BeOfType(typeof(Validation));
+        result.Error.Should().BeOfType(typeof(ValidationError));
     }
 
     [Fact]
     public void Multiple_parameters_are_validated()
     {
         // Arrange
-        var badFirstName = new Validation("firstName", "First Name cannot be empty");
-        var badEmail = new Validation("email", "Email address is not valid");
+        var badFirstName = new ValidationError.ModelError("First Name cannot be empty", "firstName");
+        var badEmail = new ValidationError.ModelError("Email address is not valid", "email");
 
         var request = new RegisterRequest("id", string.Empty, "John", "bad email", "password");
 
@@ -45,11 +44,10 @@ public class RegisterRequestTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().HaveCount(2);
-        result.Errors[0].Should().BeOfType(typeof(Validation));
-        result.Errors[0].Should().Be(badFirstName);
-        result.Errors[1].Should().BeOfType(typeof(Validation));
-        result.Errors[1].Should().Be(badEmail);
+        result.Error.Should().BeOfType(typeof(ValidationError));
+        var validationError = (ValidationError)result.Error;
+        validationError.Errors[0].Should().Be(badFirstName);
+        validationError.Errors[1].Should().Be(badEmail);
     }
 
     [Fact]
@@ -64,10 +62,10 @@ public class RegisterRequestTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         var registerCommand = result.Value;
-        registerCommand.UserId.Should().Be(UserId.Create("id").Value);
-        registerCommand.FirstName.Should().Be(FirstName.Create("Xavier").Value);
-        registerCommand.LastName.Should().Be(LastName.Create("John").Value);
-        registerCommand.Email.Should().Be(EmailAddress.Create("xavier@somewhere.com").Value);
-        registerCommand.Password.Should().Be(Password.Create("password").Value);
+        registerCommand.UserId.Should().Be(UserId.New("id").Value);
+        registerCommand.FirstName.Should().Be(FirstName.New("Xavier").Value);
+        registerCommand.LastName.Should().Be(LastName.New("John").Value);
+        registerCommand.Email.Should().Be(EmailAddress.New("xavier@somewhere.com").Value);
+        registerCommand.Password.Should().Be(Password.New("password").Value);
     }
 }

@@ -19,15 +19,15 @@
         public async Task Can_Register_new_User()
         {
             // Arrange
-            var userId = UserId.Create("xavierjohn2023").Value;
-            var firstName = FirstName.Create("Xavier").Value;
-            var lastName = LastName.Create("John").Value;
-            var email = EmailAddress.Create("xavier@somewhere.com").Value;
-            var password = Password.Create("SuperStrongPassword").Value;
-            var command = RegisterCommand.Create(userId, firstName, lastName, email, password).Value;
+            var userId = UserId.New("xavierjohn2023").Value;
+            var firstName = FirstName.New("Xavier").Value;
+            var lastName = LastName.New("John").Value;
+            var email = EmailAddress.New("xavier@somewhere.com").Value;
+            var password = Password.New("SuperStrongPassword").Value;
+            var command = RegisterCommand.New(userId, firstName, lastName, email, password).Value;
 
             // Act
-            Result<Services.Authentication.Common.AuthenticationResult> result = await _sender.Send(command);
+            Result<Services.Authentication.Common.AuthenticationResult, Error> result = await _sender.Send(command);
 
             // Assert
             result.IsSuccess.Should().BeTrue();

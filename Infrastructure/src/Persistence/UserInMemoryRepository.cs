@@ -14,22 +14,22 @@ internal class UserInMemoryRepository : IRepository<User>
         throw new NotImplementedException();
     }
 
-    public Task Add(User user, CancellationToken cancellationToken)
+    public ValueTask Add(User user, CancellationToken cancellationToken)
     {
         s_users.Add(user);
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
-    public Task Update(User entity, CancellationToken cancellationToken)
+    public ValueTask Update(User entity, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public Task Delete(User entity, CancellationToken cancellationToken)
+    public ValueTask Delete(User entity, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Maybe<User>> FindById(string id, CancellationToken cancellationToken) =>
-    Task.FromResult(s_users.SingleOrDefault(u => u.Id == id) ?? Maybe.None<User>());
+    public ValueTask<Maybe<User>> FindById(string id, CancellationToken cancellationToken) =>
+    ValueTask.FromResult(s_users.SingleOrDefault(u => u.Id == id) ?? Maybe.None<User>());
 
 }
