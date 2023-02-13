@@ -35,11 +35,11 @@ public class AuthenticationController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("register")]
-    public async Task<ActionResult<AuthenticationResponse>> Register(RegisterRequest request) =>
+    public async ValueTask<ActionResult<AuthenticationResponse>> Register(RegisterRequest request) =>
         await request.ToRegisterCommand()
         .BindAsync(command => _sender.Send(command))
         .MapAsync(_mapper.Map<AuthenticationResponse>)
-        .ToActionResultAsync(this);
+        .ToOkActionResultAsync(this);
 
     /// <summary>
     /// Login for existing user.
@@ -51,5 +51,5 @@ public class AuthenticationController : ControllerBase
         await request.ToLoginQuery()
         .BindAsync(command => _sender.Send(command))
         .MapAsync(_mapper.Map<AuthenticationResponse>)
-        .ToActionResultAsync(this);
+        .ToOkActionResultAsync(this);
 }

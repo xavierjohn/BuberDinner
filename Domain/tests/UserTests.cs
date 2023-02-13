@@ -15,29 +15,30 @@ public class UserTests
     public void Required_parameters_are_validated(string field)
     {
         // Arrange
-        UserId? id = field == nameof(User.Id) ? default : UserId.Create("xavierjohn2023").Value;
-        FirstName? firstName = field == nameof(User.FirstName) ? default : FirstName.Create("Xavier").Value;
-        LastName? lastName = field == nameof(User.LastName) ? default : LastName.Create("John").Value;
-        EmailAddress? email = field == nameof(User.Email) ? default : EmailAddress.Create("xavier@somewhere.com").Value;
-        Password? password = field == nameof(User.Password) ? default : Password.Create("you can't crack this.").Value;
+        UserId? id = field == nameof(User.Id) ? default : UserId.New("xavierjohn2023").Value;
+        FirstName? firstName = field == nameof(User.FirstName) ? default : FirstName.New("Xavier").Value;
+        LastName? lastName = field == nameof(User.LastName) ? default : LastName.New("John").Value;
+        EmailAddress? email = field == nameof(User.Email) ? default : EmailAddress.New("xavier@somewhere.com").Value;
+        Password? password = field == nameof(User.Password) ? default : Password.New("you can't crack this.").Value;
 
         // Act
 #pragma warning disable CS8604 // Possible null reference argument.
-        var userResult = User.Create(id, firstName, lastName, email, password);
+        var userResult = User.New(id, firstName, lastName, email, password);
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
         userResult.IsFailure.Should().BeTrue();
-        userResult.Error.Should().BeOfType<Validation>();
-        userResult.Error.Message.Should().EndWith($" must not be empty."); ;
+        userResult.Error.Should().BeOfType<ValidationError>();
+        var validationError = (ValidationError)userResult.Error;
+        validationError.Errors[0].Message.Should().EndWith($" must not be empty."); ;
     }
 
     [Fact]
     public void Different_passwords_are_not_the_same()
     {
         // Arrange
-        Password pwd1 = Password.Create("Hello").Value;
-        Password pwd2 = Password.Create("There").Value;
+        Password pwd1 = Password.New("Hello").Value;
+        Password pwd2 = Password.New("There").Value;
 
         // Act
         bool result1 = pwd1 == pwd2;
@@ -53,8 +54,8 @@ public class UserTests
     public void Two_passwords_of_the_same_content_are_equal()
     {
         // Arrange
-        Password pwd1 = Password.Create("Hello").Value;
-        Password pwd2 = Password.Create("Hello").Value;
+        Password pwd1 = Password.New("Hello").Value;
+        Password pwd2 = Password.New("Hello").Value;
 
         // Act
         bool result1 = pwd1 == pwd2;

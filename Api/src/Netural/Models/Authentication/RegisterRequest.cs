@@ -20,12 +20,12 @@ public record RegisterRequest(
 )
 {
 
-    internal Result<RegisterCommand> ToRegisterCommand() =>
-        UserId.Create(userId)
-        .Combine(FirstName.Create(firstName))
-        .Combine(LastName.Create(lastName))
-        .Combine(EmailAddress.Create(email))
-        .Combine(Password.Create(password))
-        .Bind((userId, firstName, lastName, email, pwd) => RegisterCommand.Create(userId, firstName, lastName, email, pwd));
+    internal Result<RegisterCommand, Error> ToRegisterCommand() =>
+        UserId.New(userId)
+        .Combine(FirstName.New(firstName))
+        .Combine(LastName.New(lastName))
+        .Combine(EmailAddress.New(email))
+        .Combine(Password.New(password))
+        .Bind(RegisterCommand.New);
 };
 

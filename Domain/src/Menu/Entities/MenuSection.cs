@@ -11,9 +11,9 @@ public class MenuSection : Entity<MenuSectionId>
 
     private readonly List<MenuItem> _menuItems = new();
 
-    public static Result<MenuSection> Create(string name, string description)
+    public static Result<MenuSection, Error> Create(string name, string description)
     {
-        MenuSection menuItem = new(MenuSectionId.CreateUnique(), name, description);
+        MenuSection menuItem = new(MenuSectionId.NewUnique(), name, description);
         return s_validator.ValidateToResult(menuItem);
     }
 

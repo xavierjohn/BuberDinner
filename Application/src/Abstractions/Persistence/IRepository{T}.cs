@@ -5,8 +5,8 @@ using FunctionalDDD;
 public interface IRepository<T> where T : class
 {
     IEnumerable<T> GetAll(CancellationToken cancellationToken);
-    Task Add(T entity, CancellationToken cancellationToken);
-    Task Update(T entity, CancellationToken cancellationToken);
-    Task Delete(T entity, CancellationToken cancellationToken);
-    Task<Maybe<T>> FindById(string id, CancellationToken cancellationToken);
+    ValueTask Add(T entity, CancellationToken cancellationToken);
+    ValueTask Update(T entity, CancellationToken cancellationToken);
+    ValueTask Delete(T entity, CancellationToken cancellationToken);
+    ValueTask<Maybe<T>> FindById(string id, CancellationToken cancellationToken);
 }

@@ -11,7 +11,7 @@ using Mediator;
 
 
 public class RegisterCommandHandler :
-    IRequestHandler<RegisterCommand, Result<AuthenticationResult>>
+    IRequestHandler<RegisterCommand, Result<AuthenticationResult, Error>>
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IRepository<User> _userRepository;
@@ -22,7 +22,7 @@ public class RegisterCommandHandler :
         _userRepository = userRepository;
     }
 
-    public ValueTask<Result<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken) =>
+    public ValueTask<Result<AuthenticationResult, Error>> Handle(RegisterCommand request, CancellationToken cancellationToken) =>
         ValidateUserDoesNotExist(request.UserId, cancellationToken)
             .BindAsync(email => CreateUser(request, cancellationToken))
             .BindAsync(user =>
@@ -31,15 +31,15 @@ public class RegisterCommandHandler :
                 return Result.Success(new AuthenticationResult(user, token));
             });
 
-    private Result<User> CreateUser(RegisterCommand command, CancellationToken cancellationToken) =>
-        User.Create(command.UserId, command.FirstName, command.LastName, command.Email, command.Password)
-        .Tap(user => _userRepository.Add(user, cancellationToken));
+    private async ValueTask<Result<User, Error>> CreateUser(RegisterCommand command, CancellationToken cancellationToken) =>
+        await User.New(command.UserId, command.FirstName, command.LastName, command.Email, command.Password)
+        .TeeAsync(user => _userRepository.Add(user, cancellationToken));
 
-    private async ValueTask<Result<string>> ValidateUserDoesNotExist(UserId id, CancellationToken cancellationToken)
+    private async ValueTask<Result<string, Error>> ValidateUserDoesNotExist(UserId id, CancellationToken cancellationToken)
     {
         var maybeUser = await _userRepository.FindById(id, cancellationToken);
         if (maybeUser.HasValue)
-            return Result.Failure<string>(new ErrorList { Errors.User.AlreadyExists(id) });
+            return Result.Failure<string>(Errors.User.AlreadyExists(id));
         return Result.Success<string>(id);
     }
 

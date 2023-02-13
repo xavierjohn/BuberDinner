@@ -26,24 +26,24 @@ internal class UserCosmosDbRepository : IRepository<User>
         throw new NotImplementedException();
     }
 
-    public async Task Add(User user, CancellationToken cancellationToken)
+    public async ValueTask Add(User user, CancellationToken cancellationToken)
     {
         var userDto = user.ToDto();
         await container.UpsertItemAsync(userDto, new PartitionKey(userDto.Id), cancellationToken: cancellationToken);
     }
 
-    public Task Update(User entity, CancellationToken cancellationToken)
+    public ValueTask Update(User entity, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public Task Delete(User entity, CancellationToken cancellationToken)
+    public ValueTask Delete(User entity, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
 
-    public async Task<Maybe<User>> FindById(string id, CancellationToken cancellationToken)
+    public async ValueTask<Maybe<User>> FindById(string id, CancellationToken cancellationToken)
     {
         try
         {

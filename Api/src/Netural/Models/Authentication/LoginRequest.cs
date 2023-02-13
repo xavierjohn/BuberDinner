@@ -13,8 +13,8 @@ public record LoginRequest(
     string password
 )
 {
-    internal Result<LoginQuery> ToLoginQuery() =>
-        UserId.Create(userId)
-        .Combine(Password.Create(password))
-        .Bind((userId, pwd) => LoginQuery.Create(userId, pwd));
+    internal Result<LoginQuery, Error> ToLoginQuery() =>
+        UserId.New(userId)
+        .Combine(Password.New(password))
+        .Bind((userId, pwd) => LoginQuery.New(userId, pwd));
 }

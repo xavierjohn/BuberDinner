@@ -5,9 +5,9 @@ using BuberDinner.Domain.User.ValueObjects;
 using Mediator;
 
 public class RegisterCommand
-    : IRequest<Result<AuthenticationResult>>
+    : IRequest<Result<AuthenticationResult, Error>>
 {
-    public static Result<RegisterCommand> Create(UserId id, FirstName firstName, LastName lastName, EmailAddress email, Password password) =>
+    public static Result<RegisterCommand, Error> New(UserId id, FirstName firstName, LastName lastName, EmailAddress email, Password password) =>
             new RegisterCommand(id, firstName, lastName, email, password);
 
     public UserId UserId { get; }

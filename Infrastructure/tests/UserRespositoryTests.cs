@@ -5,7 +5,7 @@ using BuberDinner.Domain.User.ValueObjects;
 using BuberDinner.Infrastructure.Persistence;
 using Xunit.Categories;
 
-[Category("Integration")]
+[Category("ComponentTests")]
 public class UserRespositoryTests : IClassFixture<CosmosDbFixture>
 {
     private readonly CosmosDbFixture _cosmosDbFixture;
@@ -18,12 +18,12 @@ public class UserRespositoryTests : IClassFixture<CosmosDbFixture>
     {
         // Arrange
         UserCosmosDbRepository rep = new(_cosmosDbFixture.CosmosClient, new UserCosmosDbContainerSettings());
-        var userId = UserId.Create("xavierjohn2023").Value;
-        var firstName = FirstName.Create("Xavier").Value;
-        var lastName = LastName.Create("John").Value;
-        var email = EmailAddress.Create("xavier@somewhere.com").Value;
-        var password = Password.Create("Amiko1232!").Value;
-        User user = User.Create(userId, firstName, lastName, email, password).Value;
+        var userId = UserId.New("xavierjohn2023").Value;
+        var firstName = FirstName.New("Xavier").Value;
+        var lastName = LastName.New("John").Value;
+        var email = EmailAddress.New("xavier@somewhere.com").Value;
+        var password = Password.New("Amiko1232!").Value;
+        User user = User.New(userId, firstName, lastName, email, password).Value;
 
 
         // Act
