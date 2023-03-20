@@ -24,9 +24,9 @@ public static class UserDtoExtentions
             Password = user.Password
         };
 
-    public static Maybe<User> ToUser(this UserDto? userDto) =>
+    public static User? ToUser(this UserDto? userDto) =>
         userDto is null
-        ? Maybe.None<User>()
+        ? null
         : User.New(
             UserId.New(userDto.Id).Value,
             FirstName.New(userDto.FirstName).Value,

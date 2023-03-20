@@ -8,5 +8,5 @@ public interface IRepository<T> where T : class
     ValueTask Add(T entity, CancellationToken cancellationToken);
     ValueTask Update(T entity, CancellationToken cancellationToken);
     ValueTask Delete(T entity, CancellationToken cancellationToken);
-    ValueTask<Maybe<T>> FindById(string id, CancellationToken cancellationToken);
+    ValueTask<T?> FindById(string id, CancellationToken cancellationToken);
 }

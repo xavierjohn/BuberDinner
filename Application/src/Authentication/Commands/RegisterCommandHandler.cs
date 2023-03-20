@@ -37,8 +37,8 @@ public class RegisterCommandHandler :
 
     private async ValueTask<Result<string, Error>> ValidateUserDoesNotExist(UserId id, CancellationToken cancellationToken)
     {
-        var maybeUser = await _userRepository.FindById(id, cancellationToken);
-        if (maybeUser.HasValue)
+        var user = await _userRepository.FindById(id, cancellationToken);
+        if (user is not null)
             return Result.Failure<string>(Errors.User.AlreadyExists(id));
         return Result.Success<string>(id);
     }
