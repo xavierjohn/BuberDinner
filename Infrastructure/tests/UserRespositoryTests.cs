@@ -28,11 +28,11 @@ public class UserRespositoryTests : IClassFixture<CosmosDbFixture>
 
         // Act
         await rep.Add(user, CancellationToken.None);
-        var maybeUser = await rep.FindById(userId, CancellationToken.None);
+        User? dbuser = await rep.FindById(userId, CancellationToken.None);
 
         // Assert
-        maybeUser.HasValue.Should().BeTrue();
-        User dbuser = maybeUser.Value;
+        dbuser.Should().NotBeNull();
+        if (dbuser == null) return;
         dbuser.Should().Be(user); // For entity only Id is checked for equality.
         dbuser.Id.Should().Be(userId);
         dbuser.FirstName.Should().Be(firstName);

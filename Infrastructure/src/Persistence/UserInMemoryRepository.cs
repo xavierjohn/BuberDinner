@@ -2,7 +2,6 @@
 
 using BuberDinner.Application.Abstractions.Persistence;
 using BuberDinner.Domain.User.Entities;
-using FunctionalDDD;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,7 +28,6 @@ internal class UserInMemoryRepository : IRepository<User>
         throw new NotImplementedException();
     }
 
-    public ValueTask<Maybe<User>> FindById(string id, CancellationToken cancellationToken) =>
-    ValueTask.FromResult(s_users.SingleOrDefault(u => u.Id == id) ?? Maybe.None<User>());
-
+    public ValueTask<User?> FindById(string id, CancellationToken cancellationToken) =>
+        ValueTask.FromResult(s_users.SingleOrDefault(u => u.Id == id));
 }

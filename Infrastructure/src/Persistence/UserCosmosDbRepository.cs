@@ -43,7 +43,7 @@ internal class UserCosmosDbRepository : IRepository<User>
     }
 
 
-    public async ValueTask<Maybe<User>> FindById(string id, CancellationToken cancellationToken)
+    public async ValueTask<User?> FindById(string id, CancellationToken cancellationToken)
     {
         try
         {
@@ -52,7 +52,7 @@ internal class UserCosmosDbRepository : IRepository<User>
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            return Maybe.None<User>();
+            return null;
         }
     }
 }
