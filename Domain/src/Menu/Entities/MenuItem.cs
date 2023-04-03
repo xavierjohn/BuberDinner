@@ -7,7 +7,7 @@ public class MenuItem : Entity<MenuItemId>
     public string Name { get; }
     public string Description { get; }
 
-    public static Result<MenuItem, Error> Create(string name, string description)
+    public static Result<MenuItem> Create(string name, string description)
     {
         MenuItem menuItem = new(MenuItemId.NewUnique(), name, description);
         return s_validator.ValidateToResult(menuItem);

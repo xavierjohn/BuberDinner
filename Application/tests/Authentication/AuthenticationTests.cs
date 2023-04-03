@@ -27,7 +27,7 @@
             var command = RegisterCommand.New(userId, firstName, lastName, email, password).Value;
 
             // Act
-            Result<Services.Authentication.Common.AuthenticationResult, Error> result = await _sender.Send(command);
+            Result<Services.Authentication.Common.AuthenticationResult> result = await _sender.Send(command);
 
             // Assert
             result.IsSuccess.Should().BeTrue();

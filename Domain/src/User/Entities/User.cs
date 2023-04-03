@@ -10,7 +10,7 @@ public class User : Entity<UserId>
     public EmailAddress Email { get; }
     public Password Password { get; }
 
-    public static Result<User, Error> New(UserId id, FirstName firstName, LastName lastName, EmailAddress email, Password password)
+    public static Result<User> New(UserId id, FirstName firstName, LastName lastName, EmailAddress email, Password password)
     {
         var user = new User(id, firstName, lastName, email, password);
         return s_validator.ValidateToResult(user);

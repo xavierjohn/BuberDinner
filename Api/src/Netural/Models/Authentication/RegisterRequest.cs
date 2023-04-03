@@ -20,7 +20,7 @@ public record RegisterRequest(
 )
 {
 
-    internal Result<RegisterCommand, Error> ToRegisterCommand() =>
+    internal Result<RegisterCommand> ToRegisterCommand() =>
         UserId.New(userId)
         .Combine(FirstName.New(firstName))
         .Combine(LastName.New(lastName))
