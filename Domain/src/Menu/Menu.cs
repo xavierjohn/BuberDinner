@@ -16,7 +16,7 @@
         private readonly List<MenuSection> _menuSections = new();
         private readonly List<DinnerId> _dinnerIds = new();
 
-        public static Result<Menu, Error> Create(string name, string description, HostId host)
+        public static Result<Menu> Create(string name, string description, HostId host)
         {
             Menu menu = new(MenuId.NewUnique(), name, description, host);
             return s_validator.ValidateToResult(menu);
