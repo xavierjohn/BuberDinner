@@ -5,7 +5,8 @@
 Allows you to turn your home into a restaurant where...
 Just like people turning their homes into hotels via AirBNB.
 
-What these YouTube vidoes for the background.
+Watch these YouTube vidoes for the background.
+
 [![REST API following CLEAN ARCHITECTURE & DDD Tutorial](https://img.youtube.com/vi/fhM0V2N1GpY/0.jpg)](https://www.youtube.com/watch?v=fhM0V2N1GpY&list=PLzYkqgWkHPKBcDIP5gzLfASkQyTdy0t4k)
 
 
