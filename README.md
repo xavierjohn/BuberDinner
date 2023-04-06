@@ -5,12 +5,18 @@
 Allows you to turn your home into a restaurant where...
 Just like people turning their homes into hotels via AirBNB.
 
+What these YouTube vidoes for the background.
+[![REST API following CLEAN ARCHITECTURE & DDD Tutorial](https://img.youtube.com/vi/fhM0V2N1GpY/0.jpg)](https://www.youtube.com/watch?v=fhM0V2N1GpY&list=PLzYkqgWkHPKBcDIP5gzLfASkQyTdy0t4k)
+
+
+This project is also a sample for [FunctionalDDD](https://github.com/xavierjohn/FunctionalDDD) which is a library that helps you to implement Domain-Driven Design in a functional way.
+
 ## Concepts & Tech used
 
 * .NET 7, EF Core
 * Clean Architecture & Domain-Driven Design principles
 * Common patterns such as CQRS, unit of work, repository, mediator
-* Open source libraries such as Mediator, FluentValidation, CSharpFunctionalExtensions, Mapster
+* Open source libraries such as Mediator, FluentValidation, FunctionalDDD, Mapster
 * Authentication: JWT tokens
 
 ### Clean Architecture
