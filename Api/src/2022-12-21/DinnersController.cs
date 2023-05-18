@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [ApiVersion("2022-10-01")]
 [Route("[controller]")]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status200OK)]
 public class DinnersController : ControllerBase
 {
     /// <summary>

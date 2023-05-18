@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [AllowAnonymous]
 [ApiVersionNeutral]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status200OK)]
 [Route("[controller]")]
 public class AuthenticationController : ControllerBase
 {
