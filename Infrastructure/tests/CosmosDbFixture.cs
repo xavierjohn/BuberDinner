@@ -1,7 +1,7 @@
 ﻿namespace BuberDinner.Infrastructure.Tests;
 
 using System.Threading.Tasks;
-using BuberDinner.Infrastructure.Persistence;
+using BuberDinner.Infrastructure.Persistence.Cosmos;
 using Microsoft.Azure.Cosmos;
 
 public class CosmosDbFixture : IAsyncLifetime

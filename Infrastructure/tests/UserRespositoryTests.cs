@@ -2,7 +2,7 @@
 
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
-using BuberDinner.Infrastructure.Persistence;
+using BuberDinner.Infrastructure.Persistence.Cosmos;
 using Xunit.Categories;
 
 [Category("ComponentTests")]

@@ -1,23 +1,38 @@
 ﻿namespace BuberDinner.Domain.Menu.Entities;
+
+using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Menu.ValueObject;
 using FluentValidation;
 
 public class MenuSection : Entity<MenuSectionId>
 {
-    public string Name { get; }
-    public string Description { get; }
+    public Name Name { get; }
+    public Description Description { get; }
 
     public IReadOnlyList<MenuItem> Items => _menuItems.AsReadOnly();
 
     private readonly List<MenuItem> _menuItems = new();
 
-    public static Result<MenuSection> Create(string name, string description)
+    public static Result<MenuSection> New(
+        Name name,
+        Description description,
+        IReadOnlyList<MenuItem> items)
     {
-        MenuSection menuItem = new(MenuSectionId.NewUnique(), name, description);
-        return s_validator.ValidateToResult(menuItem);
+        return New(MenuSectionId.NewUnique(), name, description, items);
     }
 
-    private MenuSection(MenuSectionId menuItemId, string name, string description)
+    public static Result<MenuSection> New(
+        MenuSectionId menuSectionId,
+        Name name,
+        Description description,
+        IReadOnlyList<MenuItem> items)
+    {
+        MenuSection menuSection = new(menuSectionId, name, description);
+        menuSection._menuItems.AddRange(items);
+        return s_validator.ValidateToResult(menuSection);
+    }
+
+    private MenuSection(MenuSectionId menuItemId, Name name, Description description)
         : base(menuItemId)
     {
         Name = name;
