@@ -2,7 +2,7 @@
 
 using Asp.Versioning;
 using BuberDinner.Api.Neutral.Models.Authentication;
-using MapsterMapper;
+using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +18,14 @@ using Microsoft.AspNetCore.Mvc;
 public class AuthenticationController : ControllerBase
 {
     private readonly ISender _sender;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="sender"></param>
-    /// <param name="mapper"></param>
-    public AuthenticationController(ISender sender, IMapper mapper)
+    public AuthenticationController(ISender sender)
     {
         _sender = sender;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -40,7 +37,7 @@ public class AuthenticationController : ControllerBase
     public async ValueTask<ActionResult<AuthenticationResponse>> Register(RegisterRequest request) =>
         await request.ToRegisterCommand()
         .BindAsync(command => _sender.Send(command))
-        .MapAsync(_mapper.Map<AuthenticationResponse>)
+        .MapAsync(authResult => authResult.Adapt<AuthenticationResponse>())
         .ToOkActionResultAsync(this);
 
     /// <summary>
@@ -52,6 +49,6 @@ public class AuthenticationController : ControllerBase
     public async Task<ActionResult<AuthenticationResponse>> Login(LoginRequest request) =>
         await request.ToLoginQuery()
         .BindAsync(command => _sender.Send(command))
-        .MapAsync(_mapper.Map<AuthenticationResponse>)
+        .MapAsync(authResult => authResult.Adapt<AuthenticationResponse>())
         .ToOkActionResultAsync(this);
 }

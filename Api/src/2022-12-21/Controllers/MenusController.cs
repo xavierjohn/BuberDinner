@@ -2,7 +2,7 @@
 
 using Asp.Versioning;
 using BuberDinner.Api._2022_12_21.Models.Menus;
-using MapsterMapper;
+using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,17 +16,14 @@ using Microsoft.AspNetCore.Mvc;
 public class MenusController : ControllerBase
 {
     private readonly ISender _sender;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// Creates an instance of the <see cref="MenusController" /> class
     /// </summary>
     /// <param name="sender">The <see cref="ISender"/> instance</param>
-    /// <param name="mapper">The <see cref="IMapper"/> instance</param>
-    public MenusController(ISender sender, IMapper mapper)
+    public MenusController(ISender sender)
     {
         _sender = sender;
-        _mapper = mapper;
     }
 
     /// <summary>
@@ -39,7 +36,7 @@ public class MenusController : ControllerBase
     public async ValueTask<ActionResult<CreateMenuResponse>> CreateMenu(CreateMenuRequest request, string hostId) =>
          await request.ToCreateMenuCommand(hostId)
         .BindAsync(command => _sender.Send(command))
-        .MapAsync(_mapper.Map<CreateMenuResponse>)
+        .MapAsync(menu => menu.Adapt<CreateMenuResponse>())
         .ToOkActionResultAsync(this);
 
 }
