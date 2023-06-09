@@ -83,5 +83,6 @@ public class Menu : AggregateRoot<MenuId>
     {
         v => v.RuleFor(x => x.Name).NotEmpty(),
         v => v.RuleFor(x => x.Description).NotEmpty(),
+        v => v.RuleFor(x => x.Sections).NotEmpty()
     };
 }

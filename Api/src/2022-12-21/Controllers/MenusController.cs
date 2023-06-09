@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 [ApiVersion("2022-10-01")]
 [Route("hosts/{hostId}/menus")]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status201Created)]
 public class MenusController : ControllerBase
 {
     private readonly ISender _sender;
@@ -32,11 +32,12 @@ public class MenusController : ControllerBase
     /// <param name="request">The <see cref="CreateMenuRequest"/></param>
     /// <param name="hostId">The id of the host creating the menu</param>
     /// <returns>A <see cref="CreateMenuResponse"/> result containing the newly created menu</returns>
-    [HttpPost]
+    [HttpPost("create")]
     public async ValueTask<ActionResult<CreateMenuResponse>> CreateMenu(CreateMenuRequest request, string hostId) =>
          await request.ToCreateMenuCommand(hostId)
         .BindAsync(command => _sender.Send(command))
         .MapAsync(menu => menu.Adapt<CreateMenuResponse>())
-        .ToOkActionResultAsync(this);
-
+        .FinallyAsync(
+             result => CreatedAtAction("Get", new { id = result.Id }, result),
+             result => result.ToErrorActionResult<CreateMenuResponse>(this));
 }

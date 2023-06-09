@@ -15,13 +15,13 @@ using NameClass = Domain.Common.ValueObjects.Name;
 public record CreateMenuRequest(
     string Name,
     string Description,
-    List<MenuSection> Sections)
+    List<MenuSectionRequest> Sections)
 {
     internal Result<CreateMenuCommand> ToCreateMenuCommand(string hostId) =>
         NameClass.New(this.Name)
         .Combine(DescriptionClass.New(this.Description))
         .Combine(this.GetMenuSectionCommands())
-        .Combine(HostId.New(Guid.Parse(hostId)))
+        .Combine(HostId.New(hostId))
         .Bind(CreateMenuCommand.New);
 
     private Result<IReadOnlyList<MenuSectionCommand>> GetMenuSectionCommands() =>
@@ -36,10 +36,10 @@ public record CreateMenuRequest(
 /// <param name="Name">The menu section name</param>
 /// <param name="Description">The menu section description</param>
 /// <param name="Items">List of menu items</param>
-public record MenuSection(
+public record MenuSectionRequest(
     string Name,
     string Description,
-    List<MenuItem> Items)
+    List<MenuItemRequest> Items)
 {
     internal Result<MenuSectionCommand> ToMenuSectionCommand() =>
         NameClass.New(this.Name)
@@ -58,7 +58,7 @@ public record MenuSection(
 /// </summary>
 /// <param name="Name">The menu item name</param>
 /// <param name="Description">The menu item description</param>
-public record MenuItem(
+public record MenuItemRequest(
     string Name,
     string Description)
 {

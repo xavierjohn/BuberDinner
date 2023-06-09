@@ -43,5 +43,6 @@ public class MenuSection : Entity<MenuSectionId>
     {
         v => v.RuleFor(x => x.Name).NotEmpty(),
         v => v.RuleFor(x => x.Description).NotEmpty(),
+        v => v.RuleFor(x => x.Items).NotEmpty()
     };
 }
