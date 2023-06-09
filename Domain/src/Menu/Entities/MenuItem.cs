@@ -29,6 +29,7 @@ public class MenuItem : Entity<MenuItemId>
 
     static readonly InlineValidator<MenuItem> s_validator = new()
     {
+        v => v.RuleFor(x => x.Id).NotEmpty(),
         v => v.RuleFor(x => x.Name).NotEmpty(),
         v => v.RuleFor(x => x.Description).NotEmpty(),
     };

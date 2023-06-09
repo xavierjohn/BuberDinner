@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 [ApiVersion("2022-10-01")]
 [Route("hosts/{hostId}/menus")]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status200OK)]
 [ProducesResponseType(StatusCodes.Status201Created)]
 public class MenusController : ControllerBase
 {
@@ -34,10 +35,18 @@ public class MenusController : ControllerBase
     /// <returns>A <see cref="CreateMenuResponse"/> result containing the newly created menu</returns>
     [HttpPost("create")]
     public async ValueTask<ActionResult<CreateMenuResponse>> CreateMenu(CreateMenuRequest request, string hostId) =>
-         await request.ToCreateMenuCommand(hostId)
-        .BindAsync(command => _sender.Send(command))
-        .MapAsync(menu => menu.Adapt<CreateMenuResponse>())
-        .FinallyAsync(
-             result => CreatedAtAction("Get", new { id = result.Id }, result),
-             result => result.ToErrorActionResult<CreateMenuResponse>(this));
+        await request
+            .ToCreateMenuCommand(hostId)
+            .BindAsync(command => _sender.Send(command))
+            .MapAsync(menu => menu.Adapt<CreateMenuResponse>())
+            .ToOkActionResultAsync(this);
+
+    // TODO: Replace ToOkActionResultAsync(this); with the below code once the Get operation is implemented.
+    //
+    //        .FinallyAsync(
+    //             result => (ActionResult<CreateMenuResponse>)CreatedAtAction(
+    //                "Get",
+    //                new { id = result.Id },
+    //                result),
+    //             result => result.ToErrorActionResult<CreateMenuResponse>(this));
 }

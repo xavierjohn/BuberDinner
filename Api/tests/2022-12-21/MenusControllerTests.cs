@@ -140,7 +140,7 @@ public class MenusControllerTests
             new StringContent(json, Encoding.UTF8, "application/json"));
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         await ValidateMenuResponse(response);
     }
 
@@ -182,7 +182,7 @@ public class MenusControllerTests
             id = default(string),
             name = default(string),
             description = default(string),
-            averageRating = default(decimal),
+            averageRating = default(decimal?),
             hostId = default(string),
             sections = Enumerable.Repeat(exampleSection, 1).ToList(),
             dinnerIds = default(List<string>),
@@ -193,7 +193,7 @@ public class MenusControllerTests
         createdMenu.id.Should().NotBeEmpty();
         createdMenu.name.Should().Be("Muffins 'R' Us");
         createdMenu.description.Should().Be("Menu for Muffins 'R' Us");
-        createdMenu.averageRating.Should().Be(0);
+        createdMenu.averageRating.Should().Be(null);
         createdMenu.hostId.Should().BeEquivalentTo("4F82063C-AE9D-4F5B-B676-DD781C14EFA0");
         createdMenu.sections.Should().HaveCount(2);
         createdMenu.dinnerIds.Should().BeEmpty();

@@ -7,11 +7,11 @@
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.0" />
     <PackageVersion Include="Azure.Identity" Version="1.9.0" />
     <PackageVersion Include="FluentValidation" Version="11.3.0" />
-    <PackageVersion Include="FunctionalDDD.Asp" Version="1.1.0-alpha.3" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="1.1.0-alpha.3" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="1.1.0-alpha.3" />
-    <PackageVersion Include="FunctionalDDD.DomainDrivenDesign" Version="1.1.0-alpha.3" />
-    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="1.1.0-alpha.3" />
+    <PackageVersion Include="FunctionalDDD.Asp" Version="1.1.0-alpha.4" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="1.1.0-alpha.4" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="1.1.0-alpha.4" />
+    <PackageVersion Include="FunctionalDDD.DomainDrivenDesign" Version="1.1.0-alpha.4" />
+    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="1.1.0-alpha.4" />
     <PackageVersion Include="FunctionalDDD.RailwayOrientedProgramming" Version="$(FunctionalDDDVersion)" />
     <PackageVersion Include="Mapster" Version="7.3.0" />
     <PackageVersion Include="Mapster.DependencyInjection" Version="1.0.0" />

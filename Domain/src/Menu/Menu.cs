@@ -81,8 +81,10 @@ public class Menu : AggregateRoot<MenuId>
 
     static readonly InlineValidator<Menu> s_validator = new()
     {
+        v => v.RuleFor(x => x.Id).NotEmpty(),
         v => v.RuleFor(x => x.Name).NotEmpty(),
         v => v.RuleFor(x => x.Description).NotEmpty(),
-        v => v.RuleFor(x => x.Sections).NotEmpty()
+        v => v.RuleFor(x => x.Sections).NotEmpty(),
+        v => v.RuleFor(x => x.HostId).NotEmpty()
     };
 }
