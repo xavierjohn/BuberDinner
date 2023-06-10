@@ -82,9 +82,7 @@ public class AuthenticationControllerTests
     private static async Task ValidateAuthenticationResponse(HttpResponseMessage response)
     {
         response.EnsureSuccessStatusCode();
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        response.Content.Headers.ContentType.ToString().Should().Be("application/json; charset=utf-8");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        response.Content.Headers.ContentType!.ToString().Should().Be("application/json; charset=utf-8");
 
         var registeredUser = await response.Content.ReadAsExample(new { userId = default(string), firstName = default(string), lastName = default(string), email = default(string) });
         registeredUser.Should().BeEquivalentTo(new

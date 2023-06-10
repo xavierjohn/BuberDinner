@@ -39,8 +39,20 @@ internal class MenuCosmosDbRepository : CosmosDbRepositoryBase, IRepository<Menu
     }
 
 
-    public ValueTask<Menu?> FindById(string id, CancellationToken cancellationToken)
+    public async ValueTask<Menu?> FindById(string id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        try
+        {
+            Container container = await GetContainer();
+            ItemResponse<MenuDto> response = await container.ReadItemAsync<MenuDto>(
+                id,
+                new PartitionKey(id),
+                cancellationToken: cancellationToken);
+            return response.Resource.ToMenu();
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
     }
 }

@@ -41,7 +41,9 @@ public class MenuSection : Entity<MenuSectionId>
 
     static readonly InlineValidator<MenuSection> s_validator = new()
     {
+        v => v.RuleFor(x => x.Id).NotEmpty(),
         v => v.RuleFor(x => x.Name).NotEmpty(),
         v => v.RuleFor(x => x.Description).NotEmpty(),
+        v => v.RuleFor(x => x.Items).NotEmpty()
     };
 }
