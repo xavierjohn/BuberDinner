@@ -9,14 +9,13 @@ Watch these YouTube vidoes for the background.
 
 [![REST API following CLEAN ARCHITECTURE & DDD Tutorial](https://img.youtube.com/vi/fhM0V2N1GpY/0.jpg)](https://www.youtube.com/watch?v=fhM0V2N1GpY&list=PLzYkqgWkHPKBcDIP5gzLfASkQyTdy0t4k)
 
-
-This project is also a sample for [FunctionalDDD](https://github.com/xavierjohn/FunctionalDDD) which is a library that helps you to implement Domain-Driven Design in a functional way.
+This is a sample project to showcase the power of the [FunctionalDDD](https://github.com/xavierjohn/FunctionalDDD) library.
 
 ## Concepts & Tech used
 
 * .NET 7, EF Core
 * Clean Architecture & Domain-Driven Design principles
-* Common patterns such as CQRS, unit of work, repository, mediator
+* Common patterns such as CQRS, repository, mediator
 * Open source libraries such as Mediator, FluentValidation, FunctionalDDD, Mapster
 * Authentication: JWT tokens
 
