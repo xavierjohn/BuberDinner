@@ -2,6 +2,7 @@
 
 using Asp.Versioning;
 using BuberDinner.Api.Neutral.Models.Authentication;
+using FunctionalDDD.Asp;
 using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;

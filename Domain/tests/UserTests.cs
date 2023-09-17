@@ -2,6 +2,8 @@
 
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
+using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD.RailwayOrientedProgramming.Errors;
 #pragma warning disable IDE0007 // Use var keyword
 
 public class UserTests

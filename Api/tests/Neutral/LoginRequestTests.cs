@@ -2,6 +2,7 @@
 
 using BuberDinner.Api.Neutral.Models.Authentication;
 using BuberDinner.Domain.User.ValueObjects;
+using FunctionalDDD.RailwayOrientedProgramming.Errors;
 
 public class LoginRequestTests
 {

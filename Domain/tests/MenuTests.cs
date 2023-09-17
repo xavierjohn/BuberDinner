@@ -5,6 +5,7 @@ using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu;
 using BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
+using FunctionalDDD.RailwayOrientedProgramming.Errors;
 
 public class MenuTests
 {

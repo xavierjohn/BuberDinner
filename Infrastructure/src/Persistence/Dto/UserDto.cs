@@ -2,6 +2,7 @@
 
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
+using FunctionalDDD.CommonValueObjects;
 
 public class UserDto
 {

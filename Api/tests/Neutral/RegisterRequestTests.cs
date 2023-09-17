@@ -2,6 +2,8 @@
 
 using BuberDinner.Api.Neutral.Models.Authentication;
 using BuberDinner.Domain.User.ValueObjects;
+using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD.RailwayOrientedProgramming.Errors;
 
 public class RegisterRequestTests
 {

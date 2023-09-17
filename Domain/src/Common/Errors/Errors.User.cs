@@ -1,5 +1,7 @@
 ﻿namespace BuberDinner.Domain.Errors;
 
+using FunctionalDDD.RailwayOrientedProgramming.Errors;
+
 public partial class Errors
 {
     public static class User
