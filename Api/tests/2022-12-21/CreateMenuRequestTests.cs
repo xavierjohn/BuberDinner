@@ -4,7 +4,7 @@ using BuberDinner.Api._2022_12_21.Models.Menus;
 using BuberDinner.Application.Menus.Commands;
 using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Host.ValueObject;
-using FunctionalDDD.RailwayOrientedProgramming.Errors;
+using FunctionalDDD.Results.Errors;
 
 public class CreateMenuRequestTests
 {

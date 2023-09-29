@@ -7,7 +7,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
 
 /// <summary>
-/// Represents the OpenAPI/Swashbuckle operation filter used to document information provided, but not used.
+/// Represents the OpenAPI/Swash-buckle operation filter used to document information provided, but not used.
 /// </summary>
 /// <remarks>This <see cref="IOperationFilter"/> is only required due to bugs in the <see cref="SwaggerGenerator"/>.
 /// Once they are fixed and published, this class can be removed.</remarks>

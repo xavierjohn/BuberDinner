@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Domain.Dinner.ValueObject;
 
-using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD.Domain;
 
 public partial class DinnerId : RequiredGuid<DinnerId>
 {

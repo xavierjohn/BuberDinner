@@ -23,7 +23,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="$(MSBuildProjectName).Tests" />
     <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all" />
-    <Using Include="FunctionalDDD.RailwayOrientedProgramming" />
+    <Using Include="FunctionalDDD.Results" />
   </ItemGroup>
 
   <!-- Test projects. -->

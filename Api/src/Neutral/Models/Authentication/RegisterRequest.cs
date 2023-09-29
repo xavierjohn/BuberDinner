@@ -1,7 +1,7 @@
 ﻿namespace BuberDinner.Api.Neutral.Models.Authentication;
 
 using BuberDinner.Application.Services.Authentication.Commands;
-using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD.Domain;
 using FirstNameClass = Domain.User.ValueObjects.FirstName;
 using LastNameClass = Domain.User.ValueObjects.LastName;
 using PasswordClass = Domain.User.ValueObjects.Password;
