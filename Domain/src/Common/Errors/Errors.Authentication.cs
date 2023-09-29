@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Domain.Errors;
 
-using FunctionalDDD.RailwayOrientedProgramming.Errors;
+using FunctionalDDD.Results.Errors;
 
 public partial class Errors
 {

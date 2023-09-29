@@ -2,7 +2,7 @@
 
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.User.ValueObjects;
-using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD.Domain;
 using Mediator;
 
 public class RegisterCommand

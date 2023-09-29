@@ -2,7 +2,6 @@
 
 using BuberDinner.Application.Menus.Commands;
 using BuberDinner.Domain.Host.ValueObject;
-using FunctionalDDD;
 using DescriptionClass = Domain.Common.ValueObjects.Description;
 using NameClass = Domain.Common.ValueObjects.Name;
 

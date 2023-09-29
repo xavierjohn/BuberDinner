@@ -2,7 +2,7 @@
 
 using Asp.Versioning;
 using BuberDinner.Api._2022_12_21.Models.Menus;
-using FunctionalDDD.Asp;
+using FunctionalDDD.Results.Asp;
 using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;

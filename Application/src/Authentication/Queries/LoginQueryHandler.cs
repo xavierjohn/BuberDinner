@@ -15,9 +15,9 @@
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IRepository<User> _userRepository;
 
-        public LoginQueryHandler(IJwtTokenGenerator jwtTokenGenerator, IRepository<User> userRepository)
+        public LoginQueryHandler(IJwtTokenGenerator jWtTokenGenerator, IRepository<User> userRepository)
         {
-            _jwtTokenGenerator = jwtTokenGenerator;
+            _jwtTokenGenerator = jWtTokenGenerator;
             _userRepository = userRepository;
         }
 

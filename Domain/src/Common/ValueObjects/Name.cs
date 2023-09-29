@@ -1,6 +1,6 @@
 ﻿namespace BuberDinner.Domain.Common.ValueObjects;
 
-using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD.Domain;
 
 public partial class Name : RequiredString<Name>
 {

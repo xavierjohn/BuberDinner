@@ -1,8 +1,10 @@
-﻿namespace BuberDinner.Infrastructure.Persistence.Dto;
+﻿// Ignore Spelling: Dto
+
+namespace BuberDinner.Infrastructure.Persistence.Dto;
 
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
-using FunctionalDDD.CommonValueObjects;
+using FunctionalDDD.Domain;
 
 public class UserDto
 {
