@@ -2,7 +2,7 @@
 
 using Asp.Versioning;
 using BuberDinner.Api._2022_12_21.Models.Menus;
-using FunctionalDDD.Results.Asp;
+using FunctionalDDD.Asp;
 using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [ApiVersion("2022-10-01")]
 [Route("hosts/{hostId}/menus")]
+[Consumes("application/json")]
+[Produces("application/json")]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ProducesResponseType(StatusCodes.Status200OK)]
 [ProducesResponseType(StatusCodes.Status201Created)]

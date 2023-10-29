@@ -33,7 +33,7 @@ public class RegisterCommandHandler :
 
     private async ValueTask<Result<User>> CreateUser(RegisterCommand command, CancellationToken cancellationToken) =>
         await User.New(command.UserId, command.FirstName, command.LastName, command.Email, command.Password)
-        .TeeAsync(user => _userRepository.Add(user, cancellationToken));
+        .TapAsync(user => _userRepository.Add(user, cancellationToken));
 
     private async ValueTask<Result<string>> ValidateUserDoesNotExist(UserId id, CancellationToken cancellationToken)
     {

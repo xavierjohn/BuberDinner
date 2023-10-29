@@ -2,6 +2,6 @@
 
 using FunctionalDDD.Domain;
 
-public partial class HostId : RequiredGuid<HostId>
+public partial class HostId : RequiredGuid
 {
 }

@@ -2,6 +2,6 @@
 
 using FunctionalDDD.Domain;
 
-public partial class UserId : RequiredString<UserId>
+public partial class UserId : RequiredString
 {
 }
