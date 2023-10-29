@@ -2,6 +2,6 @@
 
 using FunctionalDDD.Domain;
 
-public partial class DinnerId : RequiredGuid<DinnerId>
+public partial class DinnerId : RequiredGuid
 {
 }

@@ -2,7 +2,7 @@
 
 using Asp.Versioning;
 using BuberDinner.Api.Neutral.Models.Authentication;
-using FunctionalDDD.Results.Asp;
+using FunctionalDDD.Asp;
 using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [AllowAnonymous]
 [ApiVersionNeutral]
+[Consumes("application/json")]
+[Produces("application/json")]
 [ProducesResponseType(StatusCodes.Status400BadRequest)]
 [ProducesResponseType(StatusCodes.Status200OK)]
 [Route("[controller]")]

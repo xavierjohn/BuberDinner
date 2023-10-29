@@ -1,43 +1,43 @@
 <Project>
   <PropertyGroup>
-    <FunctionalDDDVersion>0.1.0-alpha.40</FunctionalDDDVersion>
+    <FunctionalDDDVersion>1.1.0-alpha.28</FunctionalDDDVersion>
   </PropertyGroup>
   <!-- Runtime -->
   <ItemGroup>
-    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.1" />
-    <PackageVersion Include="Azure.Identity" Version="1.10.1" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
+    <PackageVersion Include="Azure.Identity" Version="1.10.3" />
     <PackageVersion Include="FluentValidation" Version="11.3.0" />
-    <PackageVersion Include="FunctionalDDD.Asp" Version="1.1.0-alpha.18" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="1.1.0-alpha.18" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="1.1.0-alpha.18" />
-    <PackageVersion Include="FunctionalDDD.DomainDrivenDesign" Version="1.1.0-alpha.18" />
-    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="1.1.0-alpha.18" />
+    <PackageVersion Include="FunctionalDDD.Asp" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.DomainDrivenDesign" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="$(FunctionalDDDVersion)" />
     <PackageVersion Include="FunctionalDDD.RailwayOrientedProgramming" Version="$(FunctionalDDDVersion)" />
     <PackageVersion Include="Mapster" Version="7.4.0" />
     <PackageVersion Include="Mapster.DependencyInjection" Version="1.0.1" />
     <PackageVersion Include="Mediator.Abstractions" Version="2.1.7" />
     <PackageVersion Include="Mediator.SourceGenerator" Version="2.1.7" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.35.4" />
+    <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.36.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.6.133" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.0.1" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
   </ItemGroup>
   <!-- Test -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageVersion Include="xunit" Version="2.5.1" />
+    <PackageVersion Include="xunit" Version="2.5.3" />
     <PackageVersion Include="Xunit.DependencyInjection" Version="8.9.0" />
     <PackageVersion Include="Xunit.Priority" Version="1.1.6" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
     <PackageVersion Include="xunit.categories" Version="2.0.8" />
   </ItemGroup>
 </Project>

@@ -21,7 +21,7 @@ public class CreateMenuCommandHandler : IRequestHandler<CreateMenuCommand, Resul
 
     private async ValueTask<Result<Menu>> CreateMenu(CreateMenuCommand request, CancellationToken cancellationToken) =>
         await Menu.New(request.Name, request.Description, CreateMenuSections(request.Sections), request.HostId)
-        .TeeAsync(menu => _menuRepository.Add(menu, cancellationToken));
+        .TapAsync(menu => _menuRepository.Add(menu, cancellationToken));
 
     private static IReadOnlyList<MenuSection> CreateMenuSections(IReadOnlyList<MenuSectionCommand> commands) =>
         commands
