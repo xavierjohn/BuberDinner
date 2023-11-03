@@ -24,7 +24,7 @@ public static class MenuItemDtoExtensions
     public static MenuItem? ToMenuItem(this MenuItemDto? menuItemDto) =>
         menuItemDto is null
         ? null
-        : MenuItem.New(
+        : MenuItem.TryCreate(
             MenuItemId.TryCreate(menuItemDto.Id).Value,
             Name.TryCreate(menuItemDto.Name).Value,
             Description.TryCreate(menuItemDto.Description).Value).Value;

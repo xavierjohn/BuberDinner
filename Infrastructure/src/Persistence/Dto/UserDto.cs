@@ -29,7 +29,7 @@ public static class UserDtoExtensions
     public static User? ToUser(this UserDto? userDto) =>
         userDto is null
         ? null
-        : User.New(
+        : User.TryCreate(
             UserId.TryCreate(userDto.Id).Value,
             FirstName.TryCreate(userDto.FirstName).Value,
             LastName.TryCreate(userDto.LastName).Value,

@@ -36,7 +36,7 @@ public static class MenuDtoExtensions
     public static Menu? ToMenu(this MenuDto? menuDto) =>
         menuDto is null
         ? null
-        : Menu.New(
+        : Menu.TryCreate(
             MenuId.TryCreate(Guid.Parse(menuDto.Id)).Value,
             Name.TryCreate(menuDto.Name).Value,
             Description.TryCreate(menuDto.Description).Value,

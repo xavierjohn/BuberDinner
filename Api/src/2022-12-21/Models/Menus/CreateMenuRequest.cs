@@ -21,7 +21,7 @@ public record CreateMenuRequest(
         .Combine(DescriptionClass.TryCreate(this.Description))
         .Combine(this.GetMenuSectionCommands())
         .Combine(HostId.TryCreate(hostId))
-        .Bind(CreateMenuCommand.New);
+        .Bind(CreateMenuCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuSectionCommand>> GetMenuSectionCommands() =>
         this.Sections
@@ -44,7 +44,7 @@ public record MenuSectionRequest(
         NameClass.TryCreate(this.Name)
         .Combine(DescriptionClass.TryCreate(this.Description))
         .Combine(this.GetMenuItemCommands())
-        .Bind(MenuSectionCommand.New);
+        .Bind(MenuSectionCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuItemCommand>> GetMenuItemCommands() =>
         this.Items
@@ -64,5 +64,5 @@ public record MenuItemRequest(
     internal Result<MenuItemCommand> ToMenuItemCommand() =>
         NameClass.TryCreate(this.Name)
         .Combine(DescriptionClass.TryCreate(this.Description))
-        .Bind(MenuItemCommand.New);
+        .Bind(MenuItemCommand.TryCreate);
 }

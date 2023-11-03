@@ -23,7 +23,7 @@ public class UserRespositoryTests : IClassFixture<CosmosDbFixture>
         var lastName = LastName.TryCreate("John").Value;
         var email = EmailAddress.TryCreate("xavier@somewhere.com").Value;
         var password = Password.TryCreate("Amiko1232!").Value;
-        User user = User.New(userId, firstName, lastName, email, password).Value;
+        User user = User.TryCreate(userId, firstName, lastName, email, password).Value;
 
 
         // Act

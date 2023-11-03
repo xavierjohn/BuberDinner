@@ -24,7 +24,7 @@
             var lastName = LastName.TryCreate("John").Value;
             var email = EmailAddress.TryCreate("xavier@somewhere.com").Value;
             var password = Password.TryCreate("SuperStrongPassword").Value;
-            var command = RegisterCommand.New(userId, firstName, lastName, email, password).Value;
+            var command = RegisterCommand.TryCreate(userId, firstName, lastName, email, password).Value;
 
             // Act
             Result<Services.Authentication.Common.AuthenticationResult> result = await _sender.Send(command);

@@ -9,12 +9,12 @@ public class MenuItem : Entity<MenuItemId>
     public Name Name { get; }
     public Description Description { get; }
 
-    public static Result<MenuItem> New(Name name, Description description)
+    public static Result<MenuItem> TryCreate(Name name, Description description)
     {
-        return New(MenuItemId.NewUnique(), name, description);
+        return TryCreate(MenuItemId.NewUnique(), name, description);
     }
 
-    public static Result<MenuItem> New(MenuItemId menuItemId, Name name, Description description)
+    public static Result<MenuItem> TryCreate(MenuItemId menuItemId, Name name, Description description)
     {
         MenuItem menuItem = new(menuItemId, name, description);
         return s_validator.ValidateToResult(menuItem);

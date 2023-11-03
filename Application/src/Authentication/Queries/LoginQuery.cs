@@ -15,6 +15,6 @@ public class LoginQuery : IRequest<Result<AuthenticationResult>>
     public UserId UserId { get; }
     public Password Password { get; }
 
-    public static Result<LoginQuery> New(UserId userId, Password password) =>
+    public static Result<LoginQuery> TryCreate(UserId userId, Password password) =>
         new LoginQuery(userId, password);
 }

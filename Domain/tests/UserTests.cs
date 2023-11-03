@@ -23,7 +23,7 @@ public class UserTests
 
         // Act
 #pragma warning disable CS8604 // Possible null reference argument.
-        var userResult = User.New(id, firstName, lastName, email, password);
+        var userResult = User.TryCreate(id, firstName, lastName, email, password);
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert

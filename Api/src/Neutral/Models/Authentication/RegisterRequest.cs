@@ -29,6 +29,6 @@ public record RegisterRequest(
         .Combine(LastNameClass.TryCreate(LastName))
         .Combine(EmailAddress.TryCreate(Email))
         .Combine(PasswordClass.TryCreate(Password))
-        .Bind(RegisterCommand.New);
+        .Bind(RegisterCommand.TryCreate);
 };
 

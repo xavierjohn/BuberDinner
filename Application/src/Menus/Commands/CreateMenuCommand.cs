@@ -7,7 +7,7 @@ using Mediator;
 
 public class CreateMenuCommand : IRequest<Result<Menu>>
 {
-    public static Result<CreateMenuCommand> New(
+    public static Result<CreateMenuCommand> TryCreate(
         Name name,
         Description description,
         IReadOnlyList<MenuSectionCommand> sections,
@@ -34,7 +34,7 @@ public class CreateMenuCommand : IRequest<Result<Menu>>
 
 public class MenuSectionCommand
 {
-    public static Result<MenuSectionCommand> New(
+    public static Result<MenuSectionCommand> TryCreate(
         Name name,
         Description description,
         IReadOnlyList<MenuItemCommand> items) =>
@@ -54,7 +54,7 @@ public class MenuSectionCommand
 
 public class MenuItemCommand
 {
-    public static Result<MenuItemCommand> New(
+    public static Result<MenuItemCommand> TryCreate(
         Name name,
         Description description) =>
             new MenuItemCommand(name, description);

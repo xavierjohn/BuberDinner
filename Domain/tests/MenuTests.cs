@@ -26,7 +26,7 @@ public class MenuTests
             : Description.TryCreate("Item Description").Value;
 
         // Act
-        Result<MenuItem> menuItemResult = MenuItem.New(id!, name!, description!);
+        Result<MenuItem> menuItemResult = MenuItem.TryCreate(id!, name!, description!);
 
         // Assert
         menuItemResult.IsFailure.Should().BeTrue();
@@ -56,13 +56,13 @@ public class MenuTests
             ? new List<MenuItem>()
             : new List<MenuItem>()
             {
-                MenuItem.New(
+                MenuItem.TryCreate(
                     Name.TryCreate("Item Name").Value,
                     Description.TryCreate("Item Description").Value).Value
             };
 
         // Act
-        Result<MenuSection> menuSectionResult = MenuSection.New(id!, name!, description!, items);
+        Result<MenuSection> menuSectionResult = MenuSection.TryCreate(id!, name!, description!, items);
 
         // Assert
         menuSectionResult.IsFailure.Should().BeTrue();
@@ -93,12 +93,12 @@ public class MenuTests
             ? new List<MenuSection>()
             : new List<MenuSection>()
             {
-                MenuSection.New(
+                MenuSection.TryCreate(
                     Name.TryCreate("Section Name").Value,
                     Description.TryCreate("Section Description").Value,
                     new List<MenuItem>()
                     {
-                        MenuItem.New(
+                        MenuItem.TryCreate(
                             Name.TryCreate("Item Name").Value,
                             Description.TryCreate("Item Description").Value).Value
                     }).Value
@@ -108,7 +108,7 @@ public class MenuTests
             : HostId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E954").Value;
 
         // Act
-        Result<Menu> menuResult = Menu.New(
+        Result<Menu> menuResult = Menu.TryCreate(
             id!,
             name!,
             description!,

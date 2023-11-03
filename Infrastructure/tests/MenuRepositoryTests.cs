@@ -35,15 +35,15 @@ public class MenuRepositoryTests : IClassFixture<CosmosDbFixture>
         MenuItemId itemId = MenuItemId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E957").Value;
         Name itemName = Name.TryCreate("Item Name").Value;
         Description itemDescription = Description.TryCreate("Item Description").Value;
-        MenuItem item = MenuItem.New(itemId, itemName, itemDescription).Value;
-        MenuSection section = MenuSection.New(
+        MenuItem item = MenuItem.TryCreate(itemId, itemName, itemDescription).Value;
+        MenuSection section = MenuSection.TryCreate(
             sectionId,
             sectionName,
             sectionDescription,
             new List<MenuItem>() { item }).Value;
         DinnerId dinnerId = DinnerId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E958").Value;
         MenuReviewId menuReviewId = MenuReviewId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E959").Value;
-        Menu menu = Menu.New(
+        Menu menu = Menu.TryCreate(
             menuId,
             name,
             description,
