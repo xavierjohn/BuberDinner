@@ -27,8 +27,8 @@ public static class MenuSectionDtoExtensions
         menuSectionDto is null
         ? null
         : MenuSection.New(
-            MenuSectionId.New(menuSectionDto.Id).Value,
-            Name.New(menuSectionDto.Name).Value,
-            Description.New(menuSectionDto.Description).Value,
+            MenuSectionId.TryCreate(menuSectionDto.Id).Value,
+            Name.TryCreate(menuSectionDto.Name).Value,
+            Description.TryCreate(menuSectionDto.Description).Value,
             menuSectionDto.Items.Select(itemDto => itemDto.ToMenuItem()!).ToList()).Value;
 }

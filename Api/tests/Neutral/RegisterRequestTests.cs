@@ -2,8 +2,6 @@
 
 using BuberDinner.Api.Neutral.Models.Authentication;
 using BuberDinner.Domain.User.ValueObjects;
-using FunctionalDDD.Domain;
-using FunctionalDDD.Results.Errors;
 
 public class RegisterRequestTests
 {
@@ -64,10 +62,10 @@ public class RegisterRequestTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         var registerCommand = result.Value;
-        registerCommand.UserId.Should().Be(UserId.New("id").Value);
-        registerCommand.FirstName.Should().Be(FirstName.New("Xavier").Value);
-        registerCommand.LastName.Should().Be(LastName.New("John").Value);
-        registerCommand.Email.Should().Be(EmailAddress.New("xavier@somewhere.com").Value);
-        registerCommand.Password.Should().Be(Password.New("password").Value);
+        registerCommand.UserId.Should().Be(UserId.TryCreate("id").Value);
+        registerCommand.FirstName.Should().Be(FirstName.TryCreate("Xavier").Value);
+        registerCommand.LastName.Should().Be(LastName.TryCreate("John").Value);
+        registerCommand.Email.Should().Be(EmailAddress.TryCreate("xavier@somewhere.com").Value);
+        registerCommand.Password.Should().Be(Password.TryCreate("password").Value);
     }
 }

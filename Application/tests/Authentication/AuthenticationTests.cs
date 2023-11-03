@@ -3,7 +3,6 @@
     using System.Threading.Tasks;
     using BuberDinner.Application.Services.Authentication.Commands;
     using BuberDinner.Domain.User.ValueObjects;
-    using FunctionalDDD.Domain;
     using Mediator;
 
     public class AuthenticationTests
@@ -20,11 +19,11 @@
         public async Task Can_Register_new_User()
         {
             // Arrange
-            var userId = UserId.New("xavierjohn2023").Value;
-            var firstName = FirstName.New("Xavier").Value;
-            var lastName = LastName.New("John").Value;
-            var email = EmailAddress.New("xavier@somewhere.com").Value;
-            var password = Password.New("SuperStrongPassword").Value;
+            var userId = UserId.TryCreate("xavierjohn2023").Value;
+            var firstName = FirstName.TryCreate("Xavier").Value;
+            var lastName = LastName.TryCreate("John").Value;
+            var email = EmailAddress.TryCreate("xavier@somewhere.com").Value;
+            var password = Password.TryCreate("SuperStrongPassword").Value;
             var command = RegisterCommand.New(userId, firstName, lastName, email, password).Value;
 
             // Act

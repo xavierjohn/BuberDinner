@@ -7,7 +7,6 @@ using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
 using FluentValidation;
-using FunctionalDDD.Domain;
 
 public class Menu : Aggregate<MenuId>
 {

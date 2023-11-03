@@ -1,7 +1,5 @@
 ﻿namespace BuberDinner.Application.Abstractions.Persistence;
 
-using FunctionalDDD;
-
 public interface IRepository<T> where T : class
 {
     IEnumerable<T> GetAll(CancellationToken cancellationToken);

@@ -2,7 +2,6 @@
 
 using BuberDinner.Domain.User.ValueObjects;
 using FluentValidation;
-using FunctionalDDD.Domain;
 
 public class User : Entity<UserId>
 {

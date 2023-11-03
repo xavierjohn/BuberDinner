@@ -3,7 +3,6 @@
 using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Menu.ValueObject;
 using FluentValidation;
-using FunctionalDDD.Domain;
 
 public class MenuSection : Entity<MenuSectionId>
 {

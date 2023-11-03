@@ -1,7 +1,6 @@
 ﻿namespace BuberDinner.Api.Neutral.Models.Authentication;
 
 using BuberDinner.Application.Services.Authentication.Commands;
-using FunctionalDDD.Domain;
 using FirstNameClass = Domain.User.ValueObjects.FirstName;
 using LastNameClass = Domain.User.ValueObjects.LastName;
 using PasswordClass = Domain.User.ValueObjects.Password;
@@ -25,11 +24,11 @@ public record RegisterRequest(
 {
 
     internal Result<RegisterCommand> ToRegisterCommand() =>
-        UserIdClass.New(UserId)
-        .Combine(FirstNameClass.New(FirstName))
-        .Combine(LastNameClass.New(LastName))
-        .Combine(EmailAddress.New(Email))
-        .Combine(PasswordClass.New(Password))
+        UserIdClass.TryCreate(UserId)
+        .Combine(FirstNameClass.TryCreate(FirstName))
+        .Combine(LastNameClass.TryCreate(LastName))
+        .Combine(EmailAddress.TryCreate(Email))
+        .Combine(PasswordClass.TryCreate(Password))
         .Bind(RegisterCommand.New);
 };
 

@@ -24,25 +24,25 @@ public class MenuRepositoryTests : IClassFixture<CosmosDbFixture>
         MenuCosmosDbRepository rep = new(
             _cosmosDbFixture.CosmosClient,
             new MenuCosmosDbContainerSettings());
-        MenuId menuId = MenuId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").Value;
-        Name name = Name.New("Menu Name").Value;
-        Description description = Description.New("Menu Description").Value;
-        HostId hostId = HostId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").Value;
+        MenuId menuId = MenuId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").Value;
+        Name name = Name.TryCreate("Menu Name").Value;
+        Description description = Description.TryCreate("Menu Description").Value;
+        HostId hostId = HostId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").Value;
         decimal? averageRating = 3.8m;
-        MenuSectionId sectionId = MenuSectionId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E956").Value;
-        Name sectionName = Name.New("Section Name").Value;
-        Description sectionDescription = Description.New("Section Description").Value;
-        MenuItemId itemId = MenuItemId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E957").Value;
-        Name itemName = Name.New("Item Name").Value;
-        Description itemDescription = Description.New("Item Description").Value;
+        MenuSectionId sectionId = MenuSectionId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E956").Value;
+        Name sectionName = Name.TryCreate("Section Name").Value;
+        Description sectionDescription = Description.TryCreate("Section Description").Value;
+        MenuItemId itemId = MenuItemId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E957").Value;
+        Name itemName = Name.TryCreate("Item Name").Value;
+        Description itemDescription = Description.TryCreate("Item Description").Value;
         MenuItem item = MenuItem.New(itemId, itemName, itemDescription).Value;
         MenuSection section = MenuSection.New(
             sectionId,
             sectionName,
             sectionDescription,
             new List<MenuItem>() { item }).Value;
-        DinnerId dinnerId = DinnerId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E958").Value;
-        MenuReviewId menuReviewId = MenuReviewId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E959").Value;
+        DinnerId dinnerId = DinnerId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E958").Value;
+        MenuReviewId menuReviewId = MenuReviewId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E959").Value;
         Menu menu = Menu.New(
             menuId,
             name,
