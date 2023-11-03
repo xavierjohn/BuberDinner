@@ -17,11 +17,11 @@ public record CreateMenuRequest(
     List<MenuSectionRequest> Sections)
 {
     internal Result<CreateMenuCommand> ToCreateMenuCommand(string hostId) =>
-        NameClass.New(this.Name)
-        .Combine(DescriptionClass.New(this.Description))
+        NameClass.TryCreate(this.Name)
+        .Combine(DescriptionClass.TryCreate(this.Description))
         .Combine(this.GetMenuSectionCommands())
-        .Combine(HostId.New(hostId))
-        .Bind(CreateMenuCommand.New);
+        .Combine(HostId.TryCreate(hostId))
+        .Bind(CreateMenuCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuSectionCommand>> GetMenuSectionCommands() =>
         this.Sections
@@ -41,10 +41,10 @@ public record MenuSectionRequest(
     List<MenuItemRequest> Items)
 {
     internal Result<MenuSectionCommand> ToMenuSectionCommand() =>
-        NameClass.New(this.Name)
-        .Combine(DescriptionClass.New(this.Description))
+        NameClass.TryCreate(this.Name)
+        .Combine(DescriptionClass.TryCreate(this.Description))
         .Combine(this.GetMenuItemCommands())
-        .Bind(MenuSectionCommand.New);
+        .Bind(MenuSectionCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuItemCommand>> GetMenuItemCommands() =>
         this.Items
@@ -62,7 +62,7 @@ public record MenuItemRequest(
     string Description)
 {
     internal Result<MenuItemCommand> ToMenuItemCommand() =>
-        NameClass.New(this.Name)
-        .Combine(DescriptionClass.New(this.Description))
-        .Bind(MenuItemCommand.New);
+        NameClass.TryCreate(this.Name)
+        .Combine(DescriptionClass.TryCreate(this.Description))
+        .Bind(MenuItemCommand.TryCreate);
 }

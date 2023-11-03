@@ -7,7 +7,6 @@ using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
 using FluentValidation;
-using FunctionalDDD.Domain;
 
 public class Menu : Aggregate<MenuId>
 {
@@ -23,13 +22,13 @@ public class Menu : Aggregate<MenuId>
     private readonly List<DinnerId> _dinnerIds = new();
     private readonly List<MenuReviewId> _menuReviewIds = new();
 
-    public static Result<Menu> New(
+    public static Result<Menu> TryCreate(
         Name name,
         Description description,
         IReadOnlyList<MenuSection> sections,
         HostId host)
     {
-        return New(
+        return TryCreate(
             MenuId.NewUnique(),
             name,
             description,
@@ -40,7 +39,7 @@ public class Menu : Aggregate<MenuId>
             null);
     }
 
-    public static Result<Menu> New(
+    public static Result<Menu> TryCreate(
         MenuId menuId,
         Name name,
         Description description,

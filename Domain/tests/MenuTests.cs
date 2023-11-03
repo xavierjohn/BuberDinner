@@ -5,7 +5,6 @@ using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu;
 using BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
-using FunctionalDDD.Results.Errors;
 
 public class MenuTests
 {
@@ -18,16 +17,16 @@ public class MenuTests
         // Arrange
         MenuItemId? id = field == nameof(MenuItem.Id)
             ? default
-            : MenuItemId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E951").Value;
+            : MenuItemId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E951").Value;
         Name? name = field == nameof(Name)
             ? default
-            : Name.New("Item Name").Value;
+            : Name.TryCreate("Item Name").Value;
         Description? description = field == nameof(Description)
             ? default
-            : Description.New("Item Description").Value;
+            : Description.TryCreate("Item Description").Value;
 
         // Act
-        Result<MenuItem> menuItemResult = MenuItem.New(id!, name!, description!);
+        Result<MenuItem> menuItemResult = MenuItem.TryCreate(id!, name!, description!);
 
         // Assert
         menuItemResult.IsFailure.Should().BeTrue();
@@ -46,24 +45,24 @@ public class MenuTests
         // Arrange
         MenuSectionId? id = field == nameof(MenuSection.Id)
             ? default
-            : MenuSectionId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E952").Value;
+            : MenuSectionId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E952").Value;
         Name? name = field == nameof(Name)
             ? default
-            : Name.New("Section Name").Value;
+            : Name.TryCreate("Section Name").Value;
         Description? description = field == nameof(Description)
             ? default
-            : Description.New("Section Description").Value;
+            : Description.TryCreate("Section Description").Value;
         IReadOnlyList<MenuItem> items = field == nameof(MenuSection.Items)
             ? new List<MenuItem>()
             : new List<MenuItem>()
             {
-                MenuItem.New(
-                    Name.New("Item Name").Value,
-                    Description.New("Item Description").Value).Value
+                MenuItem.TryCreate(
+                    Name.TryCreate("Item Name").Value,
+                    Description.TryCreate("Item Description").Value).Value
             };
 
         // Act
-        Result<MenuSection> menuSectionResult = MenuSection.New(id!, name!, description!, items);
+        Result<MenuSection> menuSectionResult = MenuSection.TryCreate(id!, name!, description!, items);
 
         // Assert
         menuSectionResult.IsFailure.Should().BeTrue();
@@ -83,33 +82,33 @@ public class MenuTests
         // Arrange
         MenuId? id = field == nameof(Menu.Id)
             ? default
-            : MenuId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E953").Value;
+            : MenuId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E953").Value;
         Name? name = field == nameof(Name)
             ? default
-            : Name.New("Menu Name").Value;
+            : Name.TryCreate("Menu Name").Value;
         Description? description = field == nameof(Description)
             ? default
-            : Description.New("Menu Description").Value;
+            : Description.TryCreate("Menu Description").Value;
         IReadOnlyList<MenuSection> sections = field == nameof(Menu.Sections)
             ? new List<MenuSection>()
             : new List<MenuSection>()
             {
-                MenuSection.New(
-                    Name.New("Section Name").Value,
-                    Description.New("Section Description").Value,
+                MenuSection.TryCreate(
+                    Name.TryCreate("Section Name").Value,
+                    Description.TryCreate("Section Description").Value,
                     new List<MenuItem>()
                     {
-                        MenuItem.New(
-                            Name.New("Item Name").Value,
-                            Description.New("Item Description").Value).Value
+                        MenuItem.TryCreate(
+                            Name.TryCreate("Item Name").Value,
+                            Description.TryCreate("Item Description").Value).Value
                     }).Value
             };
         HostId? hostId = field == nameof(HostId)
             ? default
-            : HostId.New("2F45ACF9-6E51-4DC7-8732-DBE7F260E954").Value;
+            : HostId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E954").Value;
 
         // Act
-        Result<Menu> menuResult = Menu.New(
+        Result<Menu> menuResult = Menu.TryCreate(
             id!,
             name!,
             description!,

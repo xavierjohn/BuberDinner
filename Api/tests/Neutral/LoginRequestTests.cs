@@ -2,7 +2,6 @@
 
 using BuberDinner.Api.Neutral.Models.Authentication;
 using BuberDinner.Domain.User.ValueObjects;
-using FunctionalDDD.Results.Errors;
 
 public class LoginRequestTests
 {
@@ -37,7 +36,7 @@ public class LoginRequestTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         var registerCommand = result.Value;
-        registerCommand.UserId.Should().Be(UserId.New("xavierjohn2023").Value);
-        registerCommand.Password.Should().Be(Password.New("password").Value);
+        registerCommand.UserId.Should().Be(UserId.TryCreate("xavierjohn2023").Value);
+        registerCommand.Password.Should().Be(Password.TryCreate("password").Value);
     }
 }

@@ -4,7 +4,6 @@ namespace BuberDinner.Infrastructure.Persistence.Dto;
 
 using BuberDinner.Domain.User.Entities;
 using BuberDinner.Domain.User.ValueObjects;
-using FunctionalDDD.Domain;
 
 public class UserDto
 {
@@ -30,10 +29,10 @@ public static class UserDtoExtensions
     public static User? ToUser(this UserDto? userDto) =>
         userDto is null
         ? null
-        : User.New(
-            UserId.New(userDto.Id).Value,
-            FirstName.New(userDto.FirstName).Value,
-            LastName.New(userDto.LastName).Value,
-            EmailAddress.New(userDto.Email).Value,
-            Password.New(userDto.Password).Value).Value;
+        : User.TryCreate(
+            UserId.TryCreate(userDto.Id).Value,
+            FirstName.TryCreate(userDto.FirstName).Value,
+            LastName.TryCreate(userDto.LastName).Value,
+            EmailAddress.TryCreate(userDto.Email).Value,
+            Password.TryCreate(userDto.Password).Value).Value;
 }

@@ -20,16 +20,16 @@ public class CreateMenuCommandHandler : IRequestHandler<CreateMenuCommand, Resul
         CreateMenu(request, cancellationToken);
 
     private async ValueTask<Result<Menu>> CreateMenu(CreateMenuCommand request, CancellationToken cancellationToken) =>
-        await Menu.New(request.Name, request.Description, CreateMenuSections(request.Sections), request.HostId)
+        await Menu.TryCreate(request.Name, request.Description, CreateMenuSections(request.Sections), request.HostId)
         .TapAsync(menu => _menuRepository.Add(menu, cancellationToken));
 
     private static IReadOnlyList<MenuSection> CreateMenuSections(IReadOnlyList<MenuSectionCommand> commands) =>
         commands
-            .Select(msc => MenuSection.New(msc.Name, msc.Description, CreateMenuItems(msc.Items)).Value)
+            .Select(msc => MenuSection.TryCreate(msc.Name, msc.Description, CreateMenuItems(msc.Items)).Value)
             .ToList();
 
     private static IReadOnlyList<MenuItem> CreateMenuItems(IReadOnlyList<MenuItemCommand> commands) =>
         commands
-            .Select(mic => MenuItem.New(mic.Name, mic.Description).Value)
+            .Select(mic => MenuItem.TryCreate(mic.Name, mic.Description).Value)
             .ToList();
 }

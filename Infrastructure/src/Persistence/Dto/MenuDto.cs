@@ -36,13 +36,13 @@ public static class MenuDtoExtensions
     public static Menu? ToMenu(this MenuDto? menuDto) =>
         menuDto is null
         ? null
-        : Menu.New(
-            MenuId.New(Guid.Parse(menuDto.Id)).Value,
-            Name.New(menuDto.Name).Value,
-            Description.New(menuDto.Description).Value,
+        : Menu.TryCreate(
+            MenuId.TryCreate(Guid.Parse(menuDto.Id)).Value,
+            Name.TryCreate(menuDto.Name).Value,
+            Description.TryCreate(menuDto.Description).Value,
             menuDto.AverageRating,
             menuDto.Sections.Select(sectionDto => sectionDto.ToMenuSection()!).ToList(),
-            HostId.New(menuDto.HostId).Value,
-            menuDto.DinnerIds.Select(dinnerId => DinnerId.New(dinnerId).Value).ToList(),
-            menuDto.MenuReviewIds.Select(menuReviewId => MenuReviewId.New(menuReviewId).Value).ToList()).Value;
+            HostId.TryCreate(menuDto.HostId).Value,
+            menuDto.DinnerIds.Select(dinnerId => DinnerId.TryCreate(dinnerId).Value).ToList(),
+            menuDto.MenuReviewIds.Select(menuReviewId => MenuReviewId.TryCreate(menuReviewId).Value).ToList()).Value;
 }

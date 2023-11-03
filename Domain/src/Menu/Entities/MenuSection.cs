@@ -3,7 +3,6 @@
 using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Menu.ValueObject;
 using FluentValidation;
-using FunctionalDDD.Domain;
 
 public class MenuSection : Entity<MenuSectionId>
 {
@@ -14,15 +13,15 @@ public class MenuSection : Entity<MenuSectionId>
 
     private readonly List<MenuItem> _menuItems = new();
 
-    public static Result<MenuSection> New(
+    public static Result<MenuSection> TryCreate(
         Name name,
         Description description,
         IReadOnlyList<MenuItem> items)
     {
-        return New(MenuSectionId.NewUnique(), name, description, items);
+        return TryCreate(MenuSectionId.NewUnique(), name, description, items);
     }
 
-    public static Result<MenuSection> New(
+    public static Result<MenuSection> TryCreate(
         MenuSectionId menuSectionId,
         Name name,
         Description description,

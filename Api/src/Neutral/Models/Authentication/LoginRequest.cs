@@ -14,7 +14,7 @@ public record LoginRequest(
     string Password)
 {
     internal Result<LoginQuery> ToLoginQuery() =>
-        UserIdClass.New(UserId)
-        .Combine(PasswordClass.New(Password))
-        .Bind((userId, pwd) => LoginQuery.New(userId, pwd));
+        UserIdClass.TryCreate(UserId)
+        .Combine(PasswordClass.TryCreate(Password))
+        .Bind((userId, pwd) => LoginQuery.TryCreate(userId, pwd));
 }
