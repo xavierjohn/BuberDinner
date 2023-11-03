@@ -22,9 +22,7 @@ public class UserTests
         Password? password = field == nameof(User.Password) ? default : Password.TryCreate("you can't crack this.").Value;
 
         // Act
-#pragma warning disable CS8604 // Possible null reference argument.
-        var userResult = User.TryCreate(id, firstName, lastName, email, password);
-#pragma warning restore CS8604 // Possible null reference argument.
+        var userResult = User.TryCreate(id!, firstName!, lastName!, email!, password!);
 
         // Assert
         userResult.IsFailure.Should().BeTrue();
@@ -51,7 +49,7 @@ public class UserTests
     }
 
     [Fact]
-    public void Two_passwords_of_the_same_content_are_equal()
+    public void Two_passwords_with_the_same_content_are_equal()
     {
         // Arrange
         Password pwd1 = Password.TryCreate("Hello").Value;
