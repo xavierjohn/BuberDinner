@@ -1,18 +1,18 @@
 <Project>
   <PropertyGroup>
-    <FunctionalDDDVersion>1.1.0-alpha.32</FunctionalDDDVersion>
+    <FunctionalDddVersion>1.1.0-alpha.32</FunctionalDddVersion>
   </PropertyGroup>
   <!-- Runtime -->
   <ItemGroup>
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
     <PackageVersion Include="Azure.Identity" Version="1.10.3" />
     <PackageVersion Include="FluentValidation" Version="11.3.0" />
-    <PackageVersion Include="FunctionalDDD.Asp" Version="$(FunctionalDDDVersion)" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjectGenerator" Version="$(FunctionalDDDVersion)" />
-    <PackageVersion Include="FunctionalDDD.CommonValueObjects" Version="$(FunctionalDDDVersion)" />
-    <PackageVersion Include="FunctionalDDD.DomainDrivenDesign" Version="$(FunctionalDDDVersion)" />
-    <PackageVersion Include="FunctionalDDD.FluentValidation" Version="$(FunctionalDDDVersion)" />
-    <PackageVersion Include="FunctionalDDD.RailwayOrientedProgramming" Version="$(FunctionalDDDVersion)" />
+    <PackageVersion Include="FunctionalDdd.Asp" Version="$(FunctionalDddVersion)" />
+    <PackageVersion Include="FunctionalDdd.CommonValueObjectGenerator" Version="$(FunctionalDddVersion)" />
+    <PackageVersion Include="FunctionalDdd.CommonValueObjects" Version="$(FunctionalDddVersion)" />
+    <PackageVersion Include="FunctionalDdd.DomainDrivenDesign" Version="$(FunctionalDddVersion)" />
+    <PackageVersion Include="FunctionalDdd.FluentValidation" Version="$(FunctionalDddVersion)" />
+    <PackageVersion Include="FunctionalDdd.RailwayOrientedProgramming" Version="$(FunctionalDddVersion)" />
     <PackageVersion Include="Mapster" Version="7.4.0" />
     <PackageVersion Include="Mapster.DependencyInjection" Version="1.0.1" />
     <PackageVersion Include="Mediator.Abstractions" Version="2.1.7" />
