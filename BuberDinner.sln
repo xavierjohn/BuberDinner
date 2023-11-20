@@ -35,6 +35,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuberDinner.Infrastructure"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuberDinner.Infrastructure.Tests", "Infrastructure\tests\BuberDinner.Infrastructure.Tests.csproj", "{B862E6F8-8D28-41C9-8682-678CC30692ED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Requests", "Requests", "{0E4C8F09-4F38-4804-8D8A-3E614856A3DD}"
+	ProjectSection(SolutionItems) = preProject
+		Requests\httpenv.json = Requests\httpenv.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authentication", "Authentication", "{65EC07A7-FE7E-455A-A498-E58B7B078FFC}"
+	ProjectSection(SolutionItems) = preProject
+		Requests\Authentication\Login.http = Requests\Authentication\Login.http
+		Requests\Authentication\Register.http = Requests\Authentication\Register.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dinners", "Dinners", "{6DD8972D-CE48-4836-BF69-05971E28D5E9}"
+	ProjectSection(SolutionItems) = preProject
+		Requests\Dinners\ListDinners.http = Requests\Dinners\ListDinners.http
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +102,8 @@ Global
 		{97F300F7-52B2-4F31-89A0-BDBD8A857487} = {8EA76B14-2484-414E-B91A-0DA0071D196F}
 		{F06741C6-2C05-48D7-9A21-6F07328938B1} = {DE739636-E2CB-4361-99A4-AC3BB029CCAF}
 		{B862E6F8-8D28-41C9-8682-678CC30692ED} = {DE739636-E2CB-4361-99A4-AC3BB029CCAF}
+		{65EC07A7-FE7E-455A-A498-E58B7B078FFC} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
+		{6DD8972D-CE48-4836-BF69-05971E28D5E9} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {339F67B3-D073-4BDF-9C41-45665718976B}
