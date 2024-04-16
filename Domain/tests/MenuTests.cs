@@ -32,7 +32,7 @@ public class MenuTests
         menuItemResult.IsFailure.Should().BeTrue();
         menuItemResult.Error.Should().BeOfType<ValidationError>();
         ValidationError validationError = (ValidationError)menuItemResult.Error;
-        validationError.Errors[0].Message.Should().EndWith($" must not be empty."); ;
+        validationError.Errors[0].Details[0].Should().EndWith($" must not be empty."); ;
     }
 
     [Theory]
@@ -68,7 +68,7 @@ public class MenuTests
         menuSectionResult.IsFailure.Should().BeTrue();
         menuSectionResult.Error.Should().BeOfType<ValidationError>();
         ValidationError validationError = (ValidationError)menuSectionResult.Error;
-        validationError.Errors[0].Message.Should().EndWith($" must not be empty."); ;
+        validationError.Errors[0].Details[0].Should().EndWith($" must not be empty."); ;
     }
 
     [Theory]
@@ -122,6 +122,6 @@ public class MenuTests
         menuResult.IsFailure.Should().BeTrue();
         menuResult.Error.Should().BeOfType<ValidationError>();
         ValidationError validationError = (ValidationError)menuResult.Error;
-        validationError.Errors[0].Message.Should().EndWith($" must not be empty."); ;
+        validationError.Errors[0].Details[0].Should().EndWith($" must not be empty."); ;
     }
 }

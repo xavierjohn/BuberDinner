@@ -34,8 +34,8 @@ public class RegisterRequestTests
     public void Multiple_parameters_are_validated()
     {
         // Arrange
-        var badFirstName = new ValidationError.ModelError("First Name cannot be empty.", "firstName");
-        var badEmail = new ValidationError.ModelError("Email address is not valid.", "email");
+        var badFirstName = new ValidationError.FieldDetails("firstName", ["First Name cannot be empty."]);
+        var badEmail = new ValidationError.FieldDetails("email", ["Email address is not valid."]);
 
         var request = new RegisterRequest("id", string.Empty, "John", "bad email", "password");
 
@@ -46,8 +46,8 @@ public class RegisterRequestTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().BeOfType(typeof(ValidationError));
         var validationError = (ValidationError)result.Error;
-        validationError.Errors[0].Should().Be(badFirstName);
-        validationError.Errors[1].Should().Be(badEmail);
+        validationError.Errors[0].Should().BeEquivalentTo(badFirstName);
+        validationError.Errors[1].Should().BeEquivalentTo(badEmail);
     }
 
     [Fact]
