@@ -28,7 +28,7 @@ public class UserTests
         userResult.IsFailure.Should().BeTrue();
         userResult.Error.Should().BeOfType<ValidationError>();
         var validationError = (ValidationError)userResult.Error;
-        validationError.Errors[0].Message.Should().EndWith($" must not be empty."); ;
+        validationError.Errors[0].Details[0].Should().EndWith($" must not be empty."); ;
     }
 
     [Fact]

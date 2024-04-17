@@ -4,9 +4,7 @@ public partial class Errors
 {
     public static class Authentication
     {
-        public static Error InvalidCredentials => Error.Unauthorized(
-            code: "Authentication.InvalidCredentials",
-            message: "Invalid credentials.");
+        public static Error InvalidCredentials => new UnauthorizedError("Invalid credentials.", "Authentication.InvalidCredentials");
     }
 
 }

@@ -28,9 +28,9 @@ public class User : Entity<UserId>
     static readonly InlineValidator<User> s_validator = new()
     {
         v => v.RuleFor(x => x.Id).NotNull(),
-        v => v.RuleFor(x => x.FirstName).NotEmpty(),
-        v => v.RuleFor(x => x.LastName).NotEmpty(),
+        v => v.RuleFor(x => x.FirstName).NotNull(),
+        v => v.RuleFor(x => x.LastName).NotNull(),
         v => v.RuleFor(x => x.Email).NotNull(),
-        v => v.RuleFor(x => x.Password).NotEmpty()
+        v => v.RuleFor(x => x.Password).NotNull()
     };
 }
