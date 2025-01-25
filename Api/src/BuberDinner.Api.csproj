@@ -14,6 +14,7 @@
     <PackageReference Include="FunctionalDDD.Asp" />
     <PackageReference Include="Mapster" />
     <PackageReference Include="Mapster.DependencyInjection" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 

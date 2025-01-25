@@ -40,7 +40,7 @@ public class AuthenticationController : ControllerBase
         await request.ToRegisterCommand()
         .BindAsync(command => _sender.Send(command))
         .MapAsync(authResult => authResult.Adapt<AuthenticationResponse>())
-        .ToOkActionResultAsync(this);
+        .ToActionResultAsync(this);
 
     /// <summary>
     /// Login for existing user.
@@ -52,5 +52,5 @@ public class AuthenticationController : ControllerBase
         await request.ToLoginQuery()
         .BindAsync(command => _sender.Send(command))
         .MapAsync(authResult => authResult.Adapt<AuthenticationResponse>())
-        .ToOkActionResultAsync(this);
+        .ToActionResultAsync(this);
 }
