@@ -69,10 +69,10 @@ public class CreateMenuRequestTests
     public void ToCreateMenuCommand_Multiple_parameters_are_validated()
     {
         // Arrange
-        ValidationError.FieldDetails badName = new("name", ["Name cannot be empty."]);
-        ValidationError.FieldDetails badDescription = new("description", ["Description cannot be empty."]);
+        ValidationError.FieldError badName = new() { FieldName = "name", Details = ["Name cannot be empty."] };
+        ValidationError.FieldError badDescription = new() { FieldName = "description", Details = ["Description cannot be empty."] };
 
-        CreateMenuRequest request = new(string.Empty, string.Empty, new List<MenuSectionRequest>());
+        CreateMenuRequest request = new(string.Empty, string.Empty, []);
 
         // Act
         Result<CreateMenuCommand> result = request.ToCreateMenuCommand("62DB3B1E-B53A-4494-9462-B220B0A83A4B");
@@ -81,16 +81,16 @@ public class CreateMenuRequestTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().BeOfType(typeof(ValidationError));
         ValidationError validationError = (ValidationError)result.Error;
-        validationError.Errors[0].Should().BeEquivalentTo(badName);
-        validationError.Errors[1].Should().BeEquivalentTo(badDescription);
+        validationError.FieldErrors[0].Should().BeEquivalentTo(badName);
+        validationError.FieldErrors[1].Should().BeEquivalentTo(badDescription);
     }
 
     [Fact]
     public void ToMenuSectionCommand_Multiple_parameters_are_validated()
     {
         // Arrange
-        ValidationError.FieldDetails badName = new("name", ["Name cannot be empty."]);
-        ValidationError.FieldDetails badDescription = new("description", ["Description cannot be empty."]);
+        ValidationError.FieldError badName = new() { FieldName = "name", Details = ["Name cannot be empty."] };
+        ValidationError.FieldError badDescription = new() { FieldName = "description", Details = ["Description cannot be empty."] };
 
         MenuSectionRequest request = new(string.Empty, string.Empty, new List<MenuItemRequest>());
 
@@ -101,16 +101,16 @@ public class CreateMenuRequestTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().BeOfType(typeof(ValidationError));
         ValidationError validationError = (ValidationError)result.Error;
-        validationError.Errors[0].Should().BeEquivalentTo(badName);
-        validationError.Errors[1].Should().BeEquivalentTo(badDescription);
+        validationError.FieldErrors[0].Should().BeEquivalentTo(badName);
+        validationError.FieldErrors[1].Should().BeEquivalentTo(badDescription);
     }
 
     [Fact]
     public void ToMenuItemCommand_Multiple_parameters_are_validated()
     {
         // Arrange
-        ValidationError.FieldDetails badName = new("name", ["Name cannot be empty."]);
-        ValidationError.FieldDetails badDescription = new("description", ["Description cannot be empty."]);
+        ValidationError.FieldError badName = new() { FieldName = "name", Details = ["Name cannot be empty."] };
+        ValidationError.FieldError badDescription = new() { FieldName = "description", Details = ["Description cannot be empty."] };
 
         MenuItemRequest request = new(string.Empty, string.Empty);
 
@@ -121,8 +121,8 @@ public class CreateMenuRequestTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().BeOfType(typeof(ValidationError));
         ValidationError validationError = (ValidationError)result.Error;
-        validationError.Errors[0].Should().BeEquivalentTo(badName);
-        validationError.Errors[1].Should().BeEquivalentTo(badDescription);
+        validationError.FieldErrors[0].Should().BeEquivalentTo(badName);
+        validationError.FieldErrors[1].Should().BeEquivalentTo(badDescription);
     }
 
     [Fact]
