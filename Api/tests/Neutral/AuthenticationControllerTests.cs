@@ -33,7 +33,9 @@ public class AuthenticationControllerTests
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        response.Content.Headers.ContentType!.ToString().Should().Be("application/json; charset=utf-8");
+        // Trellis V3 ToHttpResponseAsync emits RFC 9457 application/problem+json
+        // for failure responses (was application/json under FunctionalDdd v2.x).
+        response.Content.Headers.ContentType!.ToString().Should().Be("application/problem+json");
     }
 
     [Fact, Priority(2)]

@@ -1,4 +1,5 @@
 ﻿namespace BuberDinner.Api.Neutral.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 

@@ -1,4 +1,4 @@
-﻿namespace BuberDinner.Domain.Tests;
+namespace BuberDinner.Domain.Tests;
 
 using BuberDinner.Domain.Common.ValueObjects;
 using BuberDinner.Domain.Host.ValueObject;
@@ -17,22 +17,22 @@ public class MenuTests
         // Arrange
         MenuItemId? id = field == nameof(MenuItem.Id)
             ? default
-            : MenuItemId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E951").Value;
+            : MenuItemId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E951").UnwrapOrThrow();
         Name? name = field == nameof(Name)
             ? default
-            : Name.TryCreate("Item Name").Value;
+            : Name.TryCreate("Item Name").UnwrapOrThrow();
         Description? description = field == nameof(Description)
             ? default
-            : Description.TryCreate("Item Description").Value;
+            : Description.TryCreate("Item Description").UnwrapOrThrow();
 
         // Act
         Result<MenuItem> menuItemResult = MenuItem.TryCreate(id!, name!, description!);
 
         // Assert
         menuItemResult.IsFailure.Should().BeTrue();
-        menuItemResult.Error.Should().BeOfType<ValidationError>();
-        ValidationError validationError = (ValidationError)menuItemResult.Error;
-        validationError.FieldErrors[0].Details[0].Should().EndWith($" must not be empty."); ;
+        menuItemResult.Error.Should().BeOfType<Error.InvalidInput>();
+        Error.InvalidInput invalidInput = (Error.InvalidInput)menuItemResult.Error!;
+        invalidInput.Fields.Items[0].Detail.Should().EndWith($" must not be empty.");
     }
 
     [Theory]
@@ -45,20 +45,20 @@ public class MenuTests
         // Arrange
         MenuSectionId? id = field == nameof(MenuSection.Id)
             ? default
-            : MenuSectionId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E952").Value;
+            : MenuSectionId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E952").UnwrapOrThrow();
         Name? name = field == nameof(Name)
             ? default
-            : Name.TryCreate("Section Name").Value;
+            : Name.TryCreate("Section Name").UnwrapOrThrow();
         Description? description = field == nameof(Description)
             ? default
-            : Description.TryCreate("Section Description").Value;
+            : Description.TryCreate("Section Description").UnwrapOrThrow();
         IReadOnlyList<MenuItem> items = field == nameof(MenuSection.Items)
             ? new List<MenuItem>()
             : new List<MenuItem>()
             {
                 MenuItem.TryCreate(
-                    Name.TryCreate("Item Name").Value,
-                    Description.TryCreate("Item Description").Value).Value
+                    Name.TryCreate("Item Name").UnwrapOrThrow(),
+                    Description.TryCreate("Item Description").UnwrapOrThrow()).UnwrapOrThrow()
             };
 
         // Act
@@ -66,9 +66,9 @@ public class MenuTests
 
         // Assert
         menuSectionResult.IsFailure.Should().BeTrue();
-        menuSectionResult.Error.Should().BeOfType<ValidationError>();
-        ValidationError validationError = (ValidationError)menuSectionResult.Error;
-        validationError.FieldErrors[0].Details[0].Should().EndWith($" must not be empty."); ;
+        menuSectionResult.Error.Should().BeOfType<Error.InvalidInput>();
+        Error.InvalidInput invalidInput = (Error.InvalidInput)menuSectionResult.Error!;
+        invalidInput.Fields.Items[0].Detail.Should().EndWith($" must not be empty.");
     }
 
     [Theory]
@@ -82,30 +82,30 @@ public class MenuTests
         // Arrange
         MenuId? id = field == nameof(Menu.Id)
             ? default
-            : MenuId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E953").Value;
+            : MenuId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E953").UnwrapOrThrow();
         Name? name = field == nameof(Name)
             ? default
-            : Name.TryCreate("Menu Name").Value;
+            : Name.TryCreate("Menu Name").UnwrapOrThrow();
         Description? description = field == nameof(Description)
             ? default
-            : Description.TryCreate("Menu Description").Value;
+            : Description.TryCreate("Menu Description").UnwrapOrThrow();
         IReadOnlyList<MenuSection> sections = field == nameof(Menu.Sections)
             ? new List<MenuSection>()
             : new List<MenuSection>()
             {
                 MenuSection.TryCreate(
-                    Name.TryCreate("Section Name").Value,
-                    Description.TryCreate("Section Description").Value,
+                    Name.TryCreate("Section Name").UnwrapOrThrow(),
+                    Description.TryCreate("Section Description").UnwrapOrThrow(),
                     new List<MenuItem>()
                     {
                         MenuItem.TryCreate(
-                            Name.TryCreate("Item Name").Value,
-                            Description.TryCreate("Item Description").Value).Value
-                    }).Value
+                            Name.TryCreate("Item Name").UnwrapOrThrow(),
+                            Description.TryCreate("Item Description").UnwrapOrThrow()).UnwrapOrThrow()
+                    }).UnwrapOrThrow()
             };
         HostId? hostId = field == nameof(HostId)
             ? default
-            : HostId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E954").Value;
+            : HostId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E954").UnwrapOrThrow();
 
         // Act
         Result<Menu> menuResult = Menu.TryCreate(
@@ -120,8 +120,8 @@ public class MenuTests
 
         // Assert
         menuResult.IsFailure.Should().BeTrue();
-        menuResult.Error.Should().BeOfType<ValidationError>();
-        ValidationError validationError = (ValidationError)menuResult.Error;
-        validationError.FieldErrors[0].Details[0].Should().EndWith($" must not be empty."); ;
+        menuResult.Error.Should().BeOfType<Error.InvalidInput>();
+        Error.InvalidInput invalidInput = (Error.InvalidInput)menuResult.Error!;
+        invalidInput.Fields.Items[0].Detail.Should().EndWith($" must not be empty.");
     }
 }

@@ -1,6 +1,7 @@
-﻿namespace BuberDinner.Api.Tests.Neutral;
+namespace BuberDinner.Api.Tests.Neutral;
 
 using BuberDinner.Api.Neutral.Models.Authentication;
+using BuberDinner.Api.Tests;
 using BuberDinner.Domain.User.ValueObjects;
 
 public class RegisterRequestTests
@@ -27,16 +28,13 @@ public class RegisterRequestTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().BeOfType(typeof(ValidationError));
+        result.Error.Should().BeOfType<Error.InvalidInput>();
     }
 
     [Fact]
     public void Multiple_parameters_are_validated()
     {
         // Arrange
-        var badFirstName = new ValidationError.FieldError("firstName", ["First Name cannot be empty."]);
-        var badEmail = new ValidationError.FieldError("email", ["Email address is not valid."]);
-
         var request = new RegisterRequest("id", string.Empty, "John", "bad email", "password");
 
         // Act
@@ -44,10 +42,11 @@ public class RegisterRequestTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().BeOfType(typeof(ValidationError));
-        var validationError = (ValidationError)result.Error;
-        validationError.FieldErrors[0].Should().BeEquivalentTo(badFirstName);
-        validationError.FieldErrors[1].Should().BeEquivalentTo(badEmail);
+        result.Error.Should().BeOfType<Error.InvalidInput>();
+        var invalidInput = (Error.InvalidInput)result.Error!;
+        var fieldPointers = invalidInput.Fields.Items.Select(v => v.Field.Path).ToArray();
+        fieldPointers.Should().Contain("/firstName");
+        fieldPointers.Should().Contain("/email");
     }
 
     [Fact]
@@ -61,11 +60,11 @@ public class RegisterRequestTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        var registerCommand = result.Value;
-        registerCommand.UserId.Should().Be(UserId.TryCreate("id").Value);
-        registerCommand.FirstName.Should().Be(FirstName.TryCreate("Xavier").Value);
-        registerCommand.LastName.Should().Be(LastName.TryCreate("John").Value);
-        registerCommand.Email.Should().Be(EmailAddress.TryCreate("xavier@somewhere.com").Value);
-        registerCommand.Password.Should().Be(Password.TryCreate("password").Value);
+        var registerCommand = result.UnwrapOrThrow();
+        registerCommand.UserId.Should().Be(UserId.TryCreate("id").UnwrapOrThrow());
+        registerCommand.FirstName.Should().Be(FirstName.TryCreate("Xavier").UnwrapOrThrow());
+        registerCommand.LastName.Should().Be(LastName.TryCreate("John").UnwrapOrThrow());
+        registerCommand.Email.Should().Be(EmailAddress.TryCreate("xavier@somewhere.com").UnwrapOrThrow());
+        registerCommand.Password.Should().Be(Password.TryCreate("password").UnwrapOrThrow());
     }
 }

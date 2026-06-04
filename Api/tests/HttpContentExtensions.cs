@@ -1,4 +1,5 @@
 ﻿namespace BuberDinner.Api.Tests;
+
 using System.Text.Json;
 
 internal static class HttpContentExtensions
