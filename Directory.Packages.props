@@ -26,6 +26,7 @@
     <PackageVersion Include="Trellis.Asp" Version="$(TrellisVersion)" />
     <PackageVersion Include="Trellis.Core" Version="$(TrellisVersion)" />
     <PackageVersion Include="Trellis.FluentValidation" Version="$(TrellisVersion)" />
+    <PackageVersion Include="Trellis.Mediator" Version="$(TrellisVersion)" />
     <PackageVersion Include="Trellis.Primitives" Version="$(TrellisVersion)" />
   </ItemGroup>
   <!-- Test -->
