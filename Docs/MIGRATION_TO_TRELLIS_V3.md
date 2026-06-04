@@ -93,6 +93,15 @@ A three-line change: add `Trellis.Mediator` package reference, `using Trellis.Me
 
 ### 🥇 The big-deal architectural wins
 
+**[win-009 — added during audit] `RequiredString<TSelf>` is strict-by-default in alpha.337**
+This wasn't visible to me when I read the older `TrellisFramework` source snapshot during the migration — that snapshot showed `[NotDefault]` as opt-in. The published API ref `.github/trellis-api-core.md:1730` is unambiguous:
+
+> *"Every `Required*<TSelf>` base is **strict by default**. The generated `TryCreate` rejects `null` for every base and also rejects each base's sentinel value where one exists... `[NotDefault]` and `[Trim]` are now vestigial no-ops: the generator ignores them and emits informational diagnostics (`TRLS046`, `TRLS047`)."*
+
+For `RequiredString<TSelf>` specifically, `null`, `""`, and whitespace-only are all rejected by default. To accept empties you opt **out** via `[AllowEmpty]` / `[AllowWhitespace]` / `[NoTrim]` — the inverse of the v2.x model. **This is the right default** and matches how every other strict primitive library converges. The previously-feared silent semantic regression (originally tracked as `reg-004`) does not exist in the shipped framework — it was an artifact of reading a stale snapshot.
+
+### 🥇 The big-deal architectural wins (continued)
+
 **[win-004] `Result<T>.Value` is gone**
 `Trellis.Core/src/Result/Result{TValue}.cs:163` explicitly documents the removal: *"in v1 there was a `public TValue Value { get; }` property that threw `InvalidOperationException` on failure — the primary cause of TRLS003. It was removed from the current API."* Callers can no longer silently bypass the failure case. Replacement APIs (`TryGetValue`, `Match`, `Deconstruct`, `GetValueOrDefault`) all force the caller to acknowledge the failure path. **The single most important safety improvement in the V3 surface.**
 
@@ -125,31 +134,13 @@ After `dotnet restore`, the consumer repo gets `.github/trellis-api-core.md`, `t
 
 ## Regressions (take-back-to-team material — these need framework-side action)
 
-> Each entry below satisfies the falsifiability rule we set for ourselves: **same user intent + observable worsening + not just mechanical churn + concrete repro artifact + the fix is owned by the framework, not by BuberDinner.**
+> **Audit correction (2026-06-04):** an audit pass against the auto-deposited API ref docs in `.github/trellis-api-*.md` invalidated the original tier-1 regression `reg-004` ("RequiredString silently accepts empty strings"). The shipped alpha.337 framework rejects empty strings by default; the `[NotDefault, Trim]` attributes the migration originally added were vestigial no-ops and have been removed. See [`win-009`](#-the-big-deal-architectural-wins) above. **Three regressions remain.** Every remaining entry below satisfies the falsifiability rule: same user intent + observable worsening + not just mechanical churn + concrete repro artifact + the fix is owned by the framework, not by BuberDinner.
 
-### 🚨 Tier 1 (correctness): `[reg-004]` `RequiredString` silently accepts empty strings
+### ~~🚨 Tier 1 (correctness): `[reg-004]` `RequiredString` silently accepts empty strings~~ — RETRACTED
 
-| | |
-|---|---|
-| **Area** | `Trellis.Core` `RequiredString<TSelf>` |
-| **Severity** | `correctness` — silent semantic change |
-| **Files** | `Domain/src/User/ValueObjects/*.cs`, `Domain/src/Common/ValueObjects/*.cs` (6 files) |
+The original claim was based on a stale `Trellis.Core/src/Primitives/RequiredString.cs` snapshot that showed `[NotDefault]` as opt-in. The published `Trellis.Core 3.0.0-alpha.337` reverses that default — see `.github/trellis-api-core.md:1730`. BuberDinner's tests pass with **no** `[NotDefault, Trim]` attributes, confirming the framework rejects empty strings by default. Issue draft `files/issue-reg-004-required-empty-string.md` has been marked **do not file**. This is a meaningful methodology correction: source-tree snapshots can lag published packages; the API ref docs auto-deposited by the package are the actual contract.
 
-`Trellis.Core/src/Primitives/RequiredString.cs:7-8` documents the design choice:
-
-> *"Rejects only `null` by default; per-type sentinel rejection (cannot be empty) and trimming are opt-in via the `NotDefaultAttribute` and `TrimAttribute` attributes."*
-
-The choice is defensible, but for anyone upgrading from FunctionalDdd v2.x (where empty strings were always rejected) this is a **silent semantic regression**. Code COMPILES. Tests pass-but-do-the-wrong-thing in subtle cases. APIs start accepting empty-string requests they used to reject. We caught it because BuberDinner's tests assert `IsFailure` when the DTO has an empty `firstName`, but a less-test-rich codebase would land an empty-string acceptance bug in production.
-
-`MIGRATION_v3.md` does not call this out as a breaking change. **It should be the loudest entry in the document.**
-
-**Proposed framework-side fix.** Pick any one of:
-
-1. **Document** prominently in `MIGRATION_v3.md` as a tier-1 silent breaking change. Suggest the canonical migration: `[Trim, NotDefault]` on every existing `RequiredString`-derived value object.
-2. **Analyzer** `TRLS-###` "`RequiredString<T>` without `[NotDefault]` silently accepts empty strings — was this intended?" Fires once per derived class. Trivial to write; eliminates the silent regression entirely.
-3. **Assembly-level opt-in** `[StrictRequiredStringDefaults]` that flips the default for codebases that want v2.x semantics globally.
-
-The analyzer is the cleanest. We added `[Trim, NotDefault]` (or `[NotDefault]` alone for `Password`) on the six affected value objects to preserve BuberDinner's contract.
+### 🚨 Tier 1 — (none remaining after audit)
 
 ### Tier 2 (annoyance): `[reg-001]` Closed `Error` union has no `ReasonCode` on `AuthenticationRequired`
 
@@ -267,9 +258,9 @@ If a future entry doesn't meet all five, demote it to "paper cut" or drop it.
 
 In priority order:
 
-1. **`reg-004` (correctness)** — document the `RequiredString` empty-string semantic change loudly in `MIGRATION_v3.md`, AND ship an analyzer.
+1. ~~**`reg-004` (correctness)** — document the `RequiredString` empty-string semantic change loudly in `MIGRATION_v3.md`, AND ship an analyzer.~~ **RETRACTED** after API-ref audit (see win-009). Framework already ships strict-by-default.
 2. **`reg-003`** — ship `Result<T>.UnwrapOrThrow(string? context = null)`. DTO reconstruction is the canonical use case; every framework adopter will write this helper themselves otherwise.
 3. **`reg-002`** — split `Trellis.FluentValidation` from `Trellis.Mediator`. Domain projects should never have to depend on a mediator framework.
 4. **`reg-001`** — add `ReasonCode` to `Error.AuthenticationRequired` (non-breaking) or introduce `Error.InvalidCredentials`.
 
-Each one is small, principled, and lifts the framework toward "obvious choices only" — the same direction `win-004`, `win-005`, and `win-007` already point.
+Each one is small, principled, and lifts the framework toward "obvious choices only" — the same direction `win-004`, `win-005`, `win-007`, and `win-009` already point.
