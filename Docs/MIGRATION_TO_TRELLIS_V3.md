@@ -102,6 +102,14 @@ For `RequiredString<TSelf>` specifically, `null`, `""`, and whitespace-only are 
 
 ### 🥇 The big-deal architectural wins (continued)
 
+**[win-010 — added during audit] `TraverseAll` for accumulating collection validation**
+Cookbook Recipe 20 (`.github/trellis-api-cookbook.md:1467-1518`) ships exactly the combinator needed for "validate every row, accumulate errors": `IEnumerable<TIn>.TraverseAll(Func<TIn, Result<TOut>>) → Result<IReadOnlyList<TOut>>`. Two failing siblings merge their `Error.InvalidInput.Fields`; mixed-kind failures flatten into `Error.Aggregate`. BuberDinner had a real correctness bug from the migration (`.Match(v => v, e => throw ...)` on nested DTO conversion would surface invalid nested sections as 500s instead of 422s) — adopting `TraverseAll` per the cookbook fixed it in one commit and the regression test now guards it.
+
+**[win-011 — added during audit] `Created(selector)` builder for spec-correct 201 + Location**
+`HttpResponseOptionsBuilder<TDomain>.Created(Func<TDomain, string> selector)` (`.github/trellis-api-asp.md:111-112`) wraps the `ToHttpResponseAsync` body+configure overload into the IETF-standard "POST returned a new resource" shape. `MenusController.CreateMenu` previously returned 200 OK despite declaring `[ProducesResponseType(Status201Created)]`; the audit-driven adoption replaces a bare `ToHttpResponseAsync().AsActionResultAsync<T>()` chain with the body-and-configure overload and the controller now emits 201 + a `Location` pointing at the new resource. The framework also has `WithVersionedRoute()` for query/header API versioning (BuberDinner uses URL versioning so a literal Location works; the cookbook flags the trap clearly).
+
+### 🥇 The big-deal architectural wins (continued continued)
+
 **[win-004] `Result<T>.Value` is gone**
 `Trellis.Core/src/Result/Result{TValue}.cs:163` explicitly documents the removal: *"in v1 there was a `public TValue Value { get; }` property that threw `InvalidOperationException` on failure — the primary cause of TRLS003. It was removed from the current API."* Callers can no longer silently bypass the failure case. Replacement APIs (`TryGetValue`, `Match`, `Deconstruct`, `GetValueOrDefault`) all force the caller to acknowledge the failure path. **The single most important safety improvement in the V3 surface.**
 
@@ -188,25 +196,31 @@ The user loses the "incremental adoption" option for `Trellis.FluentValidation` 
 - Split the `IMessageValidator` adapter into a separate `Trellis.Mediator.FluentValidation` package so `Trellis.FluentValidation` can stay Domain-friendly with zero Mediator coupling.
 - Or invert the dependency direction: move the adapter into `Trellis.Mediator/FluentValidation/` so `Trellis.Mediator` depends on `Trellis.FluentValidation`. Then pulling FluentValidation alone stays Domain-pure.
 
-### Tier 2 (annoyance): `[reg-003]` No `Result<T>.UnwrapOrThrow()` for DTO reconstruction
+### Tier 2 (annoyance): `[reg-003]` No production-safe `Result<T>.UnwrapOrThrow()` for DTO reconstruction
 
 | | |
 |---|---|
 | **Area** | `Trellis.Core` `Result<T>` |
-| **Severity** | `annoyance` — visual noise on every DTO mapper / test setup |
-| **Files** | `Infrastructure/src/Persistence/Dto/*.cs` (18 call sites), various test files |
+| **Severity** | `annoyance` — visual noise on every persistence DTO mapper |
+| **Files** | `Infrastructure/src/Persistence/Dto/*.cs` (18 call sites) |
 
-`Result<T>` removed `.Value` for safety (rightly so — see win-004). `Maybe<T>` kept `.Value` (which forwards to `GetValueOrThrow()`) AND exposes `GetValueOrThrow(string? errorMessage = null)` as a named opt-in. `Result<T>` ships neither — and the DTO-reconstruction pattern (where the database-side data is already validated, so reconstruction "cannot fail") is universal in any persistence layer.
+**Important nuance from the cookbook audit:** the framework DOES ship a `Result<T>.Unwrap()` method — in **`Trellis.Testing`** — and Recipe 18 (cookbook:1357-1422) explicitly says **"Do not use `Unwrap()` in production code — it is a `Trellis.Testing` helper for tests."** The framework's intent is unambiguous: production code stays on the Result-track via `Combine`/`Map`/`Bind`/`Traverse`. For request DTO → command conversion, Recipe 18 ships the canonical pattern. **For DTO database-load → entity reconstruction, no production-safe idiom is shipped.**
 
-Consumers have three bad choices:
+That's the actual regression: the legitimate "this row already passed validation when it was written; just rehydrate the value object" case in any persistence layer has no documented framework pattern. The three bad choices remain:
 
-1. Inline `.Match(v => v, e => throw new InvalidOperationException(e.ToString()))` 18 times in BuberDinner.
-2. Write their own `Unwrap()` extension in app code (re-invents the wheel in every Trellis adopter).
-3. Use `GetValueOrDefault(null!)` and risk silent `NullReferenceException` later.
+1. Inline `.Match(v => v, e => throw new InvalidOperationException(e.ToString()))` 50+ chars per call site (visual noise, opaque grep target).
+2. Write a local `UnwrapOrThrow` helper in every Trellis adopter (BuberDinner did this at `Domain/src/Common/TrellisResultExtensions.cs`).
+3. Use `GetValueOrDefault(null!)` and risk silent `NullReferenceException` at the next access.
 
-We adopted option 2 — `Domain/src/Common/TrellisResultExtensions.cs` is the single canonical helper, lifted into the global `Using` so all projects pick it up. The visual noise is real even in 50 lines of DTO mapping; it would be untenable in a serialization-heavy codebase.
+The `Maybe<T>` surface ships `GetValueOrThrow(string? errorMessage = null)` (cookbook:399-407) — a named, documented "this throws if absent" extractor. The asymmetry between `Maybe<T>` and `Result<T>` is the architectural mismatch.
 
-**Proposed framework-side fix.** Ship `Result<T>.UnwrapOrThrow(string? errorContext = null)` mirroring `Maybe<T>.GetValueOrThrow`. The name and "throws on failure" contract are explicit; analyzer TRLS003 can keep flagging unsafe uses but allow this one named escape hatch. Documentation should call out the DTO reconstruction pattern as the canonical use case.
+**Proposed framework-side fix.** Pick one:
+
+- (a) Ship `Result<T>.UnwrapOrThrow(string? context = null)` for the specific "trust-this-validation-already-happened" persistence-reconstruction case. Document it as production-safe but narrow.
+- (b) Ship a cookbook recipe that demonstrates the persistence-reconstruction pattern keeping `Result<TEntity>` end-to-end — even when the database side guarantees validity. (Likely requires `IRepository<T>.FindById` returning `Result<Maybe<T>>` rather than `T?`.)
+- (c) Document `Trellis.Testing.Unwrap` as also valid in production for the narrow DTO-reconstruction case, and acknowledge the naming gap.
+
+We adopted option 2 in BuberDinner (the local helper). The issue ask is for the framework to ship a documented option 1, 2, or 3 — whichever the maintainers prefer.
 
 ---
 
@@ -217,6 +231,19 @@ We adopted option 2 — `Domain/src/Common/TrellisResultExtensions.cs` is the si
 - **Validation behavior via `IMessageValidator<TCommand>`.** BuberDinner runs validation at the DTO layer (`Request.ToCommand()`) before `Send()`. Moving validation to the command boundary is an architectural shift, not a framework-migration concern. Defer.
 - **`AddTrellisFluentValidation()`.** Same reasoning — FluentValidation is used inside the Domain validators (`User`, `Menu`, `MenuItem`, `MenuSection`), not as a Mediator pre-handler.
 - **Infrastructure tests requiring a live Cosmos DB.** `Infrastructure.Tests` failed 2/2 on the baseline (no Cosmos), and fails 2/2 after the migration. Not migration-related.
+
+### Audit-deferred follow-ups (cookbook adoption gaps — separate PR)
+
+The post-merge audit against `.github/trellis-api-cookbook.md` and `.github/trellis-api-asp.md` identified 9 high-impact adoption gaps. Findings 1, 4, and 8 are fixed in the audit commits (`9b7a9e2`). The remaining six are real but bigger scope and out of scope for this migration PR:
+
+- **Finding 2 — `AddTrellisFluentValidation` at the command boundary.** Wire `IValidator<TCommand>` adapters through the mediator validation behavior (Recipe 2, cookbook:251-295). Lets the Domain project drop its `Trellis.FluentValidation` PackageReference (which also addresses part of `reg-002`).
+- **Finding 3 — Idempotency on POST endpoints.** `Register` and `CreateMenu` should opt into `[Idempotent]` + `AddTrellisIdempotency()` (cookbook Recipe 29). Production needs a shared-store decision; in-memory is fine for dev.
+- **Finding 5 — Resource-based authorization.** Host/menu ownership check via `IAuthorizeResource<Host>` + `AddResourceAuthorization()` (Recipe 7). Currently `Program.cs` requires only authentication; ownership is not validated.
+- **Finding 6 — `IRepository<T>.FindById` should return `Maybe<T>`.** Makes absence explicit and composes naturally with `Match`/`Bind` (Recipe 1, cookbook:182-188).
+- **Finding 7 — Trellis.Testing assertions.** Replace hand-rolled `Fields.Items[i].Field.Path` checks with `BeFailureOfType<Error.InvalidInput>().Which.HaveFieldError(...)` (Recipe 10).
+- **Finding 9 — Scalar-VO route constraints.** `AddTrellisRouteConstraint<HostId>("HostId")` plus `[Route("hosts/{hostId:HostId}/...")]` removes the manual `string → HostId.TryCreate` reparse in `CreateMenu` (Recipe 14).
+
+Full audit details in `~/.copilot/session-state/.../files/audit-missed-apis.md`.
 
 ---
 
