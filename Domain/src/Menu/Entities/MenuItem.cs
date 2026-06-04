@@ -11,7 +11,7 @@ public class MenuItem : Entity<MenuItemId>
 
     public static Result<MenuItem> TryCreate(Name name, Description description)
     {
-        return TryCreate(MenuItemId.NewUnique(), name, description);
+        return TryCreate(MenuItemId.NewUniqueV7(), name, description);
     }
 
     public static Result<MenuItem> TryCreate(MenuItemId menuItemId, Name name, Description description)

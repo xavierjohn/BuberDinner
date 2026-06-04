@@ -28,7 +28,7 @@
                 .BindAsync(user =>
                 {
                     var token = _jwtTokenGenerator.GenerateToken(user);
-                    return Result.Success(new AuthenticationResult(user, token));
+                    return Result.Ok(new AuthenticationResult(user, token));
                 });
     }
 }

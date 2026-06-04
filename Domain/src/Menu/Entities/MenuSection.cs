@@ -18,7 +18,7 @@ public class MenuSection : Entity<MenuSectionId>
         Description description,
         IReadOnlyList<MenuItem> items)
     {
-        return TryCreate(MenuSectionId.NewUnique(), name, description, items);
+        return TryCreate(MenuSectionId.NewUniqueV7(), name, description, items);
     }
 
     public static Result<MenuSection> TryCreate(

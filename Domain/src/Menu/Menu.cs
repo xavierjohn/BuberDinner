@@ -29,7 +29,7 @@ public class Menu : Aggregate<MenuId>
         HostId host)
     {
         return TryCreate(
-            MenuId.NewUnique(),
+            MenuId.NewUniqueV7(),
             name,
             description,
             null,

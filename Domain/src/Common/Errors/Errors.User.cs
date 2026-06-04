@@ -1,11 +1,16 @@
-﻿namespace BuberDinner.Domain.Errors;
+namespace BuberDinner.Domain.Errors;
+
+using BuberDinner.Domain.User.ValueObjects;
+using UserEntity = BuberDinner.Domain.User.Entities.User;
 
 public partial class Errors
 {
     public static class User
     {
-        public static Error AlreadyExists(string id) => new ConflictError("User Id already exists.", "User.DuplicateUserId", id);
+        public static Error AlreadyExists(UserId id) =>
+            new Error.Conflict(ResourceRef.For<UserEntity>(id.Value), "user.duplicate_id") { Detail = "User Id already exists." };
 
-        public static Error DoesNotExist(string id) => new NotFoundError("User.DoesNotExist", "User Id does not exist.", id);
+        public static Error DoesNotExist(UserId id) =>
+            new Error.NotFound(ResourceRef.For<UserEntity>(id.Value)) { Detail = "User Id does not exist." };
     }
 }

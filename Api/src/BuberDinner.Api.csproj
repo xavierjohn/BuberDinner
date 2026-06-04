@@ -11,7 +11,7 @@
    
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
-    <PackageReference Include="FunctionalDDD.Asp" />
+    <PackageReference Include="Trellis.Asp" />
     <PackageReference Include="Mapster" />
     <PackageReference Include="Mapster.DependencyInjection" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />

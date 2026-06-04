@@ -25,11 +25,13 @@ public class CreateMenuCommandHandler : IRequestHandler<CreateMenuCommand, Resul
 
     private static IReadOnlyList<MenuSection> CreateMenuSections(IReadOnlyList<MenuSectionCommand> commands) =>
         commands
-            .Select(msc => MenuSection.TryCreate(msc.Name, msc.Description, CreateMenuItems(msc.Items)).Value)
+            .Select(msc => MenuSection.TryCreate(msc.Name, msc.Description, CreateMenuItems(msc.Items))
+                .Match(section => section, error => throw new InvalidOperationException(error.ToString())))
             .ToList();
 
     private static IReadOnlyList<MenuItem> CreateMenuItems(IReadOnlyList<MenuItemCommand> commands) =>
         commands
-            .Select(mic => MenuItem.TryCreate(mic.Name, mic.Description).Value)
+            .Select(mic => MenuItem.TryCreate(mic.Name, mic.Description)
+                .Match(item => item, error => throw new InvalidOperationException(error.ToString())))
             .ToList();
 }

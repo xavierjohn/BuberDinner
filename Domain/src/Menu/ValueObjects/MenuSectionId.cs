@@ -1,5 +1,5 @@
 ﻿namespace BuberDinner.Domain.Menu.ValueObject;
 
-public partial class MenuSectionId : RequiredGuid
+public partial class MenuSectionId : RequiredGuid<MenuSectionId>
 {
 }

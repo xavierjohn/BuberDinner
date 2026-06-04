@@ -13,8 +13,8 @@ internal static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
         services.AddControllers();
+        services.AddTrellisAspWithScalarValidation();
         services.AddMappings();
-        services.AddProblemDetails();
         services.AddApiVersioning(
                     options =>
                     {

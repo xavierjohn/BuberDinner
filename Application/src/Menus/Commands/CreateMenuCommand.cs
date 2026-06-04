@@ -12,7 +12,7 @@ public class CreateMenuCommand : IRequest<Result<Menu>>
         Description description,
         IReadOnlyList<MenuSectionCommand> sections,
         HostId hostId) =>
-            new CreateMenuCommand(name, description, sections, hostId);
+            Result.Ok(new CreateMenuCommand(name, description, sections, hostId));
 
     public Name Name { get; }
     public Description Description { get; }
@@ -38,7 +38,7 @@ public class MenuSectionCommand
         Name name,
         Description description,
         IReadOnlyList<MenuItemCommand> items) =>
-            new MenuSectionCommand(name, description, items);
+            Result.Ok(new MenuSectionCommand(name, description, items));
 
     public Name Name { get; }
     public Description Description { get; }
@@ -57,7 +57,7 @@ public class MenuItemCommand
     public static Result<MenuItemCommand> TryCreate(
         Name name,
         Description description) =>
-            new MenuItemCommand(name, description);
+            Result.Ok(new MenuItemCommand(name, description));
 
     public Name Name { get; }
     public Description Description { get; }

@@ -41,7 +41,8 @@ public class MenusController : ControllerBase
             .ToCreateMenuCommand(hostId)
             .BindAsync(command => _sender.Send(command))
             .MapAsync(menu => menu.Adapt<CreateMenuResponse>())
-            .ToActionResultAsync(this);
+            .ToHttpResponseAsync()
+            .AsActionResultAsync<CreateMenuResponse>();
 
     // TODO: Replace ToOkActionResultAsync(this); with the below code once the Get operation is implemented.
     //
