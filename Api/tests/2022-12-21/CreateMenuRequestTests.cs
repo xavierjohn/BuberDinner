@@ -120,6 +120,38 @@ public class CreateMenuRequestTests
         fieldPointers.Should().Contain("/description");
     }
 
+    // Regression test for the audit finding "nested menu DTO conversion should use TraverseAll":
+    // pre-fix, an invalid section/item nested inside an otherwise-valid CreateMenuRequest threw
+    // InvalidOperationException (would surface as 500) instead of staying on the Result track and
+    // becoming an Error.InvalidInput / 422 with field violations for the nested fields.
+    [Fact]
+    public void ToCreateMenuCommand_invalid_nested_section_aggregates_field_errors_instead_of_throwing()
+    {
+        // Arrange
+        CreateMenuRequest request = new(
+            "Valid Menu Name",
+            "Valid Menu Description",
+            new List<MenuSectionRequest>
+            {
+                // Invalid: empty Section.Name AND empty MenuItem.Description
+                new(string.Empty, "Valid section description", new List<MenuItemRequest>
+                {
+                    new("Valid item name", string.Empty)
+                })
+            });
+
+        // Act
+        Result<CreateMenuCommand> result = request.ToCreateMenuCommand("62DB3B1E-B53A-4494-9462-B220B0A83A4B");
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().BeOfType<Error.InvalidInput>();
+        var invalidInput = (Error.InvalidInput)result.Error!;
+        var fieldPointers = invalidInput.Fields.Items.Select(v => v.Field.Path).ToArray();
+        fieldPointers.Should().Contain("/name", "the empty section name should be reported as a validation failure");
+        fieldPointers.Should().Contain("/description", "the empty nested item description should be reported as a validation failure");
+    }
+
     [Fact]
     public void Can_create_CreateMenuCommand()
     {

@@ -24,10 +24,7 @@ public record CreateMenuRequest(
         .Bind(CreateMenuCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuSectionCommand>> GetMenuSectionCommands() =>
-        Result.Ok((IReadOnlyList<MenuSectionCommand>)this.Sections
-            .Select(ms => ms.ToMenuSectionCommand()
-                .Match(cmd => cmd, error => throw new InvalidOperationException(error.ToString())))
-            .ToList());
+        this.Sections.TraverseAll(ms => ms.ToMenuSectionCommand());
 }
 
 /// <summary>
@@ -48,10 +45,7 @@ public record MenuSectionRequest(
         .Bind(MenuSectionCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuItemCommand>> GetMenuItemCommands() =>
-        Result.Ok((IReadOnlyList<MenuItemCommand>)this.Items
-            .Select(i => i.ToMenuItemCommand()
-                .Match(cmd => cmd, error => throw new InvalidOperationException(error.ToString())))
-            .ToList());
+        this.Items.TraverseAll(i => i.ToMenuItemCommand());
 }
 
 /// <summary>

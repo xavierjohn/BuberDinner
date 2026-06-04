@@ -8,9 +8,9 @@ public partial class Errors
     public static class User
     {
         public static Error AlreadyExists(UserId id) =>
-            new Error.Conflict(ResourceRef.For<UserEntity>(id.Value), "user.duplicate_id") { Detail = "User Id already exists." };
+            new Error.Conflict(ResourceRef.For<UserEntity>(id), "user.duplicate_id") { Detail = "User Id already exists." };
 
         public static Error DoesNotExist(UserId id) =>
-            new Error.NotFound(ResourceRef.For<UserEntity>(id.Value)) { Detail = "User Id does not exist." };
+            new Error.NotFound(ResourceRef.For<UserEntity>(id)) { Detail = "User Id does not exist." };
     }
 }

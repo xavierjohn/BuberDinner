@@ -40,16 +40,8 @@ public class MenusController : ControllerBase
         await request
             .ToCreateMenuCommand(hostId)
             .BindAsync(command => _sender.Send(command))
-            .MapAsync(menu => menu.Adapt<CreateMenuResponse>())
-            .ToHttpResponseAsync()
+            .ToHttpResponseAsync(
+                body: menu => menu.Adapt<CreateMenuResponse>(),
+                configure: opts => opts.Created(menu => $"/hosts/{hostId}/menus/{menu.Id}"))
             .AsActionResultAsync<CreateMenuResponse>();
-
-    // TODO: Replace ToOkActionResultAsync(this); with the below code once the Get operation is implemented.
-    //
-    //        .FinallyAsync(
-    //             result => (ActionResult<CreateMenuResponse>)CreatedAtAction(
-    //                "Get",
-    //                new { id = result.Id },
-    //                result),
-    //             result => result.ToErrorActionResult<CreateMenuResponse>(this));
 }

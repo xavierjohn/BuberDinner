@@ -20,18 +20,15 @@ public class CreateMenuCommandHandler : IRequestHandler<CreateMenuCommand, Resul
         CreateMenu(request, cancellationToken);
 
     private async ValueTask<Result<Menu>> CreateMenu(CreateMenuCommand request, CancellationToken cancellationToken) =>
-        await Menu.TryCreate(request.Name, request.Description, CreateMenuSections(request.Sections), request.HostId)
-        .TapAsync(menu => _menuRepository.Add(menu, cancellationToken));
+        await CreateMenuSections(request.Sections)
+            .Bind(sections => Menu.TryCreate(request.Name, request.Description, sections, request.HostId))
+            .TapAsync(menu => _menuRepository.Add(menu, cancellationToken));
 
-    private static IReadOnlyList<MenuSection> CreateMenuSections(IReadOnlyList<MenuSectionCommand> commands) =>
-        commands
-            .Select(msc => MenuSection.TryCreate(msc.Name, msc.Description, CreateMenuItems(msc.Items))
-                .Match(section => section, error => throw new InvalidOperationException(error.ToString())))
-            .ToList();
+    private static Result<IReadOnlyList<MenuSection>> CreateMenuSections(IReadOnlyList<MenuSectionCommand> commands) =>
+        commands.TraverseAll(command =>
+            CreateMenuItems(command.Items)
+                .Bind(items => MenuSection.TryCreate(command.Name, command.Description, items)));
 
-    private static IReadOnlyList<MenuItem> CreateMenuItems(IReadOnlyList<MenuItemCommand> commands) =>
-        commands
-            .Select(mic => MenuItem.TryCreate(mic.Name, mic.Description)
-                .Match(item => item, error => throw new InvalidOperationException(error.ToString())))
-            .ToList();
+    private static Result<IReadOnlyList<MenuItem>> CreateMenuItems(IReadOnlyList<MenuItemCommand> commands) =>
+        commands.TraverseAll(command => MenuItem.TryCreate(command.Name, command.Description));
 }

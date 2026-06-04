@@ -140,7 +140,12 @@ public class MenusControllerTests
             new StringContent(json, Encoding.UTF8, "application/json"));
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        // Finding 4 from .github/trellis-api-asp.md audit: CreateMenu now correctly returns 201 Created
+        // with a Location header instead of 200 OK (matches the [ProducesResponseType(201)] declaration
+        // on the controller and the framework's ToHttpResponseAsync(..., opts => opts.Created(...)) builder).
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Headers.Location.Should().NotBeNull();
+        response.Headers.Location!.OriginalString.Should().StartWith("/hosts/4F82063C-AE9D-4F5B-B676-DD781C14EFA0/menus/");
         await ValidateMenuResponse(response);
     }
 
