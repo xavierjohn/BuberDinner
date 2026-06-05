@@ -2,51 +2,63 @@
 
 ## Dinner
 
-```csharp
-class Dinner
-{
-    // TODO: Add methods
-}
+Lifecycle-driven aggregate. State transitions enforced via a Stateless state machine
+configured inside the aggregate; transitions return `Result<Dinner>` so the handler
+chain composes cleanly. Every successful transition adds one entry to
+`DomainEvents`, dispatched by `DomainEventDispatchBehavior` after the handler returns
+success — registered handlers fire post-persistence.
+
+### Status
+
+```text
+Upcoming ──Start──▶ InProgress ──End──▶ Ended    (terminal)
+   │
+   └──────Cancel(reason)──▶ Cancelled            (terminal)
 ```
+
+`Ended` and `Cancelled` are both terminal but semantically distinct:
+
+- `Cancelled` = the dinner *never happened*. Set from `Upcoming` only.
+- `Ended` = the dinner *ran to completion*. Set from `InProgress` only.
+
+### Domain events
+
+| Event | When | Payload |
+|---|---|---|
+| `DinnerScheduled` | `TryCreate` succeeds | `DinnerId, HostId, MenuId, StartDateTime, EndDateTime, OccurredAt` |
+| `DinnerStarted`   | `Start(clock)` succeeds | `DinnerId, HostId, MenuId, OccurredAt` |
+| `DinnerEnded`     | `End(clock)` succeeds | `DinnerId, HostId, MenuId, OccurredAt` |
+| `DinnerCancelled` | `Cancel(reason, clock)` succeeds | `DinnerId, HostId, MenuId, Reason, OccurredAt` |
+
+Per cookbook Recipe 17: `OccurredAt` is the *only* timestamp on a domain event; the
+event type name carries the semantic. Don't add `StartedAt`/`EndedAt`/`CancelledAt`
+aliases to the events — those live on the aggregate.
+
+### Wire shape
 
 ```json
 {
-    "id": { "value": "00000000-0000-0000-0000-000000000000" },
-    "name": "Yummy Dinner",
-    "description": "A dinner with yummy food",
-    "startDateTime": "2020-01-01T00:00:00.0000000Z",
-    "endDateTime": "2020-01-01T00:00:00.0000000Z",
-    "startedDateTime": null,
-    "endedDateTime": null,
-    "status": "Upcoming", // Upcoming, InProgress, Ended, Cancelled
-    "isPublic": true,
-    "maxGuests": 10,
-    "price": {
-        "amount": 10.99,
-        "currency": "USD"
-    },
-    "hostId": { "value": "00000000-0000-0000-0000-000000000000" },
-    "menuId": { "value": "00000000-0000-0000-0000-000000000000" },
-    "imageUrl": "https://image.com",
-    "location": {
-        "name": "Dan's Pizza Place",
-        "address": "Berlin, Germany",
-        "latitude": 52.520008,
-        "longitude": 13.404954
-    },
-    "reservations": [
-        {
-            "id": { "value": "00000000-0000-0000-0000-000000000000" },
-            "guestCount": 2,
-            "reservationStatus": "Reserved", // PendingGuestConfirmation, Reserved, Cancelled
-            "guestId": { "value": "00000000-0000-0000-0000-000000000000" },
-            "billId": { "value": "00000000-0000-0000-0000-000000000000 }",
-            "arrivalDateTime": null,
-            "createdDateTime": "2020-01-01T00:00:00.0000000Z",
-            "updatedDateTime": "2020-01-01T00:00:00.0000000Z"
-        }
-    ],
-    "createdDateTime": "2020-01-01T00:00:00.0000000Z",
-    "updatedDateTime": "2020-01-01T00:00:00.0000000Z"
+    "id": "019e95a2-5735-71c1-a435-f78c5c2d6182",
+    "name": "Brunch with friends",
+    "description": "Casual Sunday brunch",
+    "hostId": "019e95a2-5601-7868-9d20-7fb072bd5757",
+    "menuId": "019e95a2-567e-739e-a05e-fe55ca12e19e",
+    "status": "Upcoming",
+    "startDateTime": "2026-07-01T18:00:00+00:00",
+    "endDateTime":   "2026-07-01T21:00:00+00:00",
+    "startedAt": null,
+    "endedAt": null,
+    "cancelledAt": null,
+    "cancellationReason": null
 }
 ```
+
+### Reservations / Location / Price (deferred)
+
+The earlier aspirational shape included `reservations[]`, `location`, `price`, and
+`imageUrl`. Those land in later PRs:
+
+- **PR 4**: `Reservation` entities under Dinner + `Bookings` aggregate + idempotency-key
+  bookings + multi-aggregate orchestration.
+- **PR 5+**: `Location` value object (composite), `Money` from `Trellis.Primitives`, optional
+  image URL with `Maybe<UrlValue>` per Recipe 14.

@@ -1,8 +1,11 @@
 ﻿namespace BuberDinner.Api;
 
 using System.Reflection;
+using BuberDinner.Application.Dinners.Events;
 using BuberDinner.Application.Hosts.Authorization;
 using BuberDinner.Application.Menus.Commands;
+using BuberDinner.Domain.Dinner.Events;
+using BuberDinner.Domain.Dinner.ValueObject;
 using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu.ValueObject;
 using Mapster;
@@ -23,9 +26,10 @@ internal static class DependencyInjection
         services.AddTrellisAspWithScalarValidation();
 
         // Scalar value-object route constraints — let MVC bind `{hostId:HostId}` / `{menuId:MenuId}`
-        // straight into typed VOs at the boundary (instead of string-then-reparse-in-DTO).
+        // / `{dinnerId:DinnerId}` straight into typed VOs at the boundary.
         services.AddTrellisRouteConstraint<HostId>(nameof(HostId));
         services.AddTrellisRouteConstraint<MenuId>(nameof(MenuId));
+        services.AddTrellisRouteConstraint<DinnerId>(nameof(DinnerId));
 
         // Resource-based authorization wiring: ClaimsActorProvider reads the JWT `sub` claim
         // and the SharedResourceLoaderById<Host, HostId> in the Application assembly authorizes
@@ -34,6 +38,19 @@ internal static class DependencyInjection
         services.AddResourceAuthorization(
             typeof(UpdateMenuCommand).Assembly,   // Application — commands + IAuthorizeResource implementations
             typeof(HostResourceLoader).Assembly); // Same assembly today; named for clarity / future ACL split
+
+        // Domain event dispatch (Cookbook Recipe 17): explicit per-handler registration is
+        // AOT-safe and surfaces intent at the registration site. Each Dinner state transition
+        // raises exactly one event; each event has a single side-effect-only logging handler.
+        services.AddDomainEventDispatch();
+        services.AddDomainEventHandler<DinnerScheduled, LogDinnerScheduledHandler>();
+        services.AddDomainEventHandler<DinnerStarted, LogDinnerStartedHandler>();
+        services.AddDomainEventHandler<DinnerEnded, LogDinnerEndedHandler>();
+        services.AddDomainEventHandler<DinnerCancelled, LogDinnerCancelledHandler>();
+
+        // .NET 8 testable clock — handlers inject TimeProvider rather than DateTime.UtcNow so
+        // tests can pin the clock via FakeTimeProvider (Cookbook Recipe 17 §1319).
+        services.AddSingleton(TimeProvider.System);
 
         services.AddMappings();
         services.AddApiVersioning(

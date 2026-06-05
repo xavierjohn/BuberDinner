@@ -7,6 +7,7 @@ using BuberDinner.Application.Abstractions.Persistence;
 using BuberDinner.Domain.Menu;
 using BuberDinner.Domain.User.Entities;
 using HostEntity = BuberDinner.Domain.Host.Entities.Host;
+using DinnerEntity = BuberDinner.Domain.Dinner.Entities.Dinner;
 using BuberDinner.Infrastructure.Authentication;
 using BuberDinner.Infrastructure.Persistence.Cosmos;
 using BuberDinner.Infrastructure.Persistence.Memory;
@@ -66,6 +67,12 @@ public static class DependencyInjection
         // POST /hosts or PUT /hosts/.../menus/... (which loads the parent Host for
         // IAuthorizeResource<Host>). Tracked alongside the broader 5-PR showcase roadmap.
         services.AddScoped<IRepository<HostEntity>, HostInMemoryRepository>();
+        // TODO: replace with DinnerCosmosDbRepository when implemented. Same stop-gap rationale
+        // as Host above — Dinner aggregates land in the in-memory store regardless of the
+        // configured persistence mode until a Cosmos implementation ships.
+        services.AddScoped<DinnerInMemoryRepository>();
+        services.AddScoped<IRepository<DinnerEntity>>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
+        services.AddScoped<IDinnerRepository>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
         return services;
     }
 
@@ -74,6 +81,9 @@ public static class DependencyInjection
         services.AddScoped<IRepository<User>, UserInMemoryRepository>();
         services.AddScoped<IRepository<Menu>, MenuInMemoryRepository>();
         services.AddScoped<IRepository<HostEntity>, HostInMemoryRepository>();
+        services.AddScoped<DinnerInMemoryRepository>();
+        services.AddScoped<IRepository<DinnerEntity>>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
+        services.AddScoped<IDinnerRepository>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
         return services;
     }
 }

@@ -1,13 +1,16 @@
-### TODO: ListDinners endpoint not yet implemented.
-### BuberDinner.Domain.Dinner currently has only a DinnerId value object — no Dinner aggregate,
-### no controller, no handler. This file is aspirational; the request below will 404 until
-### a Dinners controller is added (likely future PR: paginated list using Trellis Page<T> +
-### Cursor + ToPageAsync, see cookbook Recipe 3).
-###
-### Keeping the file as a placeholder so the planned shape is visible from the Requests/
-### tree, but it does NOT exercise a live endpoint today.
+### List all dinners owned by the route host. Simple (non-paginated) for PR 2 —
+### PR 3 will switch this to `Page<T>` + `Cursor` per Cookbook Recipe 3.
 
 @token = yourtoken
-GET {{host}}/dinners?api-version=2022-10-01
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+
+GET {{host}}/hosts/{{hostId}}/dinners?api-version=2022-10-01
 Authorization: Bearer {{token}}
 
+### Expected response:
+### HTTP/1.1 200 OK
+### Content-Type: application/json
+### [
+###   { "id": "...", "name": "Brunch with friends", "status": "Upcoming", ... },
+###   { "id": "...", "name": "Another dinner",       "status": "Cancelled", ... }
+### ]

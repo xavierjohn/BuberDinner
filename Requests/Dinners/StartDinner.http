@@ -1,0 +1,28 @@
+### Transition a dinner from `Upcoming` to `InProgress`. Body-less per Cookbook Recipe 23 —
+### state machines on POST endpoints substitute for `If-Match` (an invalid transition is a
+### semantic rule violation, not a concurrent-modification conflict).
+###
+### On success: 200 OK + new ETag + body reflecting `status: "InProgress"` and `startedAt`
+### populated to the server's wall-clock at transition time. A `DinnerStarted` domain event
+### is published to every registered IDomainEventHandler<DinnerStarted>.
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@dinnerId = 019E95A2-5735-71C1-A435-F78C5C2D6182
+
+POST {{host}}/hosts/{{hostId}}/dinners/{{dinnerId}}/start?api-version=2022-10-01
+Authorization: Bearer {{token}}
+
+### Expected response (happy path):
+### HTTP/1.1 200 OK
+### ETag: "<new-etag>"
+### { ..., "status": "InProgress", "startedAt": "2026-07-01T18:00:00.123Z", ... }
+###
+### Expected response (invalid transition — already InProgress or Ended/Cancelled):
+### HTTP/1.1 422 Unprocessable Entity
+### Content-Type: application/problem+json
+### {
+###   "status": 422, "code": "invalid-input",
+###   "rules": [{ "code": "state.machine.invalid.transition",
+###               "detail": "Trigger 'Start' is not permitted from state 'InProgress'." }]
+### }

@@ -1,0 +1,40 @@
+### Schedule a new dinner under the route host. Resource auth gates by Host ownership;
+### the handler also verifies the supplied menuId belongs to the same host (404 if not).
+### Validates EndDateTime > StartDateTime (422 if not).
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+
+POST {{host}}/hosts/{{hostId}}/dinners?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Brunch with friends",
+    "description": "Casual Sunday brunch",
+    "menuId": "{{menuId}}",
+    "startDateTime": "2026-07-01T18:00:00Z",
+    "endDateTime": "2026-07-01T21:00:00Z"
+}
+
+### Expected response shape:
+### HTTP/1.1 201 Created
+### ETag: "<strong-etag>"
+### Location: /hosts/{hostId}/dinners/{dinnerId}
+### Content-Type: application/json
+### {
+###   "id": "019e95a2-5735-71c1-a435-f78c5c2d6182",
+###   "name": "Brunch with friends",
+###   "description": "Casual Sunday brunch",
+###   "hostId": "...",
+###   "menuId": "...",
+###   "status": "Upcoming",
+###   "startDateTime": "2026-07-01T18:00:00+00:00",
+###   "endDateTime":   "2026-07-01T21:00:00+00:00",
+###   "startedAt": null, "endedAt": null,
+###   "cancelledAt": null, "cancellationReason": null
+### }
+###
+### Side effect (visible in server logs, captured by integration tests):
+###   info: LogDinnerScheduledHandler[0] Dinner X scheduled for host Y from ... to ...
