@@ -53,7 +53,9 @@ public class MenusController : ControllerBase
         [FromQuery(Name = "limit")] int? limit,
         CancellationToken cancellationToken)
     {
-        var basePath = $"/hosts/{hostId.Value}/menus";
+        // Framework contract (trellis-api-asp.md:86): nextUrlBuilder must return an absolute URL.
+        var origin = $"{Request.Scheme}://{Request.Host}";
+        var basePath = $"{origin}/hosts/{hostId.Value}/menus";
         var apiVersion = HttpContext.GetRequestedApiVersion()?.ToString() ?? "2022-10-01";
 
         return await _sender.Send(

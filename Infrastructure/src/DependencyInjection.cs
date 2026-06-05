@@ -61,13 +61,17 @@ public static class DependencyInjection
         configuration.Bind(nameof(CosmosDbClientSettings), cosmosDbClientSettings);
         services.AddSingleton(CosmosClientFactory.InitializeCosmosClientInstance(cosmosDbClientSettings));
         services.AddScoped<IRepository<User>, UserCosmosDbRepository>();
-        services.AddScoped<IRepository<Menu>, MenuCosmosDbRepository>();
-        // TODO: replace with HostCosmosDbRepository / MenuCosmosDbRepository (paginated) /
-        // DinnerCosmosDbRepository when they ship. Until then, fall back to in-memory so a
-        // Cosmos-configured deploy doesn't crash on POST /hosts, PUT .../menus/..., or the
-        // paginated list/dinner endpoints. Tracked alongside the broader 5-PR roadmap.
+        // TODO: replace with HostCosmosDbRepository / paginated MenuCosmosDbRepository (implements
+        // IMenuRepository) / DinnerCosmosDbRepository when they ship. Until then, fall back to
+        // in-memory so a Cosmos-configured deploy doesn't crash on POST /hosts, the paginated
+        // GET /menus / GET /dinners, or any Dinner state-transition. CRITICAL: both
+        // IRepository<TAggregate> AND the typed sub-interface (IMenuRepository / IDinnerRepository)
+        // must bind to the SAME scoped concrete instance — otherwise write and read flows hit
+        // different static stores and the list endpoints silently return empty after a successful
+        // create. Mirrors the InMemory branch wiring below.
         services.AddScoped<IRepository<HostEntity>, HostInMemoryRepository>();
         services.AddScoped<MenuInMemoryRepository>();
+        services.AddScoped<IRepository<Menu>>(sp => sp.GetRequiredService<MenuInMemoryRepository>());
         services.AddScoped<IMenuRepository>(sp => sp.GetRequiredService<MenuInMemoryRepository>());
         services.AddScoped<DinnerInMemoryRepository>();
         services.AddScoped<IRepository<DinnerEntity>>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());

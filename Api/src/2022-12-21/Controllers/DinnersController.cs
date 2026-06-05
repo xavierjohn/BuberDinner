@@ -83,7 +83,13 @@ public class DinnersController : ControllerBase
         [FromQuery(Name = "limit")] int? limit,
         CancellationToken cancellationToken)
     {
-        var basePath = $"/hosts/{hostId.Value}/dinners";
+        // Framework contract (trellis-api-asp.md:86 / :383): nextUrlBuilder must return an
+        // ABSOLUTE URL. The cursor flows into PageLink.Href on the JSON envelope AND the
+        // RFC 8288 `Link: <href>; rel="next"` header — both downstream consumers (clients
+        // queueing the cursor for later, share-the-cursor flows, HATEOAS schedulers) expect
+        // a fully-qualified URI they can hand to `new Uri(...)` without a base.
+        var origin = $"{Request.Scheme}://{Request.Host}";
+        var basePath = $"{origin}/hosts/{hostId.Value}/dinners";
         var apiVersion = HttpContext.GetRequestedApiVersion()?.ToString() ?? "2022-10-01";
 
         return await _sender.Send(

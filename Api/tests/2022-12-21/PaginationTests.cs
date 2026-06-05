@@ -42,6 +42,12 @@ public class PaginationTests
         p1.Next.Should().NotBeNull("the first page must carry a forward cursor when more rows exist");
         p1.Next!.Cursor.Should().NotBeNullOrEmpty();
         p1.Next.Href.Should().Contain("cursor=").And.Contain("limit=5");
+        // Framework contract (trellis-api-asp.md:86): next.href must be an absolute URL so
+        // out-of-band consumers (queued cursors, scheduled jobs, share-the-cursor flows) can
+        // hand it to `new Uri(...)` without a base.
+        Uri.TryCreate(p1.Next.Href, UriKind.Absolute, out var nextUri).Should().BeTrue(
+            "next.href must be an absolute URL, but got '{0}'", p1.Next.Href);
+        nextUri!.Scheme.Should().BeOneOf("http", "https");
         p1.WasCapped.Should().BeFalse();
         p1.RequestedLimit.Should().Be(5);
         p1.AppliedLimit.Should().Be(5);
@@ -151,6 +157,20 @@ public class PaginationTests
 
         ownerPage.Items.Should().HaveCount(4).And.OnlyContain(d => d.HostId == ownerHost);
         foreignPage.Items.Should().HaveCount(7).And.OnlyContain(d => d.HostId == foreignHost);
+
+        // The actual scenario this test's name advertises: take a cursor produced by host A's
+        // pagination and submit it against host B's URL. The host filter is applied BEFORE the
+        // cursor seek in the repo, so the response must contain ONLY host B's rows — never any
+        // row owned by host A — regardless of how the cursor was constructed.
+        var ownerPaged = await GetPageAsync<DinnerBody>(ownerClient, $"hosts/{ownerHost}/dinners", limit: 2);
+        ownerPaged.Next.Should().NotBeNull("setup needs a non-null cursor to swap onto the foreign host");
+        var crossPage = await GetPageAsync<DinnerBody>(
+            foreignClient, $"hosts/{foreignHost}/dinners", limit: 2, cursor: ownerPaged.Next!.Cursor);
+
+        crossPage.Items.Should().OnlyContain(d => d.HostId == foreignHost,
+            "host filter is applied BEFORE the cursor seek; a stolen cursor cannot leak another host's rows");
+        crossPage.Items.Should().NotContain(d => ownerPage.Items.Any(o => o.Id == d.Id),
+            "no owner-owned id may appear in the foreign host's page even when the cursor is swapped");
     }
 
     // ---------------- helpers ----------------
