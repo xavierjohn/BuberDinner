@@ -4,10 +4,13 @@ public partial class Errors
 {
     public static class Authentication
     {
-        // NOTE: Trellis V3's closed Error union has no `Code` slot on AuthenticationRequired.
-        // The old "Authentication.InvalidCredentials" machine code is preserved only via Detail.
-        // See Docs/MIGRATION_TO_TRELLIS_V3.md (reg-001-auth-no-reason-code).
+        // Trellis 3.0.0-alpha.342 added the `ReasonCode` slot on Error.AuthenticationRequired
+        // (Option A from the reg-001 issue draft). Restores the v2.x machine-readable code
+        // distinction without forcing telemetry/clients to parse Detail.
         public static Error InvalidCredentials =>
-            new Error.AuthenticationRequired(Scheme: "Bearer") { Detail = "Invalid credentials." };
+            new Error.AuthenticationRequired(Scheme: "Bearer", ReasonCode: "Authentication.InvalidCredentials")
+            {
+                Detail = "Invalid credentials.",
+            };
     }
 }
