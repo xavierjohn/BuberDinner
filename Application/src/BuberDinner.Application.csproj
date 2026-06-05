@@ -8,6 +8,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Trellis.Mediator" />
+    <PackageReference Include="Trellis.Mediator.FluentValidation" />
     <PackageReference Include="Trellis.Http.Abstractions" />
   </ItemGroup>
 

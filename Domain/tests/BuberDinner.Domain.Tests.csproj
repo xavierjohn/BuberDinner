@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\src\BuberDinner.Domain.csproj" />
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <PackageReference Include="Trellis.Testing" />
   </ItemGroup>
 
 

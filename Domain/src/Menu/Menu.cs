@@ -6,6 +6,7 @@ using BuberDinner.Domain.Dinner.ValueObject;
 using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
+using BuberDinner.Domain.MenuReview.ValueObject;
 using FluentValidation;
 
 public class Menu : Aggregate<MenuId>
@@ -81,27 +82,27 @@ public class Menu : Aggregate<MenuId>
     }
 
     /// <summary>
-    /// Updates the menu's name and description. Returns a validated <see cref="Result{Menu}"/>
-    /// so callers can compose on the Result track. Mutation is applied speculatively and rolled
-    /// back if aggregate-invariant validation fails — important because in-memory repositories
-    /// hand out live aggregate references, so a half-applied mutation would otherwise leak into
-    /// subsequent reads. Caller is responsible for the persistence commit (which bumps the
+    /// Updates the menu's name and description. Validates the inputs via FluentValidation
+    /// BEFORE mutation, so a rejected update never touches aggregate state and there is no
+    /// rollback path. Caller is responsible for the persistence commit (which bumps the
     /// optimistic-concurrency ETag) — see Recipe 23 in the cookbook.
     /// </summary>
-    public Result<Menu> Update(Name name, Description description)
+    public Result<Menu> Update(Name name, Description description) =>
+        s_updateInputValidator.ValidateToResult(new UpdateInputs(name, description))
+            .Map(inputs =>
+            {
+                Name = inputs.Name;
+                Description = inputs.Description;
+                return this;
+            });
+
+    private sealed record UpdateInputs(Name Name, Description Description);
+
+    static readonly InlineValidator<UpdateInputs> s_updateInputValidator = new()
     {
-        var previousName = Name;
-        var previousDescription = Description;
-        Name = name;
-        Description = description;
-        var result = s_validator.ValidateToResult(this);
-        if (result.IsFailure)
-        {
-            Name = previousName;
-            Description = previousDescription;
-        }
-        return result;
-    }
+        v => v.RuleFor(x => x.Name).NotEmpty(),
+        v => v.RuleFor(x => x.Description).NotEmpty(),
+    };
 
     static readonly InlineValidator<Menu> s_validator = new()
     {
