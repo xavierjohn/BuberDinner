@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Transitive duplicate of trellis-api-testing.md shipped by Trellis.Testing package build
+.github/trellis-api-testing-reference.md
+
