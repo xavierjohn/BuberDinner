@@ -1,0 +1,27 @@
+### Get a menu by id (happy path). Emits a strong ETag for conditional requests.
+### Requires a Bearer token AND a {{hostId}}/{{menuId}} from CreateMenu.http
+### (use the `id` in the response body for {{menuId}} and the `hostId` you created
+### in Hosts/CreateHost.http).
+### Per Cookbook Recipe 6 — `WithETag(...).EvaluatePreconditions()`.
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+
+GET {{host}}/hosts/{{hostId}}/menus/{{menuId}}?api-version=2022-10-01
+Authorization: Bearer {{token}}
+
+### Expected response shape:
+### HTTP/1.1 200 OK
+### ETag: "0ada920e5adc4c7ca9b843350fe5f093"
+### Content-Type: application/json
+### {
+###   "id":"019e955c-8a14-7b4c-8b40-f82ffb3b05f1",
+###   "name":"Brunch",
+###   "description":"Sunday brunch menu",
+###   "averageRating":null,
+###   "sections":[ ... ],
+###   "hostId":"019e955c-89a3-7f92-a289-35f8823bc135",
+###   "dinnerIds":[],
+###   "menuReviewIds":[]
+### }

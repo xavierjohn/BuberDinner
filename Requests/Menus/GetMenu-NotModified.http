@@ -1,0 +1,20 @@
+### Conditional GET that returns 304 Not Modified when the client's cached ETag
+### matches the server's current ETag. Demonstrates RFC 9110 §13.1.2 (If-None-Match).
+### Paste the ETag returned by Menus/GetMenu.http into the If-None-Match header below.
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+@etag = "0ada920e5adc4c7ca9b843350fe5f093"
+
+GET {{host}}/hosts/{{hostId}}/menus/{{menuId}}?api-version=2022-10-01
+Authorization: Bearer {{token}}
+If-None-Match: {{etag}}
+
+### Expected response shape:
+### HTTP/1.1 304 Not Modified
+### ETag: "0ada920e5adc4c7ca9b843350fe5f093"
+### (no body)
+###
+### If a different (stale) ETag is sent, the server treats the precondition as
+### unmatched and returns the full 200 + body.

@@ -1,0 +1,26 @@
+### Create a Host owned by the authenticated user.
+### Requires a Bearer token from Authentication/Register.http or Authentication/Login.http.
+### The Host's OwnerId is taken from the JWT `sub` claim (see Api.DependencyInjection
+### `AddClaimsActorProvider(opts => opts.ActorIdClaim = "sub")`). All subsequent
+### CreateMenu/UpdateMenu calls under `/hosts/{hostId}/menus/...` will be gated by
+### `IAuthorizeResource<Host>` (Cookbook Recipe 7): a user can only mutate menus
+### attached to a Host they own.
+
+@token = yourtoken
+
+POST {{host}}/hosts?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "displayName": "Xavier's Kitchen"
+}
+
+### Expected response shape:
+### HTTP/1.1 201 Created
+### Location: /hosts/{hostId}
+### {
+###   "id": "019e955c-89a3-7f92-a289-35f8823bc135",
+###   "displayName": "Xavier's Kitchen",
+###   "ownerId": "xavierjohn2023"
+### }
