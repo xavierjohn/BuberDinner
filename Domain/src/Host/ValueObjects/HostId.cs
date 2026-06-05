@@ -1,5 +1,5 @@
 ﻿namespace BuberDinner.Domain.Host.ValueObject;
 
-public partial class HostId : RequiredGuid
+public partial class HostId : RequiredGuid<HostId>
 {
 }

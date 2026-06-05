@@ -25,7 +25,7 @@ public static class MenuItemDtoExtensions
         menuItemDto is null
         ? null
         : MenuItem.TryCreate(
-            MenuItemId.TryCreate(menuItemDto.Id).Value,
-            Name.TryCreate(menuItemDto.Name).Value,
-            Description.TryCreate(menuItemDto.Description).Value).Value;
+            MenuItemId.TryCreate(menuItemDto.Id).GetValueOrThrow(nameof(menuItemDto.Id)),
+            Name.TryCreate(menuItemDto.Name).GetValueOrThrow(nameof(menuItemDto.Name)),
+            Description.TryCreate(menuItemDto.Description).GetValueOrThrow(nameof(menuItemDto.Description))).GetValueOrThrow(nameof(MenuItem));
 }

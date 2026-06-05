@@ -1,8 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
    <ItemGroup>
-      <PackageReference Include="FunctionalDDD.DomainDrivenDesign" />
-      <PackageReference Include="FunctionalDDD.CommonValueObjectGenerator" />
-      <PackageReference Include="FunctionalDDD.FluentValidation" />
-      <PackageReference Include="FunctionalDDD.CommonValueObjects" />
+      <PackageReference Include="Trellis.Core" />
+      <PackageReference Include="Trellis.Primitives" />
+      <PackageReference Include="Trellis.FluentValidation" />
    </ItemGroup>
 </Project>

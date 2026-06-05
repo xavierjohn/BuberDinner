@@ -1,0 +1,34 @@
+### Create a menu (happy path).
+### Requires a Bearer token from Authentication/Register.http or Authentication/Login.http.
+### Expected: 201 Created with a Location header pointing at /hosts/{hostId}/menus/{menuId}.
+
+@token = yourtoken
+@hostId = 4F82063C-AE9D-4F5B-B676-DD781C14EFA0
+
+POST {{host}}/hosts/{{hostId}}/menus/create?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Muffins R Us",
+    "description": "Menu for Muffins R Us",
+    "sections": [
+        {
+            "name": "Muffins",
+            "description": "The Muffins section",
+            "items": [
+                { "name": "Blueberry", "description": "A Blueberry Muffin" },
+                { "name": "Chocolate", "description": "A Chocolate Muffin" },
+                { "name": "Lemon",     "description": "A Lemon Muffin" }
+            ]
+        },
+        {
+            "name": "Not Muffins",
+            "description": "Anything that is not a muffin",
+            "items": [
+                { "name": "Cookie",  "description": "Probably oatmeal raisin or something" },
+                { "name": "Cupcake", "description": "Its trying to be a muffin, but its not fooling anyone" }
+            ]
+        }
+    ]
+}

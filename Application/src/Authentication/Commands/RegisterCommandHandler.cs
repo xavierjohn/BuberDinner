@@ -28,7 +28,7 @@ public class RegisterCommandHandler :
             .BindAsync(user =>
             {
                 var token = _jwtTokenGenerator.GenerateToken(user);
-                return Result.Success(new AuthenticationResult(user, token));
+                return Result.Ok(new AuthenticationResult(user, token));
             });
 
     private async ValueTask<Result<User>> CreateUser(RegisterCommand command, CancellationToken cancellationToken) =>
@@ -39,8 +39,8 @@ public class RegisterCommandHandler :
     {
         var user = await _userRepository.FindById(id, cancellationToken);
         if (user is not null)
-            return Result.Failure<string>(Errors.User.AlreadyExists(id));
-        return Result.Success<string>(id);
+            return Result.Fail<string>(Errors.User.AlreadyExists(id));
+        return Result.Ok<string>(id);
     }
 
 }

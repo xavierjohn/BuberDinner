@@ -1,5 +1,5 @@
 ﻿namespace BuberDinner.Domain.User.ValueObjects;
 
-public partial class Password : RequiredString
+public partial class Password : RequiredString<Password>
 {
 }

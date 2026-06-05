@@ -1,4 +1,5 @@
 ﻿namespace BuberDinner.Infrastructure.Persistence.Cosmos;
+
 using Microsoft.Azure.Cosmos;
 
 internal abstract class CosmosDbRepositoryBase

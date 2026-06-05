@@ -37,12 +37,12 @@ public static class MenuDtoExtensions
         menuDto is null
         ? null
         : Menu.TryCreate(
-            MenuId.TryCreate(Guid.Parse(menuDto.Id)).Value,
-            Name.TryCreate(menuDto.Name).Value,
-            Description.TryCreate(menuDto.Description).Value,
+            MenuId.TryCreate(Guid.Parse(menuDto.Id)).GetValueOrThrow(nameof(menuDto.Id)),
+            Name.TryCreate(menuDto.Name).GetValueOrThrow(nameof(menuDto.Name)),
+            Description.TryCreate(menuDto.Description).GetValueOrThrow(nameof(menuDto.Description)),
             menuDto.AverageRating,
             menuDto.Sections.Select(sectionDto => sectionDto.ToMenuSection()!).ToList(),
-            HostId.TryCreate(menuDto.HostId).Value,
-            menuDto.DinnerIds.Select(dinnerId => DinnerId.TryCreate(dinnerId).Value).ToList(),
-            menuDto.MenuReviewIds.Select(menuReviewId => MenuReviewId.TryCreate(menuReviewId).Value).ToList()).Value;
+            HostId.TryCreate(menuDto.HostId).GetValueOrThrow(nameof(menuDto.HostId)),
+            menuDto.DinnerIds.Select(dinnerId => DinnerId.TryCreate(dinnerId).GetValueOrThrow(nameof(menuDto.DinnerIds))).ToList(),
+            menuDto.MenuReviewIds.Select(menuReviewId => MenuReviewId.TryCreate(menuReviewId).GetValueOrThrow(nameof(menuDto.MenuReviewIds))).ToList()).GetValueOrThrow(nameof(Menu));
 }

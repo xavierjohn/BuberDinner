@@ -24,9 +24,7 @@ public record CreateMenuRequest(
         .Bind(CreateMenuCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuSectionCommand>> GetMenuSectionCommands() =>
-        this.Sections
-            .Select(ms => ms.ToMenuSectionCommand().Value)
-            .ToList();
+        this.Sections.TraverseAll(ms => ms.ToMenuSectionCommand());
 }
 
 /// <summary>
@@ -47,9 +45,7 @@ public record MenuSectionRequest(
         .Bind(MenuSectionCommand.TryCreate);
 
     private Result<IReadOnlyList<MenuItemCommand>> GetMenuItemCommands() =>
-        this.Items
-            .Select(i => i.ToMenuItemCommand().Value)
-            .ToList();
+        this.Items.TraverseAll(i => i.ToMenuItemCommand());
 }
 
 /// <summary>

@@ -8,7 +8,7 @@ public class RegisterCommand
     : IRequest<Result<AuthenticationResult>>
 {
     public static Result<RegisterCommand> TryCreate(UserId id, FirstName firstName, LastName lastName, EmailAddress email, Password password) =>
-            new RegisterCommand(id, firstName, lastName, email, password);
+            Result.Ok(new RegisterCommand(id, firstName, lastName, email, password));
 
     public UserId UserId { get; }
     public FirstName FirstName { get; }
