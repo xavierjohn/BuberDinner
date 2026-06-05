@@ -38,11 +38,7 @@ public sealed class CreateReservationCommandHandler
             .TapAsync(reservation => _reservationRepository.Add(reservation, cancellationToken));
 
     private async ValueTask<Result<Dinner>> LoadDinnerAsync(
-        DinnerId dinnerId, CancellationToken cancellationToken)
-    {
-        var dinner = await _dinnerRepository.FindById(dinnerId.Value.ToString(), cancellationToken);
-        return dinner is null
-            ? Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)))
-            : Result.Ok(dinner);
-    }
+        DinnerId dinnerId, CancellationToken cancellationToken) =>
+        (await _dinnerRepository.FindById(dinnerId.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)));
 }

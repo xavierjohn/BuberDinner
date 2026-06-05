@@ -29,16 +29,13 @@ public sealed class GetReservationQueryHandler : IRequestHandler<GetReservationQ
         _repo = repo;
     }
 
-    public async ValueTask<Result<Reservation>> Handle(GetReservationQuery request, CancellationToken cancellationToken)
-    {
-        var reservation = await _repo.FindById(request.ReservationId.Value.ToString(), cancellationToken);
-        if (reservation is null)
-            return Result.Fail<Reservation>(new Error.NotFound(ResourceRef.For<Reservation>(request.ReservationId)));
-        if (reservation.GuestUserId != request.CallerGuestUserId)
-            return Result.Fail<Reservation>(new Error.NotFound(ResourceRef.For<Reservation>(request.ReservationId))
-            {
-                Detail = "Reservation does not belong to the calling guest.",
-            });
-        return Result.Ok(reservation);
-    }
+    public async ValueTask<Result<Reservation>> Handle(GetReservationQuery request, CancellationToken cancellationToken) =>
+        (await _repo.FindById(request.ReservationId.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Reservation>(request.ReservationId)))
+            .Ensure(
+                r => r.GuestUserId == request.CallerGuestUserId,
+                new Error.NotFound(ResourceRef.For<Reservation>(request.ReservationId))
+                {
+                    Detail = "Reservation does not belong to the calling guest.",
+                });
 }

@@ -42,16 +42,13 @@ public sealed class CancelReservationCommandHandler
             .TapAsync(reservation => _repo.Update(reservation, cancellationToken));
 
     private async ValueTask<Result<Reservation>> LoadReservationOwnedByAsync(
-        ReservationId reservationId, UserId callerGuestUserId, CancellationToken cancellationToken)
-    {
-        var reservation = await _repo.FindById(reservationId.Value.ToString(), cancellationToken);
-        if (reservation is null)
-            return Result.Fail<Reservation>(new Error.NotFound(ResourceRef.For<Reservation>(reservationId)));
-        if (reservation.GuestUserId != callerGuestUserId)
-            return Result.Fail<Reservation>(new Error.NotFound(ResourceRef.For<Reservation>(reservationId))
-            {
-                Detail = "Reservation does not belong to the calling guest.",
-            });
-        return Result.Ok(reservation);
-    }
+        ReservationId reservationId, UserId callerGuestUserId, CancellationToken cancellationToken) =>
+        (await _repo.FindById(reservationId.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Reservation>(reservationId)))
+            .Ensure(
+                r => r.GuestUserId == callerGuestUserId,
+                new Error.NotFound(ResourceRef.For<Reservation>(reservationId))
+                {
+                    Detail = "Reservation does not belong to the calling guest.",
+                });
 }
