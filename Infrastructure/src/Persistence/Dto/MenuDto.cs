@@ -5,6 +5,7 @@ using BuberDinner.Domain.Dinner.ValueObject;
 using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu;
 using BuberDinner.Domain.Menu.ValueObject;
+using BuberDinner.Domain.MenuReview.ValueObject;
 
 public class MenuDto
 {
