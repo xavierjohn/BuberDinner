@@ -174,4 +174,38 @@ public class DinnersController : ControllerBase
                 body: dinner => dinner.Adapt<DinnerResponse>(),
                 configure: opts => opts.WithETag(dinner => EntityTagValue.Strong(dinner.ETag)))
             .AsActionResultAsync<DinnerResponse>();
+
+    /// <summary>
+    /// Paginated list of every reservation against the route dinner — the host's view of
+    /// who's coming. Gated by Host ownership (Cookbook Recipe 7) via
+    /// <see cref="Trellis.Authorization.IAuthorizeResource{T}"/> on the underlying query.
+    /// Defense-in-depth: handler additionally verifies the dinner belongs to the route host.
+    /// </summary>
+    [HttpGet("{dinnerId:DinnerId}/reservations")]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async ValueTask<ActionResult<PagedResponse<BuberDinner.Api._2022_12_21.Models.Reservations.ReservationResponse>>> ListReservationsForDinner(
+        HostId hostId,
+        DinnerId dinnerId,
+        [FromQuery(Name = "cursor")] string? cursor,
+        [FromQuery(Name = "limit")] int? limit,
+        CancellationToken cancellationToken)
+    {
+        var origin = $"{Request.Scheme}://{Request.Host}";
+        var basePath = $"{origin}/hosts/{hostId.Value}/dinners/{dinnerId.Value}/reservations";
+        var apiVersion = HttpContext.GetRequestedApiVersion()?.ToString() ?? "2022-10-01";
+
+        return await _sender.Send(
+                new BuberDinner.Application.Reservations.Queries.ListReservationsForDinnerQuery(
+                    hostId, dinnerId,
+                    cursor is { Length: > 0 } token ? new Cursor(token) : (Cursor?)null,
+                    limit),
+                cancellationToken)
+            .ToHttpResponseAsync(
+                nextUrlBuilder: (nextCursor, appliedLimit) =>
+                    $"{basePath}?cursor={Uri.EscapeDataString(nextCursor.Token)}&limit={appliedLimit}&api-version={apiVersion}",
+                body: reservation => reservation.Adapt<BuberDinner.Api._2022_12_21.Models.Reservations.ReservationResponse>())
+            .AsActionResultAsync<PagedResponse<BuberDinner.Api._2022_12_21.Models.Reservations.ReservationResponse>>();
+    }
 }

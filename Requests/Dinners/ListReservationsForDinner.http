@@ -1,0 +1,19 @@
+### Host view: paginated list of every reservation against one of their dinners.
+### Gated by Host ownership via `IAuthorizeResource<Host>` — only the route host's owner
+### can read. Same envelope shape as Reservations/ListMyReservations.http.
+
+@token = yourtoken
+@hostId = 019E9690-0ECA-7523-8AD5-E75B71E572DE
+@dinnerId = 019E9690-0FDC-7AA6-9807-7F0A56F08C42
+
+GET {{host}}/hosts/{{hostId}}/dinners/{{dinnerId}}/reservations?api-version=2022-10-01&limit=10
+Authorization: Bearer {{token}}
+
+### Expected response (happy path):
+### HTTP/1.1 200 OK
+### { "items":[ <ReservationResponse>, ... ],
+###   "next":  { ... } or null,
+###   "previous": null,
+###   "requestedLimit": 10, "appliedLimit": 10, "deliveredCount": <=10, "wasCapped": false }
+###
+### As a different host → 403 Forbidden with code `reservations.host.owner`.

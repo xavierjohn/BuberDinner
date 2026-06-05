@@ -1,0 +1,14 @@
+### Paginated list of the calling guest's own reservations. Same cursor pagination shape
+### as PR 3's ListDinners / ListMenus.
+
+@token = yourtoken
+
+GET {{host}}/reservations/mine?api-version=2022-10-01&limit=10
+Authorization: Bearer {{token}}
+
+### Expected response:
+### HTTP/1.1 200 OK
+### { "items":[ <ReservationResponse>, ... ],
+###   "next":  { "cursor": "...", "href": "https://.../reservations/mine?cursor=...&limit=10&api-version=..." } or null,
+###   "previous": null,
+###   "requestedLimit": 10, "appliedLimit": 10, "deliveredCount": <=10, "wasCapped": false }

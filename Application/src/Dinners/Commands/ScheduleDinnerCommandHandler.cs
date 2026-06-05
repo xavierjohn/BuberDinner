@@ -32,12 +32,15 @@ public sealed class ScheduleDinnerCommandHandler : ICommandHandler<ScheduleDinne
 
     public async ValueTask<Result<Dinner>> Handle(ScheduleDinnerCommand request, CancellationToken cancellationToken)
     {
-        // Resource auth proves the caller owns the route Host. It does NOT prove the supplied
-        // MenuId exists or belongs to that host. Without this load, a host could schedule a
-        // dinner against another host's menu (cookbook Recipe 22 — fail-loud on missing related
-        // aggregates).
+        // Recipe 22 — fail-loud on missing related aggregate. Without this the create
+        // command would silently succeed against a non-existent menu, persisting an orphan
+        // dinner pointing at nothing. NotFound (not Forbidden) keeps existence private from
+        // the caller. The two cases — Menu missing vs Menu owned by another host — are
+        // detected separately so the Detail string accurately reflects which one fired.
         var menu = await _menuRepository.FindById(request.MenuId.Value.ToString(), cancellationToken);
-        if (menu is null || menu.HostId != request.HostId)
+        if (menu is null)
+            return Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId)));
+        if (menu.HostId != request.HostId)
             return Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId))
             {
                 Detail = "Menu does not belong to the specified host.",

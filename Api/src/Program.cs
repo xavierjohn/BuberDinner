@@ -1,6 +1,7 @@
 ﻿using BuberDinner.Api;
 using BuberDinner.Application;
 using BuberDinner.Infrastructure;
+using Trellis.Asp.Idempotency;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -29,8 +30,15 @@ var app = builder.Build();
         });
     app.UseExceptionHandler("/error");
     app.UseHttpsRedirection();
+    app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
+    // Idempotency middleware MUST sit AFTER UseAuthentication/UseAuthorization so the default
+    // per-actor scope sees the authenticated Actor and partitions the store by it. Mounting
+    // before authentication would let every authenticated request fall back to the shared
+    // 'anonymous' scope, which can let different users collide on the same Idempotency-Key
+    // (trellis-api-asp.md:431).
+    app.UseTrellisIdempotency();
     app.MapControllers().RequireAuthorization();
     app.Run();
 }

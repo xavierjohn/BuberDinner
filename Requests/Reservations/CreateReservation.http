@@ -1,0 +1,35 @@
+### Reserve a seat at an upcoming dinner. The endpoint is opted into the IETF
+### Idempotency-Key middleware (Cookbook Recipe 29): a retry with the same key + body
+### returns the cached 201 byte-for-byte (no double-booking). Same key + DIFFERENT body
+### → 422 fingerprint mismatch. Missing key → 400 `idempotency.key_required`.
+
+@token = yourtoken
+@dinnerId = 019E9690-0FDC-7AA6-9807-7F0A56F08C42
+@key = 12345678-1234-1234-1234-1234567890ab
+
+POST {{host}}/reservations?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: {{key}}
+
+{
+    "dinnerId": "{{dinnerId}}",
+    "guestCount": 2
+}
+
+### Expected response (first call):
+### HTTP/1.1 201 Created
+### ETag: "..."
+### Location: /reservations/{reservationId}
+### { "id":"...", "dinnerId":"...", "guestUserId":"...", "guestCount":2,
+###   "status":"Reserved", "reservedAt":"...", "cancelledAt":null, "cancellationReason":null }
+###
+### Expected response (replay — same key+body):
+### HTTP/1.1 201 Created
+### ETag: "..."  (identical to first)
+### Location: /reservations/{same-id}
+### Idempotent-Replayed: true   ← framework's marker that this is a cached response
+### { same body as first call, byte for byte }
+###
+### Side effect (visible in server logs):
+###   info: LogReservationCreatedHandler[0] Reservation X created by guest Y for dinner Z (2 seats) at ...

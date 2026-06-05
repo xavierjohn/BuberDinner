@@ -8,6 +8,7 @@ using BuberDinner.Domain.Menu;
 using BuberDinner.Domain.User.Entities;
 using HostEntity = BuberDinner.Domain.Host.Entities.Host;
 using DinnerEntity = BuberDinner.Domain.Dinner.Entities.Dinner;
+using ReservationEntity = BuberDinner.Domain.Reservation.Entities.Reservation;
 using BuberDinner.Infrastructure.Authentication;
 using BuberDinner.Infrastructure.Persistence.Cosmos;
 using BuberDinner.Infrastructure.Persistence.Memory;
@@ -76,6 +77,9 @@ public static class DependencyInjection
         services.AddScoped<DinnerInMemoryRepository>();
         services.AddScoped<IRepository<DinnerEntity>>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
         services.AddScoped<IDinnerRepository>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
+        services.AddScoped<ReservationInMemoryRepository>();
+        services.AddScoped<IRepository<ReservationEntity>>(sp => sp.GetRequiredService<ReservationInMemoryRepository>());
+        services.AddScoped<IReservationRepository>(sp => sp.GetRequiredService<ReservationInMemoryRepository>());
         return services;
     }
 
@@ -89,6 +93,9 @@ public static class DependencyInjection
         services.AddScoped<DinnerInMemoryRepository>();
         services.AddScoped<IRepository<DinnerEntity>>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
         services.AddScoped<IDinnerRepository>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
+        services.AddScoped<ReservationInMemoryRepository>();
+        services.AddScoped<IRepository<ReservationEntity>>(sp => sp.GetRequiredService<ReservationInMemoryRepository>());
+        services.AddScoped<IReservationRepository>(sp => sp.GetRequiredService<ReservationInMemoryRepository>());
         return services;
     }
 }
