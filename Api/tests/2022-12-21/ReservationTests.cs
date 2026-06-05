@@ -63,7 +63,7 @@ public class ReservationTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact, Priority(5)]
     public async Task CreateReservation_against_InProgress_dinner_returns_422()
     {
-        var (hostClient, hostToken, hostId, _, dinnerId) = await SeedHostAndDinnerAsync();
+        var (hostClient, _, hostId, _, dinnerId) = await SeedHostAndDinnerAsync();
         // Host starts the dinner so it's no longer Upcoming.
         var startResponse = await hostClient.PostAsync(
             $"hosts/{hostId}/dinners/{dinnerId}/start{ApiVersion}", new StringContent("", Encoding.UTF8, "application/json"));

@@ -50,6 +50,7 @@ public class ReservationsController : ControllerBase
     [Idempotent]
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]   // [Idempotent] middleware → idempotency.key_required
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async ValueTask<ActionResult<ReservationResponse>> CreateReservation(
@@ -77,6 +78,7 @@ public class ReservationsController : ControllerBase
     /// <summary>Get a single reservation. Visible only to the owning guest.</summary>
     [HttpGet("{reservationId:ReservationId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status304NotModified)]   // .EvaluatePreconditions() → If-None-Match match
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<ReservationResponse>> GetReservation(
         ReservationId reservationId, CancellationToken cancellationToken)
