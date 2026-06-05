@@ -61,13 +61,11 @@ public class ReservationsController : ControllerBase
             return Unauthorized();
         var guestId = guestIdResult.GetValueOrThrow("guestId");
 
-        var dinnerIdResult = DinnerId.TryCreate(request.DinnerId);
-        if (dinnerIdResult.IsFailure)
-            return UnprocessableEntity(new { errors = new { dinnerId = new[] { "Invalid DinnerId." } } });
-        var dinnerId = dinnerIdResult.GetValueOrThrow("dinnerId");
-
-        var command = new CreateReservationCommand(dinnerId, guestId, request.GuestCount);
-        return await _sender.Send(command, cancellationToken)
+        // Parse + send through one Result pipeline. A bad DinnerId surfaces as the framework's
+        // standard 422 Problem Details shape via ToHttpResponseAsync (consistent with
+        // ScheduleDinnerRequest, UpdateMenuRequest, etc.) — no hand-rolled error bodies.
+        return await request.ToCreateReservationCommand(guestId)
+            .BindAsync(command => _sender.Send(command, cancellationToken))
             .ToHttpResponseAsync(
                 body: reservation => reservation.Adapt<ReservationResponse>(),
                 configure: opts => opts

@@ -1,8 +1,11 @@
 namespace BuberDinner.Api._2022_12_21.Models.Reservations;
 
 using System;
+using BuberDinner.Application.Reservations.Commands;
 using BuberDinner.Domain.Reservation.Entities;
+using BuberDinner.Domain.User.ValueObjects;
 using Mapster;
+using DinnerIdClass = BuberDinner.Domain.Dinner.ValueObject.DinnerId;
 
 /// <summary>Wire representation of a <see cref="Reservation"/>.</summary>
 public record ReservationResponse(
@@ -16,7 +19,19 @@ public record ReservationResponse(
     string? CancellationReason);
 
 /// <summary>POST /reservations request body.</summary>
-public record CreateReservationRequest(string DinnerId, int GuestCount);
+public record CreateReservationRequest(string DinnerId, int GuestCount)
+{
+    /// <summary>
+    /// Lifts the request into a validated <see cref="CreateReservationCommand"/> using the
+    /// railway pipeline. A bad <see cref="DinnerId"/> surfaces as the framework's standard
+    /// 422 Problem Details shape (one FieldViolation per offending field) — same as every
+    /// other request DTO in the codebase. Hand-rolling the 422 body in the controller
+    /// would diverge from the Trellis problem-details contract.
+    /// </summary>
+    public Result<CreateReservationCommand> ToCreateReservationCommand(UserId guestUserId) =>
+        DinnerIdClass.TryCreate(this.DinnerId, nameof(DinnerId))
+            .Map(dinnerId => new CreateReservationCommand(dinnerId, guestUserId, this.GuestCount));
+}
 
 /// <summary>POST /reservations/{id}/cancel request body.</summary>
 public record CancelReservationRequest(string Reason);

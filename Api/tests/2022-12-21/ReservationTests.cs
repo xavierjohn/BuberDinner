@@ -184,6 +184,44 @@ public class ReservationTests : IClassFixture<WebApplicationFactory<Program>>
         problem!.Code.Should().Be("idempotency.key_required");
     }
 
+    [Fact, Priority(5)]
+    public async Task CreateReservation_with_malformed_DinnerId_returns_422_via_Trellis_problem_details()
+    {
+        var guest = await NewGuestClientAsync();
+
+        var req = new HttpRequestMessage(HttpMethod.Post, $"reservations{ApiVersion}")
+        {
+            Content = JsonBody(new { dinnerId = "not-a-guid", guestCount = 1 }),
+        };
+        req.Headers.TryAddWithoutValidation("Idempotency-Key", Guid.NewGuid().ToString());
+        var response = await guest.client.SendAsync(req);
+
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+        // The Trellis problem-details contract — `errors` is a dictionary keyed by field name,
+        // NOT the hand-rolled { errors: { dinnerId: [...] } } shape the controller used to emit.
+        response.Content.Headers.ContentType!.ToString().Should().StartWith("application/problem+json");
+        var problem = await response.Content.ReadAsAsync<ProblemDetailsBody>();
+        problem!.Code.Should().Be("invalid-input");
+    }
+
+    [Fact, Priority(5)]
+    public async Task ListReservationsForDinner_with_missing_dinner_returns_404_without_misleading_host_detail()
+    {
+        var (hostClient, _, hostId, _, _) = await SeedHostAndDinnerAsync();
+        var phantomDinnerId = Guid.NewGuid().ToString();
+
+        var response = await hostClient.GetAsync(
+            $"hosts/{hostId}/dinners/{phantomDinnerId}/reservations{ApiVersion}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var problem = await response.Content.ReadAsAsync<ProblemDetailsBody>();
+        // If the dinner truly doesn't exist, the Detail must NOT claim "does not belong to
+        // the specified host" — that's the wrong-host case. Two different 404 reasons need
+        // two different Detail strings.
+        problem!.Detail.Should().NotContain("does not belong",
+            "missing dinner is a different case from wrong-host; Detail must not conflate them");
+    }
+
     // -------------------- helpers --------------------
 
     private async Task<(HttpClient hostClient, string hostToken, string hostId, string menuId, string dinnerId)>

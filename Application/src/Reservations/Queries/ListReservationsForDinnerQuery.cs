@@ -58,14 +58,20 @@ public sealed class ListReservationsForDinnerQueryHandler
     {
         // Defense-in-depth: route auth already proved the caller owns the route host.
         // The dinner must additionally belong to that host (route-hierarchy check, mirrors
-        // the GetMenu/GetDinner pattern from PR 1/2). NotFound on mismatch keeps the leak
-        // surface consistent with the rest of the codebase.
+        // the GetMenu/GetDinner pattern from PR 1/2). NotFound on either condition keeps
+        // the leak surface consistent with the rest of the codebase — but the two cases
+        // are detected separately so the Detail string accurately reflects which one fired
+        // (clients and log scrapers shouldn't see "does not belong" when the row is missing).
         var dinner = await _dinnerRepo.FindById(request.DinnerId.Value.ToString(), cancellationToken);
-        if (dinner is null || dinner.HostId != request.HostId)
-            return Result.Fail<Page<Reservation>>(new Error.NotFound(ResourceRef.For<BuberDinner.Domain.Dinner.Entities.Dinner>(request.DinnerId))
-            {
-                Detail = "Dinner does not belong to the specified host.",
-            });
+        if (dinner is null)
+            return Result.Fail<Page<Reservation>>(
+                new Error.NotFound(ResourceRef.For<BuberDinner.Domain.Dinner.Entities.Dinner>(request.DinnerId)));
+        if (dinner.HostId != request.HostId)
+            return Result.Fail<Page<Reservation>>(
+                new Error.NotFound(ResourceRef.For<BuberDinner.Domain.Dinner.Entities.Dinner>(request.DinnerId))
+                {
+                    Detail = "Dinner does not belong to the specified host.",
+                });
 
         var pageSize = PageSize.FromRequested(request.Limit);
 
