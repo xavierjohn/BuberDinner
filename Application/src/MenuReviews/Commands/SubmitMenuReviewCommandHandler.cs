@@ -65,14 +65,17 @@ public sealed class SubmitMenuReviewCommandHandler
             .ToResult(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)));
 
     private async ValueTask<Result<Dinner>> EnsureCallerReservedAsync(
-        Dinner dinner, UserId guestUserId, CancellationToken cancellationToken)
-    {
-        var reservation = await _reservationRepository.FindByDinnerAndGuest(dinner.Id, guestUserId, cancellationToken);
-        if (reservation is null || reservation.Status != ReservationStatus.Reserved)
-            return Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Dinner>(dinner.Id))
+        Dinner dinner, UserId guestUserId, CancellationToken cancellationToken) =>
+        (await _reservationRepository.FindByDinnerAndGuest(dinner.Id, guestUserId, cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Dinner>(dinner.Id))
             {
                 Detail = "Caller did not reserve this dinner.",
-            });
-        return Result.Ok(dinner);
-    }
+            })
+            .Ensure(
+                r => r.Status == ReservationStatus.Reserved,
+                new Error.NotFound(ResourceRef.For<Dinner>(dinner.Id))
+                {
+                    Detail = "Caller did not reserve this dinner.",
+                })
+            .Map(_ => dinner);
 }

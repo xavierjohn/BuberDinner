@@ -21,16 +21,13 @@ public sealed class UpdateMenuCommandHandler : IRequestHandler<UpdateMenuCommand
             .BindAsync(menu => menu.Update(request.Name, request.Description))
             .TapAsync(menu => _menuRepository.Update(menu, cancellationToken));
 
-    private async ValueTask<Result<Menu>> LoadMenuAsync(UpdateMenuCommand request, CancellationToken cancellationToken)
-    {
-        var menu = await _menuRepository.FindById(request.MenuId.Value.ToString(), cancellationToken);
-        if (menu is null)
-            return Result.Fail<Menu>(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId)));
-        if (menu.HostId != request.HostId)
-            return Result.Fail<Menu>(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId))
-            {
-                Detail = "Menu does not belong to the specified host.",
-            });
-        return Result.Ok(menu);
-    }
+    private async ValueTask<Result<Menu>> LoadMenuAsync(UpdateMenuCommand request, CancellationToken cancellationToken) =>
+        (await _menuRepository.FindById(request.MenuId.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId)))
+            .Ensure(
+                m => m.HostId == request.HostId,
+                new Error.NotFound(ResourceRef.For<Menu>(request.MenuId))
+                {
+                    Detail = "Menu does not belong to the specified host.",
+                });
 }

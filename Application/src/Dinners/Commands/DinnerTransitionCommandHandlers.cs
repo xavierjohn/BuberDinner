@@ -18,24 +18,24 @@ internal static class DinnerTransitionPipeline
         BuberDinner.Domain.Host.ValueObject.HostId expectedHostId,
         BuberDinner.Domain.Dinner.ValueObject.DinnerId dinnerId,
         Func<Dinner, Result<Dinner>> transition,
-        CancellationToken cancellationToken)
-    {
-        var dinner = await repo.FindById(dinnerId.Value.ToString(), cancellationToken);
-        if (dinner is null)
-            return Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)));
-        if (dinner.HostId != expectedHostId)
-            return Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId))
-            {
-                Detail = "Dinner does not belong to the specified host.",
-            });
+        CancellationToken cancellationToken) =>
+        await LoadOwnedDinnerAsync(repo, dinnerId, expectedHostId, cancellationToken)
+            .BindAsync(dinner => transition(dinner))
+            .TapAsync(dinner => repo.Update(dinner, cancellationToken));
 
-        var transitionResult = transition(dinner);
-        if (transitionResult.IsFailure)
-            return transitionResult;
-
-        await repo.Update(dinner, cancellationToken);
-        return transitionResult;
-    }
+    private static async ValueTask<Result<Dinner>> LoadOwnedDinnerAsync(
+        IRepository<Dinner> repo,
+        BuberDinner.Domain.Dinner.ValueObject.DinnerId dinnerId,
+        BuberDinner.Domain.Host.ValueObject.HostId expectedHostId,
+        CancellationToken cancellationToken) =>
+        (await repo.FindById(dinnerId.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)))
+            .Ensure(
+                d => d.HostId == expectedHostId,
+                new Error.NotFound(ResourceRef.For<Dinner>(dinnerId))
+                {
+                    Detail = "Dinner does not belong to the specified host.",
+                });
 }
 
 public sealed class StartDinnerCommandHandler : ICommandHandler<StartDinnerCommand, Result<Dinner>>

@@ -22,11 +22,7 @@ public sealed class HostResourceLoader : SharedResourceLoaderById<Host, HostId>
         _hostRepository = hostRepository;
     }
 
-    public override async Task<Result<Host>> GetByIdAsync(HostId id, CancellationToken cancellationToken)
-    {
-        var host = await _hostRepository.FindById(id.Value.ToString(), cancellationToken);
-        if (host is null)
-            return Result.Fail<Host>(new Error.NotFound(ResourceRef.For<Host>(id)));
-        return Result.Ok(host);
-    }
+    public override async Task<Result<Host>> GetByIdAsync(HostId id, CancellationToken cancellationToken) =>
+        (await _hostRepository.FindById(id.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Host>(id)));
 }
