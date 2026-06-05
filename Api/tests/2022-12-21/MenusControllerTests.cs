@@ -145,7 +145,9 @@ public class MenusControllerTests
         // on the controller and the framework's ToHttpResponseAsync(..., opts => opts.Created(...)) builder).
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.OriginalString.Should().StartWith("/hosts/4F82063C-AE9D-4F5B-B676-DD781C14EFA0/menus/");
+        // GUIDs are case-insensitive per RFC 4122 §3; the `:HostId` route constraint normalises
+        // them to lowercase via Guid.ToString("D"). Compare case-insensitively.
+        response.Headers.Location!.OriginalString.Should().StartWithEquivalentOf("/hosts/4F82063C-AE9D-4F5B-B676-DD781C14EFA0/menus/");
         await ValidateMenuResponse(response);
     }
 
