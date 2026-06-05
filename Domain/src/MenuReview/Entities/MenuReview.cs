@@ -6,7 +6,6 @@ using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.MenuReview.Events;
 using BuberDinner.Domain.MenuReview.ValueObject;
 using BuberDinner.Domain.User.ValueObjects;
-using FluentValidation;
 
 public sealed class MenuReview : Aggregate<MenuReviewId>
 {
@@ -22,19 +21,18 @@ public sealed class MenuReview : Aggregate<MenuReviewId>
         UserId guestUserId,
         int rating,
         string comment,
-        TimeProvider clock)
-    {
-        var review = new MenuReview(
-            MenuReviewId.NewUniqueV7(), menuId, dinnerId, guestUserId, rating, comment ?? string.Empty);
-
-        var validation = s_validator.ValidateToResult(review);
-        if (validation.IsFailure)
-            return validation;
-
-        review.DomainEvents.Add(new MenuReviewSubmitted(
-            review.Id, review.MenuId, review.DinnerId, review.GuestUserId, review.Rating, clock.GetUtcNow()));
-        return Result.Ok(review);
-    }
+        TimeProvider clock) =>
+        ValidateContentInputs(rating, comment)
+            .Map(inputs =>
+            {
+                var review = new MenuReview(
+                    MenuReviewId.NewUniqueV7(), menuId, dinnerId, guestUserId,
+                    inputs.Rating, inputs.Comment);
+                review.DomainEvents.Add(new MenuReviewSubmitted(
+                    review.Id, review.MenuId, review.DinnerId, review.GuestUserId,
+                    review.Rating, clock.GetUtcNow()));
+                return review;
+            });
 
     private MenuReview(
         MenuReviewId id, MenuId menuId, DinnerId dinnerId, UserId guestUserId,
@@ -48,32 +46,25 @@ public sealed class MenuReview : Aggregate<MenuReviewId>
         Comment = comment;
     }
 
-    public Result<MenuReview> UpdateContent(int rating, string comment, TimeProvider clock)
-    {
-        var previousRating = Rating;
-        var previousComment = Comment;
-        Rating = rating;
-        Comment = comment ?? string.Empty;
+    public Result<MenuReview> UpdateContent(int rating, string comment, TimeProvider clock) =>
+        ValidateContentInputs(rating, comment)
+            .Map(inputs =>
+            {
+                Rating = inputs.Rating;
+                Comment = inputs.Comment;
+                DomainEvents.Add(new MenuReviewUpdated(Id, Rating, clock.GetUtcNow()));
+                return this;
+            });
 
-        var validation = s_validator.ValidateToResult(this);
-        if (validation.IsFailure)
-        {
-            Rating = previousRating;
-            Comment = previousComment;
-            return validation;
-        }
-
-        DomainEvents.Add(new MenuReviewUpdated(Id, Rating, clock.GetUtcNow()));
-        return Result.Ok(this);
-    }
-
-    static readonly InlineValidator<MenuReview> s_validator = new()
-    {
-        v => v.RuleFor(x => x.Id).NotEmpty(),
-        v => v.RuleFor(x => x.MenuId).NotEmpty(),
-        v => v.RuleFor(x => x.DinnerId).NotEmpty(),
-        v => v.RuleFor(x => x.GuestUserId).NotEmpty(),
-        v => v.RuleFor(x => x.Rating).InclusiveBetween(1, 5),
-        v => v.RuleFor(x => x.Comment).NotEmpty().MaximumLength(1000),
-    };
+    private static Result<(int Rating, string Comment)> ValidateContentInputs(int rating, string comment) =>
+        Result.Ok((Rating: rating, Comment: comment ?? string.Empty))
+            .Ensure(t => t.Rating is >= 1 and <= 5,
+                Error.InvalidInput.ForField("rating", "menu-review.invalid.rating",
+                    "Rating must be between 1 and 5."))
+            .Ensure(t => !string.IsNullOrWhiteSpace(t.Comment),
+                Error.InvalidInput.ForField("comment", "menu-review.invalid.comment-required",
+                    "Comment is required."))
+            .Ensure(t => t.Comment.Length <= 1000,
+                Error.InvalidInput.ForField("comment", "menu-review.invalid.comment-too-long",
+                    "Comment must not exceed 1000 characters."));
 }
