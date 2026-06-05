@@ -30,14 +30,17 @@
     <PackageVersion Include="Trellis.Mediator" Version="$(TrellisVersion)" />
     <PackageVersion Include="Trellis.Primitives" Version="$(TrellisVersion)" />
     <PackageVersion Include="Trellis.StateMachine" Version="$(TrellisVersion)" />
+    <PackageVersion Include="Trellis.Mediator.FluentValidation" Version="$(TrellisVersion)" />
+    <PackageVersion Include="Trellis.ServiceDefaults" Version="$(TrellisVersion)" />
     <PackageVersion Include="Stateless" Version="5.20.1" />
   </ItemGroup>
   <!-- Test -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="FluentAssertions" Version="7.2.2" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.6.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageVersion Include="Trellis.Testing" Version="$(TrellisVersion)" />
     <PackageVersion Include="xunit" Version="2.8.0" />
     <PackageVersion Include="Xunit.DependencyInjection" Version="9.3.0" />
     <PackageVersion Include="Xunit.Priority" Version="1.1.6" />

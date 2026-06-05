@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
    <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+      <PackageReference Include="Trellis.Testing" />
       <PackageReference Include="Xunit.Priority" />
    </ItemGroup>
    <ItemGroup>
