@@ -64,16 +64,40 @@ public class DinnersController : ControllerBase
             .AsActionResultAsync<DinnerResponse>();
 
     /// <summary>
-    /// Lists every dinner owned by the route host. PR 3 will replace this with paginated
-    /// <see cref="Trellis.Page{T}"/> + <see cref="Trellis.Cursor"/> output.
+    /// Lists dinners owned by the route host with cursor-based pagination (Cookbook Recipe 3).
+    /// <list type="bullet">
+    ///   <item><c>?limit=N</c> requests at most <c>N</c> items per page; server caps at <c>PageSize.Max</c>.
+    ///         Omitted/zero/negative → <c>PageSize.Default</c>.</item>
+    ///   <item><c>?cursor=&lt;opaque&gt;</c> resumes from the previous page's <c>next</c> token.
+    ///         Malformed cursors → 422 with reason code <c>cursor.malformed</c>.</item>
+    /// </list>
+    /// Uses Trellis.Asp's <c>Result&lt;Page&lt;T&gt;&gt;.ToHttpResponseAsync</c> overload so the
+    /// envelope, RFC 8288 <c>Link</c> header, and next/previous <c>PageLink</c> records are all
+    /// emitted by the framework.
     /// </summary>
     [HttpGet]
-    public async ValueTask<ActionResult<DinnerResponse[]>> ListDinners(
-        HostId hostId, CancellationToken cancellationToken) =>
-        await _sender.Send(new ListDinnersForHostQuery(hostId), cancellationToken)
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async ValueTask<ActionResult<Trellis.Asp.PagedResponse<DinnerResponse>>> ListDinners(
+        HostId hostId,
+        [FromQuery(Name = "cursor")] string? cursor,
+        [FromQuery(Name = "limit")] int? limit,
+        CancellationToken cancellationToken)
+    {
+        var basePath = $"/hosts/{hostId.Value}/dinners";
+        var apiVersion = HttpContext.GetRequestedApiVersion()?.ToString() ?? "2022-10-01";
+
+        return await _sender.Send(
+                new ListDinnersForHostQuery(
+                    hostId,
+                    cursor is { Length: > 0 } token ? new Cursor(token) : (Cursor?)null,
+                    limit),
+                cancellationToken)
             .ToHttpResponseAsync(
-                body: dinners => dinners.Select(d => d.Adapt<DinnerResponse>()).ToArray())
-            .AsActionResultAsync<DinnerResponse[]>();
+                nextUrlBuilder: (nextCursor, appliedLimit) =>
+                    $"{basePath}?cursor={Uri.EscapeDataString(nextCursor.Token)}&limit={appliedLimit}&api-version={apiVersion}",
+                body: dinner => dinner.Adapt<DinnerResponse>())
+            .AsActionResultAsync<Trellis.Asp.PagedResponse<DinnerResponse>>();
+    }
 
     /// <summary>
     /// Get a dinner by id. Emits a strong ETag (Cookbook Recipe 6) — though dinners are

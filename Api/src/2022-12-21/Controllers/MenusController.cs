@@ -11,7 +11,6 @@ using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Trellis;
 using Trellis.Asp;
-
 /// <summary>
 /// CRUD for menu.
 /// </summary>
@@ -33,6 +32,41 @@ public class MenusController : ControllerBase
     public MenusController(ISender sender)
     {
         _sender = sender;
+    }
+
+    /// <summary>
+    /// Lists menus owned by the route host with cursor-based pagination (Cookbook Recipe 3).
+    /// Mirrors the shape of <see cref="DinnersController.ListDinners"/> exactly — same query
+    /// params (<c>?cursor</c> / <c>?limit</c>), same <c>PagedResponse&lt;T&gt;</c> envelope,
+    /// same RFC 8288 <c>Link</c> header.
+    /// </summary>
+    /// <param name="hostId">The id of the host whose menus are being listed.</param>
+    /// <param name="cursor">Opaque continuation token from the previous page's <c>next</c>. Null on the first page.</param>
+    /// <param name="limit">Requested page size (clamped to <c>PageSize.Max</c>); falls back to <c>PageSize.Default</c> when null/non-positive.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async ValueTask<ActionResult<PagedResponse<MenuResponse>>> ListMenus(
+        HostId hostId,
+        [FromQuery(Name = "cursor")] string? cursor,
+        [FromQuery(Name = "limit")] int? limit,
+        CancellationToken cancellationToken)
+    {
+        var basePath = $"/hosts/{hostId.Value}/menus";
+        var apiVersion = HttpContext.GetRequestedApiVersion()?.ToString() ?? "2022-10-01";
+
+        return await _sender.Send(
+                new ListMenusForHostQuery(
+                    hostId,
+                    cursor is { Length: > 0 } token ? new Cursor(token) : (Cursor?)null,
+                    limit),
+                cancellationToken)
+            .ToHttpResponseAsync(
+                nextUrlBuilder: (nextCursor, appliedLimit) =>
+                    $"{basePath}?cursor={Uri.EscapeDataString(nextCursor.Token)}&limit={appliedLimit}&api-version={apiVersion}",
+                body: menu => menu.Adapt<MenuResponse>())
+            .AsActionResultAsync<PagedResponse<MenuResponse>>();
     }
 
     /// <summary>
