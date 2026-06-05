@@ -68,6 +68,45 @@ public class DinnerTests
     }
 
     [Fact]
+    public void TryCreate_rejects_default_start_date()
+    {
+        // Guards against omitted-in-JSON properties deserializing to default(DateTimeOffset).
+        // Without this guard, a Dinner could be scheduled at year 0001 because the end-after-start
+        // relative check passes when EndDateTime is in the future.
+        var clock = Clock();
+        var bad = Dinner.TryCreate(
+            Name.TryCreate("Bad").GetValueOrThrow(),
+            Description.TryCreate("Bad").GetValueOrThrow(),
+            Host, Menu,
+            startDateTime: default,
+            endDateTime: Now.AddHours(4),
+            clock);
+
+        bad.IsFailure.Should().BeTrue();
+        var error = bad.Match(_ => null!, e => e).Should().BeOfType<Error.InvalidInput>().Subject;
+        error.Fields.Items.Should().ContainSingle()
+            .Which.ReasonCode.Should().Be("dinner.invalid.start-required");
+    }
+
+    [Fact]
+    public void TryCreate_rejects_default_end_date()
+    {
+        var clock = Clock();
+        var bad = Dinner.TryCreate(
+            Name.TryCreate("Bad").GetValueOrThrow(),
+            Description.TryCreate("Bad").GetValueOrThrow(),
+            Host, Menu,
+            startDateTime: Now.AddHours(2),
+            endDateTime: default,
+            clock);
+
+        bad.IsFailure.Should().BeTrue();
+        var error = bad.Match(_ => null!, e => e).Should().BeOfType<Error.InvalidInput>().Subject;
+        error.Fields.Items.Should().ContainSingle()
+            .Which.ReasonCode.Should().Be("dinner.invalid.end-required");
+    }
+
+    [Fact]
     public void Start_succeeds_from_Upcoming_and_raises_DinnerStarted()
     {
         var clock = Clock();

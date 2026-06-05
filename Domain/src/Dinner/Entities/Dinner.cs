@@ -58,6 +58,17 @@ public sealed class Dinner : Aggregate<DinnerId>
         DateTimeOffset endDateTime,
         TimeProvider clock)
     {
+        // Reject default(DateTimeOffset) (year 0001) so an omitted-in-JSON property doesn't
+        // silently produce an aggregate scheduled at 0001-01-01 that still satisfies the
+        // EndDateTime > StartDateTime relative check below.
+        if (startDateTime == default)
+            return Result.Fail<Dinner>(
+                Error.InvalidInput.ForField(nameof(StartDateTime), "dinner.invalid.start-required",
+                    "StartDateTime is required."));
+        if (endDateTime == default)
+            return Result.Fail<Dinner>(
+                Error.InvalidInput.ForField(nameof(EndDateTime), "dinner.invalid.end-required",
+                    "EndDateTime is required."));
         if (endDateTime <= startDateTime)
             return Result.Fail<Dinner>(
                 Error.InvalidInput.ForField(nameof(EndDateTime), "dinner.invalid.schedule",
