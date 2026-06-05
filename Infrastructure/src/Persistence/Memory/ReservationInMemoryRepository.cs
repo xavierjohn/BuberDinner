@@ -90,6 +90,15 @@ internal sealed class ReservationInMemoryRepository : IReservationRepository
         }
     }
 
+    public ValueTask<Reservation?> FindByDinnerAndGuest(DinnerId dinnerId, UserId guestUserId, CancellationToken cancellationToken)
+    {
+        Reservation? reservation;
+        lock (s_lock)
+            reservation = s_reservations.FirstOrDefault(r =>
+                r.DinnerId == dinnerId && r.GuestUserId == guestUserId);
+        return ValueTask.FromResult(reservation);
+    }
+
     private static void BumpETag(Reservation reservation)
     {
         var newETag = Guid.NewGuid().ToString("N");

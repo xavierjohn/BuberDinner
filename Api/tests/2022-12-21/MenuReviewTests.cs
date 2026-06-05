@@ -26,8 +26,8 @@ public class MenuReviewTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact, Priority(6)]
     public async Task SubmitReview_returns_201_with_etag_and_location()
     {
-        var (_, _, _, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
         var guest = await NewGuestClientAsync();
+        var (menuId, dinnerId) = await SeedReadyToReviewAsync(guest.client);
 
         var response = await PostReviewAsync(guest.client, menuId, dinnerId, rating: 4, comment: "Great brunch!");
 
@@ -88,8 +88,8 @@ public class MenuReviewTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact, Priority(6)]
     public async Task UpdateReview_with_invalid_rating_returns_422_via_FluentValidation_before_handler_runs()
     {
-        var (_, _, _, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
         var guest = await NewGuestClientAsync();
+        var (menuId, dinnerId) = await SeedReadyToReviewAsync(guest.client);
         var first = await PostReviewAsync(guest.client, menuId, dinnerId, rating: 3, comment: "okay");
         var id = (await first.Content.ReadAsAsync<ReviewBody>())!.Id;
 
@@ -104,8 +104,8 @@ public class MenuReviewTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact, Priority(6)]
     public async Task UpdateReview_as_different_guest_returns_404_NotFound_leak_shield()
     {
-        var (_, _, _, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
         var owner = await NewGuestClientAsync();
+        var (menuId, dinnerId) = await SeedReadyToReviewAsync(owner.client);
         var first = await PostReviewAsync(owner.client, menuId, dinnerId, rating: 4, comment: "ok");
         var id = (await first.Content.ReadAsAsync<ReviewBody>())!.Id;
 
@@ -119,8 +119,8 @@ public class MenuReviewTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact, Priority(6)]
     public async Task ListReviewsForMenu_paginates()
     {
-        var (_, _, _, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
         var guest = await NewGuestClientAsync();
+        var (menuId, dinnerId) = await SeedReadyToReviewAsync(guest.client);
         for (int i = 0; i < 7; i++)
             (await PostReviewAsync(guest.client, menuId, dinnerId, rating: 5, comment: $"Review {i}"))
                 .EnsureSuccessStatusCode();
@@ -140,7 +140,112 @@ public class MenuReviewTests : IClassFixture<WebApplicationFactory<Program>>
         p3.Next.Should().BeNull();
     }
 
+    [Fact, Priority(6)]
+    public async Task SubmitReview_against_missing_dinner_returns_404()
+    {
+        var (_, _, _, _, menuId, _) = await SeedHostMenuAndDinnerAsync();
+        var guest = await NewGuestClientAsync();
+        var phantomDinnerId = Guid.NewGuid().ToString();
+
+        var response = await PostReviewAsync(guest.client, menuId, phantomDinnerId, rating: 3, comment: "ok");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact, Priority(6)]
+    public async Task SubmitReview_against_dinner_not_matching_menu_returns_404_leak_shield()
+    {
+        var (hostClient, _, hostId, _, menuAId, dinnerForAId) = await SeedHostMenuAndDinnerAsync();
+        var menuBResp = await hostClient.PostAsync($"hosts/{hostId}/menus/create{ApiVersion}", JsonBody(new
+        {
+            name = "M-B",
+            description = "d",
+            sections = new[] { new { name = "s", description = "d", items = new[] { new { name = "i", description = "d" } } } },
+        }));
+        var menuBId = (await menuBResp.Content.ReadAsAsync<IdOnly>())!.Id;
+        var guest = await NewGuestClientAsync();
+
+        var response = await PostReviewAsync(guest.client, menuBId, dinnerForAId, rating: 4, comment: "wrong menu");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound,
+            "the dinner-belongs-to-menu gate fires as 404 to avoid leaking dinner existence to callers querying with a mismatched menu");
+    }
+
+    [Fact, Priority(6)]
+    public async Task SubmitReview_without_reservation_returns_404_leak_shield()
+    {
+        var (_, _, _, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
+        var guest = await NewGuestClientAsync();
+
+        var response = await PostReviewAsync(guest.client, menuId, dinnerId, rating: 4, comment: "ok");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound,
+            "callers without a reservation get a leak-shielded 404 rather than a status-revealing 422");
+    }
+
+    [Fact, Priority(6)]
+    public async Task SubmitReview_against_upcoming_dinner_returns_422_review_dinner_not_ended()
+    {
+        var (_, _, _, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
+        var guest = await NewGuestClientAsync();
+        await ReserveAsync(guest.client, dinnerId);
+
+        var response = await PostReviewAsync(guest.client, menuId, dinnerId, rating: 5, comment: "too early");
+
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+        var problem = await response.Content.ReadAsAsync<ProblemWithRules>();
+        problem!.Rules.Should().NotBeNull().And.Subject!
+            .Should().ContainSingle().Which.Code.Should().Be("review.dinner-not-ended");
+    }
+
+    [Fact, Priority(6)]
+    public async Task SubmitReview_with_cancelled_reservation_returns_404_leak_shield()
+    {
+        var (hostClient, _, hostId, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
+        var guest = await NewGuestClientAsync();
+        var reservationResp = await ReserveAsync(guest.client, dinnerId);
+        var reservationId = (await reservationResp.Content.ReadAsAsync<ReservationIdOnly>())!.Id;
+        (await guest.client.PostAsync($"reservations/{reservationId}/cancel{ApiVersion}",
+            JsonBody(new { reason = "changed-mind" }))).EnsureSuccessStatusCode();
+        await StartAndEndDinnerAsync(hostClient, hostId, dinnerId);
+
+        var response = await PostReviewAsync(guest.client, menuId, dinnerId, rating: 5, comment: "should be blocked");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound,
+            "cancelled reservations don't count as 'reserved this dinner'");
+    }
+
     // ---------------- helpers ----------------
+
+    private async Task<(string menuId, string dinnerId)> SeedReadyToReviewAsync(HttpClient guestClient)
+    {
+        var (hostClient, _, hostId, _, menuId, dinnerId) = await SeedHostMenuAndDinnerAsync();
+        await ReserveAsync(guestClient, dinnerId);
+        await StartAndEndDinnerAsync(hostClient, hostId, dinnerId);
+        return (menuId, dinnerId);
+    }
+
+    private static async Task<HttpResponseMessage> ReserveAsync(HttpClient guestClient, string dinnerId)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post, $"reservations{ApiVersion}")
+        {
+            Content = JsonBody(new { dinnerId, guestCount = 1 }),
+        };
+        req.Headers.TryAddWithoutValidation("Idempotency-Key", Guid.NewGuid().ToString());
+        var resp = await guestClient.SendAsync(req);
+        resp.EnsureSuccessStatusCode();
+        return resp;
+    }
+
+    private static async Task StartAndEndDinnerAsync(HttpClient hostClient, string hostId, string dinnerId)
+    {
+        (await hostClient.PostAsync(
+            $"hosts/{hostId}/dinners/{dinnerId}/start{ApiVersion}",
+            new StringContent("", Encoding.UTF8, "application/json"))).EnsureSuccessStatusCode();
+        (await hostClient.PostAsync(
+            $"hosts/{hostId}/dinners/{dinnerId}/end{ApiVersion}",
+            new StringContent("", Encoding.UTF8, "application/json"))).EnsureSuccessStatusCode();
+    }
 
     private async Task<(HttpClient hostClient, string hostToken, string hostId, string hostUserId, string menuId, string dinnerId)>
         SeedHostMenuAndDinnerAsync()
@@ -204,8 +309,11 @@ public class MenuReviewTests : IClassFixture<WebApplicationFactory<Program>>
 
     private sealed record TokenReply(string Token);
     private sealed record IdOnly(string Id);
+    private sealed record ReservationIdOnly(string Id);
     private sealed record ReviewBody(string Id, string MenuId, string DinnerId, string GuestUserId, int Rating, string Comment);
     private sealed record ProblemWithErrors(int Status, string? Code, Dictionary<string, string[]>? Errors);
+    private sealed record ProblemWithRules(int Status, string? Code, List<RuleEntry>? Rules);
+    private sealed record RuleEntry(string Code, string? Detail);
     private sealed record PagedEnvelope<T>(List<T> Items, PageLink? Next);
     private sealed record PageLink(string Cursor, string Href);
 }

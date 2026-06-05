@@ -19,19 +19,31 @@ Only the owning guest can update. Reviews are not deleted.
 
 ### Validation
 
-Validation lives in three places:
+Validation lives in four places, each with a distinct job:
 
-1. **Domain invariants** — `MenuReview.s_validator` enforces rating ∈ [1, 5],
-   non-empty comment ≤ 1000 chars, non-empty IDs. The aggregate refuses to
-   exist in an invalid state.
-2. **Command boundary** (PR 5 showcase) — `SubmitMenuReviewCommandValidator`
-   and `UpdateMenuReviewCommandValidator` re-state those rules as FluentValidation
-   rules wired into the Mediator pipeline via `AddTrellisFluentValidation(...)`.
-   These run BEFORE the handler and surface field-bound 422s with the standard
-   Trellis Problem Details shape.
-3. **Wire DTO** — `SubmitMenuReviewRequest.ToSubmitMenuReviewCommand(UserId)`
-   does the primitive → `MenuId`/`DinnerId` value-object parse via the
-   `TryCreate`/`Combine`/`Map` Result pipeline.
+1. **Content invariants (domain)** — `MenuReview.s_inputValidator` is a private
+   `InlineValidator<ContentInputs>` that runs over a `(rating, comment)` record
+   BEFORE any mutation. It enforces rating ∈ [1, 5], non-empty comment ≤ 1000
+   chars. Failures aggregate into one `Error.InvalidInput`.
+2. **FK integrity (wire)** — `SubmitMenuReviewRequest.ToSubmitMenuReviewCommand(UserId)`
+   parses the inbound primitive `menuId`/`dinnerId` strings into `MenuId`/`DinnerId`
+   value objects via the `TryCreate`/`Combine`/`Map` Result pipeline — a malformed
+   GUID produces a 422 before the handler runs.
+3. **Cross-aggregate gates (handler)** — `SubmitMenuReviewCommandHandler` chains the
+   following ROP gates so an orphan/unauthorised review can't be created:
+   1. Menu exists → 404.
+   2. Dinner exists → 404.
+   3. Dinner.MenuId == request.MenuId → 404 (leak-shielded).
+   4. Caller has a non-cancelled reservation for the dinner → 404 (leak-shielded —
+      identical shape to the missing-dinner case to avoid revealing dinner existence
+      to non-attendees).
+   5. Dinner.Status == `Ended` → 422 `review.dinner-not-ended` (status revealed
+      only AFTER the caller is proven to be an attendee).
+4. **Command boundary (PR 5 showcase)** — `SubmitMenuReviewCommandValidator` and
+   `UpdateMenuReviewCommandValidator` re-state the rating/comment rules as
+   FluentValidation rules wired into the Mediator pipeline via
+   `AddTrellisFluentValidation(...)`. These run BEFORE the handler and surface
+   field-bound 422s with the standard Trellis Problem Details shape.
 
 ### Wire shape
 

@@ -363,4 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 # Transitive duplicate of trellis-api-testing.md shipped by Trellis.Testing package build
 .github/trellis-api-testing-reference.md
+# trellis-api-efcore.md is shipped transitively but BuberDinner does not reference Trellis.EntityFrameworkCore
+.github/trellis-api-efcore.md
 

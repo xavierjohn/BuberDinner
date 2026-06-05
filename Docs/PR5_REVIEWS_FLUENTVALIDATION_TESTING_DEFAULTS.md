@@ -24,7 +24,7 @@
 
 ```http
 POST /menu-reviews
-{ "menuId": "...", "dinnerId": "...", "rating": 99, "comment": "x" }
+{ "menuId": "...", "dinnerId": "...", "rating": 99, "comment": "" }
 
 HTTP/1.1 422 Unprocessable Entity
 Content-Type: application/problem+json
@@ -32,7 +32,7 @@ Content-Type: application/problem+json
   "status": 422, "code": "invalid-input",
   "errors": {
     "Rating":  ["Rating must be between 1 and 5."],
-    "Comment": ["Comment must not exceed 1000 characters."]
+    "Comment": ["Comment is required."]
   }
 }
 ```
