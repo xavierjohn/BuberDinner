@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 680" role="img" aria-label="BuberDinner Clean Architecture onion diagram">
+  <title>BuberDinner Clean Architecture layers — dependencies point inward</title>
+
+  <!-- Title -->
+  <text x="320" y="32" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="16" font-weight="700" fill="#5a6470">
+    Clean Architecture — dependencies point inward
+  </text>
+
+  <!-- Outer ring (Presentation + Infrastructure) -->
+  <circle cx="320" cy="350" r="270" fill="#f7f9fc" stroke="#9aa4b1" stroke-width="2"/>
+  <!-- Application ring -->
+  <circle cx="320" cy="350" r="185" fill="#eaf0f7" stroke="#9aa4b1" stroke-width="2"/>
+  <!-- Domain center -->
+  <circle cx="320" cy="350" r="105" fill="#d9e2ee" stroke="#9aa4b1" stroke-width="2"/>
+
+  <!-- Dashed horizontal divider — visually splits outer ring into Api (top) / Infrastructure (bottom) -->
+  <line x1="55" y1="350" x2="585" y2="350" stroke="#b6bfc9" stroke-width="1" stroke-dasharray="5,4"/>
+
+  <!-- Outer ring TOP — Api / Presentation -->
+  <text x="320" y="118" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="15" font-weight="700" fill="#33404f">
+    Api · Presentation
+  </text>
+  <text x="320" y="138" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#5a6470">
+    ASP.NET Core controllers · Trellis.Asp
+  </text>
+  <text x="320" y="154" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#5a6470">
+    Problem Details · ETags · Idempotency
+  </text>
+
+  <!-- Outer ring BOTTOM — Infrastructure -->
+  <text x="320" y="555" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="15" font-weight="700" fill="#33404f">
+    Infrastructure
+  </text>
+  <text x="320" y="575" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#5a6470">
+    In-memory repositories · JWT generator
+  </text>
+  <text x="320" y="591" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#5a6470">
+    Persistence DTOs · Cosmos seam
+  </text>
+
+  <!-- Application ring (top band, above Domain) -->
+  <text x="320" y="208" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="15" font-weight="700" fill="#33404f">
+    Application
+  </text>
+  <text x="320" y="227" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#5a6470">
+    Mediator commands · queries · handlers
+  </text>
+  <text x="320" y="243" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#5a6470">
+    FluentValidation · resource loaders · event handlers
+  </text>
+
+  <!-- Domain center -->
+  <text x="320" y="338" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="16" font-weight="700" fill="#1f2937">
+    Domain
+  </text>
+  <text x="320" y="358" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#33404f">
+    Aggregates · Value Objects
+  </text>
+  <text x="320" y="374" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" fill="#33404f">
+    Events · State Machines · ROP
+  </text>
+
+  <!-- Dependency arrow on the right edge — visually shows the "points inward" rule -->
+  <defs>
+    <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L8,3 z" fill="#5a6470"/>
+    </marker>
+  </defs>
+  <line x1="612" y1="350" x2="600" y2="350" stroke="#5a6470" stroke-width="1.5"/>
+  <line x1="600" y1="350" x2="430" y2="350" stroke="#5a6470" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrowHead)"/>
+  <text x="612" y="338" text-anchor="end"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" font-style="italic" fill="#5a6470">
+    depends on
+  </text>
+
+  <!-- Footer annotation -->
+  <text x="320" y="650" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        font-size="11" font-style="italic" fill="#5a6470">
+    Trellis V3 packages plug in at every ring · Domain has no outward dependencies
+  </text>
+</svg>

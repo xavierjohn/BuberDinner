@@ -38,7 +38,8 @@ BuberDinner is a reference application for evaluating and learning the Trellis V
 | `Trellis.Mediator.FluentValidation` | Auto-wired `IValidator<TCommand>` validation behavior. |
 | `Trellis.FluentValidation` | `IValidator<T>.ValidateToResult()` bridge used inside factories. |
 | `Trellis.StateMachine` | Stateless adapter with `LazyStateMachine<,>` and `FireResult(...)`. |
-| `Trellis.Authorization` | Resource authorization contracts and shared resource loader base. |
+| `Trellis.Http.Abstractions` | Direct dependency of `Application` for HTTP-shape primitives used by handlers. |
+| `Trellis.Authorization` | Resource authorization contracts and shared resource loader base (pulled in transitively via `Trellis.Mediator`). |
 | `Trellis.Testing` | FluentAssertions matchers for `Result<T>`. |
 | `Trellis.ServiceDefaults` | Fluent `services.AddTrellis(t => t.Use*(...))` registration. |
 
@@ -77,6 +78,12 @@ The repository was built up through seven merged PRs. The docs use local showcas
 | #32 | ROP refactor sweep | Converted load-check-act seams and `TryCreate` factories to `.ToResult().Ensure().BindAsync().TapAsync()` and `ValidateToResult(...).Map(...)` chains. | [SubmitMenuReviewCommandHandler.cs](Application/src/MenuReviews/Commands/SubmitMenuReviewCommandHandler.cs) |
 
 ## Architecture
+
+The codebase follows Clean Architecture: Domain at the centre, Application around it, then Infrastructure and Api on the outside. Dependencies always point inward — `Domain` has no outward references, `Application` references `Domain`, and `Infrastructure` + `Api` implement abstractions defined further inside.
+
+![Clean Architecture onion diagram — Domain at centre, Application around it, Api and Infrastructure on the outside](readme-assets/clean-architecture-onion.svg)
+
+The same picture, as a runtime flow showing how a request travels through the layers and where each Trellis package plugs in:
 
 ```mermaid
 flowchart TB
@@ -139,7 +146,7 @@ flowchart LR
 
 ## API surface at a glance
 
-All application endpoints are under the versioned `2022-12-21` controller set except authentication, which is version-neutral.
+All application endpoints live under the `Api/src/2022-12-21/` controller folder (the date is a source-tree namespace, not the wire version) and expose API version **`2022-10-01`** via `[ApiVersion("2022-10-01")]`. Pass `?api-version=2022-10-01` on every call. Authentication is version-neutral.
 
 | Area | Endpoint family | What to look for |
 |---|---|---|
@@ -197,7 +204,7 @@ build/           Repository build support.
 
 The `Requests/` directory is organized by feature area and can be used with the VS Code REST Client or JetBrains HTTP Client. The files cover the happy path plus important failure modes: 428 missing precondition, 412 stale ETag, 422 validation/rule codes, 404 leak shields, 401/403 auth, 304 conditional GET, and idempotency 400/422 responses.
 
-Run the API with a fresh in-memory store, then execute the requests in dependency order: authentication, host, menu, dinner, reservation, review. A local session-state helper named `replay-http.py` has also been used to replay the current set in order; after a fresh `dotnet run`, the request set passes 37/37. The durable automated coverage is the API integration test project, so `dotnet test` remains the primary verification command.
+Run the API with a fresh in-memory store, then execute the requests in dependency order: authentication, host, menu, dinner, reservation, review. The durable automated coverage is the API integration test project, so `dotnet test` remains the primary verification command — it exercises the same endpoints end-to-end without any manual replay step.
 
 ## Credits and history
 
