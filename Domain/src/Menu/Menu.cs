@@ -10,8 +10,8 @@ using FluentValidation;
 
 public class Menu : Aggregate<MenuId>
 {
-    public Name Name { get; }
-    public Description Description { get; }
+    public Name Name { get; private set; }
+    public Description Description { get; private set; }
     public decimal? AverageRating { get; }
     public IReadOnlyList<MenuSection> Sections => _menuSections.AsReadOnly();
     public HostId HostId { get; }
@@ -78,6 +78,18 @@ public class Menu : Aggregate<MenuId>
         Description = description;
         AverageRating = averageRating;
         HostId = hostId;
+    }
+
+    /// <summary>
+    /// Updates the menu's name and description. Returns a validated <see cref="Result{Menu}"/>
+    /// so callers can compose on the Result track. Caller is responsible for the persistence
+    /// commit (which bumps the optimistic-concurrency ETag) — see Recipe 23 in the cookbook.
+    /// </summary>
+    public Result<Menu> Update(Name name, Description description)
+    {
+        Name = name;
+        Description = description;
+        return s_validator.ValidateToResult(this);
     }
 
     static readonly InlineValidator<Menu> s_validator = new()
