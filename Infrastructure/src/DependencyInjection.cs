@@ -6,6 +6,7 @@ using BuberDinner.Application.Abstractions.Authentication;
 using BuberDinner.Application.Abstractions.Persistence;
 using BuberDinner.Domain.Menu;
 using BuberDinner.Domain.User.Entities;
+using HostEntity = BuberDinner.Domain.Host.Entities.Host;
 using BuberDinner.Infrastructure.Authentication;
 using BuberDinner.Infrastructure.Persistence.Cosmos;
 using BuberDinner.Infrastructure.Persistence.Memory;
@@ -67,6 +68,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IRepository<User>, UserInMemoryRepository>();
         services.AddScoped<IRepository<Menu>, MenuInMemoryRepository>();
+        services.AddScoped<IRepository<HostEntity>, HostInMemoryRepository>();
         return services;
     }
 }
