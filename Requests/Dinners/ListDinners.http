@@ -1,4 +1,13 @@
-@token=yourtoken
+### TODO: ListDinners endpoint not yet implemented.
+### BuberDinner.Domain.Dinner currently has only a DinnerId value object — no Dinner aggregate,
+### no controller, no handler. This file is aspirational; the request below will 404 until
+### a Dinners controller is added (likely future PR: paginated list using Trellis Page<T> +
+### Cursor + ToPageAsync, see cookbook Recipe 3).
+###
+### Keeping the file as a placeholder so the planned shape is visible from the Requests/
+### tree, but it does NOT exercise a live endpoint today.
+
+@token = yourtoken
 GET {{host}}/dinners?api-version=2022-10-01
 Authorization: Bearer {{token}}
 

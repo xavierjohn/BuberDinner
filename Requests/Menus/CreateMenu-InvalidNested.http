@@ -1,0 +1,42 @@
+### Create a menu with an invalid nested section (regression guard).
+### Validates the TraverseAll adoption from commit 9b7a9e2:
+### before the fix this would return HTTP 500 (InvalidOperationException) because nested
+### .Match(v => v, e => throw ...) bubbled up past the Result track.
+### After the fix it returns HTTP 422 with per-field violations for /name and /description
+### (Section.Name is empty AND MenuItem.Description is empty).
+
+@token = yourtoken
+@hostId = 4F82063C-AE9D-4F5B-B676-DD781C14EFA0
+
+POST {{host}}/hosts/{{hostId}}/menus/create?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Valid Menu",
+    "description": "Valid Description",
+    "sections": [
+        {
+            "name": "",
+            "description": "Section description",
+            "items": [
+                { "name": "Item name", "description": "" }
+            ]
+        }
+    ]
+}
+
+### Expected response shape:
+### HTTP/1.1 422 Unprocessable Entity
+### Content-Type: application/problem+json
+### {
+###   "type":"https://tools.ietf.org/html/rfc4918#section-11.2",
+###   "title":"One or more validation errors occurred.",
+###   "status":422,
+###   "errors":{
+###     "name":["Name cannot be empty."],
+###     "description":["Description cannot be empty."]
+###   },
+###   "code":"invalid-input",
+###   "kind":"unprocessable-content"
+### }
