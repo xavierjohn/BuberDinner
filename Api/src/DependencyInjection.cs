@@ -1,12 +1,19 @@
 ﻿namespace BuberDinner.Api;
 
 using System.Reflection;
+using BuberDinner.Application.Hosts.Authorization;
+using BuberDinner.Application.Menus.Commands;
+using BuberDinner.Domain.Host.ValueObject;
+using BuberDinner.Domain.Menu.ValueObject;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Trellis.Asp.Authorization;
+using Trellis.Asp.Routing;
+using Trellis.Mediator;
 
 internal static class DependencyInjection
 {
@@ -14,6 +21,20 @@ internal static class DependencyInjection
     {
         services.AddControllers();
         services.AddTrellisAspWithScalarValidation();
+
+        // Scalar value-object route constraints — let MVC bind `{hostId:HostId}` / `{menuId:MenuId}`
+        // straight into typed VOs at the boundary (instead of string-then-reparse-in-DTO).
+        services.AddTrellisRouteConstraint<HostId>(nameof(HostId));
+        services.AddTrellisRouteConstraint<MenuId>(nameof(MenuId));
+
+        // Resource-based authorization wiring: ClaimsActorProvider reads the JWT `sub` claim
+        // and the SharedResourceLoaderById<Host, HostId> in the Application assembly authorizes
+        // any command implementing IAuthorizeResource<Host> + IIdentifyResource<Host, HostId>.
+        services.AddClaimsActorProvider(opts => opts.ActorIdClaim = "sub");
+        services.AddResourceAuthorization(
+            typeof(UpdateMenuCommand).Assembly,   // Application — commands + IAuthorizeResource implementations
+            typeof(HostResourceLoader).Assembly); // Same assembly today; named for clarity / future ACL split
+
         services.AddMappings();
         services.AddApiVersioning(
                     options =>
