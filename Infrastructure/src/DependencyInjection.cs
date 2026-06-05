@@ -62,14 +62,13 @@ public static class DependencyInjection
         services.AddSingleton(CosmosClientFactory.InitializeCosmosClientInstance(cosmosDbClientSettings));
         services.AddScoped<IRepository<User>, UserCosmosDbRepository>();
         services.AddScoped<IRepository<Menu>, MenuCosmosDbRepository>();
-        // TODO: replace with HostCosmosDbRepository when implemented. Until then, fall back to
-        // the in-memory implementation so a Cosmos-configured deploy doesn't crash on the first
-        // POST /hosts or PUT /hosts/.../menus/... (which loads the parent Host for
-        // IAuthorizeResource<Host>). Tracked alongside the broader 5-PR showcase roadmap.
+        // TODO: replace with HostCosmosDbRepository / MenuCosmosDbRepository (paginated) /
+        // DinnerCosmosDbRepository when they ship. Until then, fall back to in-memory so a
+        // Cosmos-configured deploy doesn't crash on POST /hosts, PUT .../menus/..., or the
+        // paginated list/dinner endpoints. Tracked alongside the broader 5-PR roadmap.
         services.AddScoped<IRepository<HostEntity>, HostInMemoryRepository>();
-        // TODO: replace with DinnerCosmosDbRepository when implemented. Same stop-gap rationale
-        // as Host above — Dinner aggregates land in the in-memory store regardless of the
-        // configured persistence mode until a Cosmos implementation ships.
+        services.AddScoped<MenuInMemoryRepository>();
+        services.AddScoped<IMenuRepository>(sp => sp.GetRequiredService<MenuInMemoryRepository>());
         services.AddScoped<DinnerInMemoryRepository>();
         services.AddScoped<IRepository<DinnerEntity>>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
         services.AddScoped<IDinnerRepository>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());
@@ -79,7 +78,9 @@ public static class DependencyInjection
     private static IServiceCollection AddInMemoryDb(this IServiceCollection services)
     {
         services.AddScoped<IRepository<User>, UserInMemoryRepository>();
-        services.AddScoped<IRepository<Menu>, MenuInMemoryRepository>();
+        services.AddScoped<MenuInMemoryRepository>();
+        services.AddScoped<IRepository<Menu>>(sp => sp.GetRequiredService<MenuInMemoryRepository>());
+        services.AddScoped<IMenuRepository>(sp => sp.GetRequiredService<MenuInMemoryRepository>());
         services.AddScoped<IRepository<HostEntity>, HostInMemoryRepository>();
         services.AddScoped<DinnerInMemoryRepository>();
         services.AddScoped<IRepository<DinnerEntity>>(sp => sp.GetRequiredService<DinnerInMemoryRepository>());

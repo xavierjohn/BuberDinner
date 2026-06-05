@@ -2,10 +2,12 @@ namespace BuberDinner.Infrastructure.Persistence.Memory;
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using BuberDinner.Application.Abstractions.Persistence;
+using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu;
 
-internal class MenuInMemoryRepository : IRepository<Menu>
+internal class MenuInMemoryRepository : IMenuRepository
 {
     private static readonly List<Menu> s_menus = new();
     // Parallel ETag store: in a real persistence layer the ETag is the row-version that the
@@ -18,6 +20,23 @@ internal class MenuInMemoryRepository : IRepository<Menu>
     {
         lock (s_lock)
             return s_menus.ToList();
+    }
+
+    /// <summary>
+    /// Over-fetched, host-filtered, id-ordered slice for cursor pagination. Same shape as
+    /// <see cref="DinnerInMemoryRepository.GetPageForHost"/>.
+    /// </summary>
+    public IReadOnlyList<Menu> GetPageForHost(HostId hostId, Trellis.PageSize pageSize, System.Guid? afterId)
+    {
+        lock (s_lock)
+        {
+            IEnumerable<Menu> source = s_menus
+                .Where(m => m.HostId == hostId)
+                .OrderBy(m => m.Id.Value);
+            if (afterId is { } cursorId)
+                source = source.Where(m => m.Id.Value.CompareTo(cursorId) > 0);
+            return source.Take(pageSize.Applied + 1).ToList();
+        }
     }
 
     public ValueTask Add(Menu menu, CancellationToken cancellationToken)

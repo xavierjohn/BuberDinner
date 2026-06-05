@@ -30,7 +30,27 @@ internal class DinnerInMemoryRepository : IDinnerRepository
     public IReadOnlyList<Dinner> GetForHost(HostId hostId)
     {
         lock (s_lock)
-            return s_dinners.Where(d => d.HostId == hostId).ToList();
+            return s_dinners.Where(d => d.HostId == hostId)
+                            .OrderBy(d => d.Id.Value)
+                            .ToList();
+    }
+
+    /// <summary>
+    /// Over-fetched, host-filtered, id-ordered slice for cursor pagination. Returns at most
+    /// <c>pageSize.Applied + 1</c> rows so <c>PageBuilder.FromOverFetch</c> can detect a next
+    /// page without an extra COUNT.
+    /// </summary>
+    public IReadOnlyList<Dinner> GetPageForHost(HostId hostId, Trellis.PageSize pageSize, System.Guid? afterId)
+    {
+        lock (s_lock)
+        {
+            IEnumerable<Dinner> source = s_dinners
+                .Where(d => d.HostId == hostId)
+                .OrderBy(d => d.Id.Value);
+            if (afterId is { } cursorId)
+                source = source.Where(d => d.Id.Value.CompareTo(cursorId) > 0);
+            return source.Take(pageSize.Applied + 1).ToList();
+        }
     }
 
     public ValueTask Add(Dinner dinner, CancellationToken cancellationToken)
