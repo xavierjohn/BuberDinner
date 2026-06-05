@@ -1,0 +1,21 @@
+### List menus owned by the route host with cursor-based pagination. Same envelope and
+### query parameters as GET /hosts/{hostId}/dinners (Cookbook Recipe 3).
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+
+GET {{host}}/hosts/{{hostId}}/menus?api-version=2022-10-01&limit=5
+Authorization: Bearer {{token}}
+
+### Expected response shape (identical to ListDinners.http):
+### HTTP/1.1 200 OK
+### Link: </hosts/.../menus?cursor=<base64>&limit=5&api-version=2022-10-01>; rel="next"
+### {
+###   "items": [ <MenuResponse>, ... ],
+###   "next":  { "cursor": "...", "href": "..." } or null,
+###   "previous": null,
+###   "requestedLimit": 5,
+###   "appliedLimit": 5,
+###   "deliveredCount": 5,
+###   "wasCapped": false
+### }

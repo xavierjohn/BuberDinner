@@ -1,0 +1,25 @@
+### Follow the `next.cursor` returned by the previous page to fetch the next slice.
+### The cursor is opaque (URL-safe base64); paste the value from the previous response's
+### `next.cursor` field (or follow the `Link: <...>; rel="next"` header URL directly).
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@cursor = MDE5ZTk2NjctMTQxZi03ZmQ1LTkxZjQtZWMzNzNkMDI2M2M4
+
+GET {{host}}/hosts/{{hostId}}/dinners?api-version=2022-10-01&limit=5&cursor={{cursor}}
+Authorization: Bearer {{token}}
+
+### Expected response (somewhere in the middle of a multi-page result set):
+### HTTP/1.1 200 OK
+### Link: </hosts/.../dinners?cursor=<next-base64>&limit=5&api-version=2022-10-01>; rel="next"
+### {
+###   "items": [ ... 5 entries ... ],
+###   "next":  { "cursor": "...", "href": "..." },
+###   "previous": null,
+###   "requestedLimit": 5,
+###   "appliedLimit": 5,
+###   "deliveredCount": 5,
+###   "wasCapped": false
+### }
+###
+### On the LAST page, `next` is null and no `Link: rel="next"` header is emitted.

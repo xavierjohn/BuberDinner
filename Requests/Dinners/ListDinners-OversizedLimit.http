@@ -1,0 +1,21 @@
+### Server caps the limit at `PageSize.Max = 100`. Asking for more is not an error —
+### the page returns `appliedLimit=100`, `requestedLimit=<what you asked>`, and
+### `wasCapped=true` so the client can see the clamp.
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+
+GET {{host}}/hosts/{{hostId}}/dinners?api-version=2022-10-01&limit=500
+Authorization: Bearer {{token}}
+
+### Expected response:
+### HTTP/1.1 200 OK
+### {
+###   "items": [ ... up to 100 entries ... ],
+###   "next": { ... } or null,
+###   "previous": null,
+###   "requestedLimit": 500,
+###   "appliedLimit": 100,
+###   "deliveredCount": <= 100,
+###   "wasCapped": true
+### }
