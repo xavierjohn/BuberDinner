@@ -1,0 +1,63 @@
+### Three failure modes for POST /reservations:
+###
+###   1. Missing Idempotency-Key       → 400 `idempotency.key_required` (middleware-level)
+###   2. Same key + DIFFERENT body     → 422 fingerprint mismatch (no replay possible)
+###   3. POST against missing DinnerId → 404 (Cookbook Recipe 22 — fail-loud on missing related)
+
+@token = yourtoken
+@dinnerId = 019E9690-0FDC-7AA6-9807-7F0A56F08C42
+@phantomDinner = 00000000-1111-2222-3333-444444444444
+@key = 12345678-1234-1234-1234-1234567890ab
+
+### 1. Missing Idempotency-Key → 400.
+POST {{host}}/reservations?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "dinnerId": "{{dinnerId}}",
+    "guestCount": 1
+}
+
+### Expected:
+### HTTP/1.1 400 Bad Request
+### { "status":400, "detail":"This endpoint requires the Idempotency-Key header.",
+###   "code":"idempotency.key_required" }
+
+
+### 2. Same key as a prior successful call but a DIFFERENT body → 422 (fingerprint mismatch).
+###    Assumes you already ran CreateReservation.http with guestCount=2 and the same key.
+###    The framework rejects so the caller knows the key was reused with mutated input.
+POST {{host}}/reservations?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: {{key}}
+
+{
+    "dinnerId": "{{dinnerId}}",
+    "guestCount": 5
+}
+
+### Expected:
+### HTTP/1.1 422 Unprocessable Entity
+### (Problem Details body indicating fingerprint mismatch)
+
+
+### 3. POST against a non-existent dinner → 404 (Recipe 22 fail-loud).
+###    Without this check, the handler would silently create an orphan reservation row
+###    pointing at a non-existent dinner — the post-condition "every reservation references
+###    a real dinner" would be broken with no signal to the caller.
+POST {{host}}/reservations?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: 99999999-9999-9999-9999-999999999999
+
+{
+    "dinnerId": "{{phantomDinner}}",
+    "guestCount": 1
+}
+
+### Expected:
+### HTTP/1.1 404 Not Found
+### { "status":404, "code":"not-found",
+###   "instance":"/dinners/00000000-1111-2222-3333-444444444444" }

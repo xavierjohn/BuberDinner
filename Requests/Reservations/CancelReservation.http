@@ -1,0 +1,21 @@
+### Cancel an active reservation. Only the owning guest can cancel — other callers
+### (including the dinner's host) get 404 (NotFound-leak-shield).
+
+@token = yourtoken
+@reservationId = 019E9690-10F4-7584-8AB7-5AF569F6983A
+
+POST {{host}}/reservations/{{reservationId}}/cancel?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "reason": "Schedule conflict"
+}
+
+### Expected response (happy path):
+### HTTP/1.1 200 OK
+### ETag: "<new>"
+### { ..., "status":"Cancelled", "cancelledAt":"...", "cancellationReason":"Schedule conflict" }
+###
+### Cancel-again returns 422 with code `state.machine.invalid.transition`
+### (Cookbook Recipe 9 — terminal-state guard).
