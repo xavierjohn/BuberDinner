@@ -9,13 +9,6 @@ using FluentValidation;
 using Stateless;
 using Trellis.StateMachine;
 
-/// <summary>
-/// A reservation a guest holds against a <see cref="Dinner"/>. Lifecycle is two states
-/// (Reserved -> Cancelled) backed by the same Stateless / LazyStateMachine pattern PR 2 used
-/// for Dinner — a one-transition machine is still the right shape for consistency, and the
-/// pattern lets us add future transitions (e.g. CheckedIn, NoShow) without changing the
-/// surrounding handler chain.
-/// </summary>
 public sealed class Reservation : Aggregate<ReservationId>
 {
     public DinnerId DinnerId { get; }
@@ -28,10 +21,6 @@ public sealed class Reservation : Aggregate<ReservationId>
 
     private readonly LazyStateMachine<ReservationStatus, ReservationTrigger> _machine;
 
-    /// <summary>
-    /// Creates a new reservation. Validates <paramref name="guestCount"/> is positive and
-    /// raises <see cref="ReservationCreated"/> for the dispatch pipeline.
-    /// </summary>
     public static Result<Reservation> TryCreate(
         DinnerId dinnerId,
         UserId guestUserId,
@@ -76,12 +65,6 @@ public sealed class Reservation : Aggregate<ReservationId>
             configure: ConfigureMachine);
     }
 
-    /// <summary>
-    /// Transitions the reservation from <see cref="ReservationStatus.Reserved"/> to
-    /// <see cref="ReservationStatus.Cancelled"/>, records the supplied reason, and raises
-    /// <see cref="ReservationCancelled"/>. Rejected (422 with reason code
-    /// <c>state.machine.invalid.transition</c>) when the reservation is already cancelled.
-    /// </summary>
     public Result<Reservation> Cancel(string reason, TimeProvider clock)
     {
         if (string.IsNullOrWhiteSpace(reason))
@@ -101,12 +84,9 @@ public sealed class Reservation : Aggregate<ReservationId>
             });
     }
 
-    private static void ConfigureMachine(StateMachine<ReservationStatus, ReservationTrigger> machine)
-    {
+    private static void ConfigureMachine(StateMachine<ReservationStatus, ReservationTrigger> machine) =>
         machine.Configure(ReservationStatus.Reserved)
                .Permit(ReservationTrigger.Cancel, ReservationStatus.Cancelled);
-        // Cancelled is terminal.
-    }
 
     static readonly InlineValidator<Reservation> s_validator = new()
     {

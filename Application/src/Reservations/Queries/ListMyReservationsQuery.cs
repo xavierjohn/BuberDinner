@@ -7,10 +7,6 @@ using BuberDinner.Domain.Reservation.Entities;
 using BuberDinner.Domain.User.ValueObjects;
 using Mediator;
 
-/// <summary>
-/// Paginated list of the calling guest's own reservations across every dinner.
-/// Same cursor-pagination shape as PR 3's ListDinners / ListMenus.
-/// </summary>
 public sealed class ListMyReservationsQuery : IRequest<Result<Page<Reservation>>>
 {
     public UserId CallerGuestUserId { get; }

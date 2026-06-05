@@ -9,12 +9,6 @@ using BuberDinner.Domain.Dinner.ValueObject;
 using BuberDinner.Domain.Reservation.Entities;
 using Mediator;
 
-/// <summary>
-/// Handles <see cref="CreateReservationCommand"/>: loads the parent Dinner (fail-loud if
-/// missing per Cookbook Recipe 22), verifies it is still in <c>Upcoming</c>, builds the
-/// Reservation aggregate, and persists. The dispatch pipeline then publishes
-/// <c>ReservationCreated</c> after the handler returns successfully.
-/// </summary>
 public sealed class CreateReservationCommandHandler
     : ICommandHandler<CreateReservationCommand, Result<Reservation>>
 {
@@ -33,31 +27,22 @@ public sealed class CreateReservationCommandHandler
     }
 
     public async ValueTask<Result<Reservation>> Handle(
-        CreateReservationCommand request, CancellationToken cancellationToken)
+        CreateReservationCommand request, CancellationToken cancellationToken) =>
+        await LoadDinnerAsync(request.DinnerId, cancellationToken)
+            .EnsureAsync(
+                d => d.Status == DinnerStatus.Upcoming,
+                d => Error.InvalidInput.ForRule("reservation.dinner-not-upcoming",
+                    $"Cannot reserve against a dinner whose status is {d.Status.Value}."))
+            .BindAsync(_ => Reservation.TryCreate(
+                request.DinnerId, request.GuestUserId, request.GuestCount, _clock))
+            .TapAsync(reservation => _reservationRepository.Add(reservation, cancellationToken));
+
+    private async ValueTask<Result<Dinner>> LoadDinnerAsync(
+        DinnerId dinnerId, CancellationToken cancellationToken)
     {
-        // Recipe 22 — fail-loud on missing related aggregate. Without this the create
-        // command would silently succeed against a non-existent dinner, leaving an orphan
-        // reservation row pointing at nothing. NotFound (not Forbidden) keeps existence
-        // private from the caller.
-        var dinner = await _dinnerRepository.FindById(request.DinnerId.Value.ToString(), cancellationToken);
-        if (dinner is null)
-            return Result.Fail<Reservation>(new Error.NotFound(ResourceRef.For<Dinner>(request.DinnerId)));
-
-        // Capacity / state precondition: a reservation only makes sense on a dinner that's
-        // still in the future. Started / ended / cancelled dinners are 422, not 404 — the
-        // dinner exists, it just doesn't accept reservations any more.
-        if (dinner.Status != DinnerStatus.Upcoming)
-            return Result.Fail<Reservation>(
-                Error.InvalidInput.ForRule("reservation.dinner-not-upcoming",
-                    $"Cannot reserve against a dinner whose status is {dinner.Status.Value}."));
-
-        var reservationResult = Reservation.TryCreate(
-            request.DinnerId, request.GuestUserId, request.GuestCount, _clock);
-        if (reservationResult.IsFailure)
-            return reservationResult;
-        var reservation = reservationResult.GetValueOrThrow("reservation");
-
-        await _reservationRepository.Add(reservation, cancellationToken);
-        return Result.Ok(reservation);
+        var dinner = await _dinnerRepository.FindById(dinnerId.Value.ToString(), cancellationToken);
+        return dinner is null
+            ? Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)))
+            : Result.Ok(dinner);
     }
 }

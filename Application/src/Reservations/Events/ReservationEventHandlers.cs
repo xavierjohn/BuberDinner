@@ -6,8 +6,6 @@ using BuberDinner.Domain.Reservation.Events;
 using Microsoft.Extensions.Logging;
 using Trellis.Mediator;
 
-/// <summary>Logs <see cref="ReservationCreated"/> events. In a real deployment this would
-/// fan out to the host's notifications channel ("Alice booked 2 seats for your Brunch").</summary>
 public sealed class LogReservationCreatedHandler : IDomainEventHandler<ReservationCreated>
 {
     private readonly ILogger<LogReservationCreatedHandler> _logger;
@@ -27,7 +25,6 @@ public sealed class LogReservationCreatedHandler : IDomainEventHandler<Reservati
     }
 }
 
-/// <summary>Logs <see cref="ReservationCancelled"/> events, including the guest-supplied reason.</summary>
 public sealed class LogReservationCancelledHandler : IDomainEventHandler<ReservationCancelled>
 {
     private readonly ILogger<LogReservationCancelledHandler> _logger;

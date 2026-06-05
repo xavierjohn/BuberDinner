@@ -20,12 +20,7 @@ using Trellis;
 using Trellis.Asp;
 using Trellis.Asp.Idempotency;
 
-/// <summary>
-/// Reservation endpoints. The create endpoint opts into the IETF Idempotency-Key middleware
-/// (Cookbook Recipe 29) via <see cref="IdempotentAttribute"/> — a retry with the same
-/// <c>Idempotency-Key</c> header + same body returns the cached 201 byte-for-byte instead
-/// of creating a second reservation. Same key + different body → 422 fingerprint mismatch.
-/// </summary>
+/// <summary>Reservation endpoints.</summary>
 [ApiVersion("2022-10-01")]
 [Route("reservations")]
 [Produces("application/json")]
@@ -34,23 +29,18 @@ public class ReservationsController : ControllerBase
 {
     private readonly ISender _sender;
 
-    /// <summary>Initialises a new instance of <see cref="ReservationsController"/>.</summary>
+    /// <summary>Initialises a new <see cref="ReservationsController"/>.</summary>
     public ReservationsController(ISender sender)
     {
         _sender = sender;
     }
 
-    /// <summary>
-    /// Reserve a seat at a dinner. Idempotent via the <c>Idempotency-Key</c> header per
-    /// IETF draft-ietf-httpapi-idempotency-key-header. Recipe 22 fail-loud applies: the
-    /// handler returns 404 if the supplied DinnerId doesn't exist, and 422 if the dinner
-    /// is no longer in the <c>Upcoming</c> state.
-    /// </summary>
+    /// <summary>Reserve a seat at a dinner. Idempotent via the Idempotency-Key header (Recipe 29).</summary>
     [HttpPost]
     [Idempotent]
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]   // [Idempotent] middleware → idempotency.key_required
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async ValueTask<ActionResult<ReservationResponse>> CreateReservation(
@@ -62,9 +52,6 @@ public class ReservationsController : ControllerBase
             return Unauthorized();
         var guestId = guestIdResult.GetValueOrThrow("guestId");
 
-        // Parse + send through one Result pipeline. A bad DinnerId surfaces as the framework's
-        // standard 422 Problem Details shape via ToHttpResponseAsync (consistent with
-        // ScheduleDinnerRequest, UpdateMenuRequest, etc.) — no hand-rolled error bodies.
         return await request.ToCreateReservationCommand(guestId)
             .BindAsync(command => _sender.Send(command, cancellationToken))
             .ToHttpResponseAsync(
@@ -78,7 +65,7 @@ public class ReservationsController : ControllerBase
     /// <summary>Get a single reservation. Visible only to the owning guest.</summary>
     [HttpGet("{reservationId:ReservationId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status304NotModified)]   // .EvaluatePreconditions() → If-None-Match match
+    [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<ReservationResponse>> GetReservation(
         ReservationId reservationId, CancellationToken cancellationToken)
@@ -121,10 +108,7 @@ public class ReservationsController : ControllerBase
             .AsActionResultAsync<ReservationResponse>();
     }
 
-    /// <summary>
-    /// Paginated list of the calling guest's own reservations. Cursor + limit per Cookbook
-    /// Recipe 3 — same envelope shape as PR 3's other list endpoints.
-    /// </summary>
+    /// <summary>Paginated list of the calling guest's own reservations.</summary>
     [HttpGet("mine")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]

@@ -8,12 +8,6 @@ using BuberDinner.Domain.Dinner.ValueObject;
 using BuberDinner.Domain.Reservation.Entities;
 using BuberDinner.Domain.User.ValueObjects;
 
-/// <summary>
-/// In-memory <see cref="IReservationRepository"/>. Same pattern as
-/// <see cref="DinnerInMemoryRepository"/> and <see cref="MenuInMemoryRepository"/>:
-/// static aggregate list + parallel ETag dictionary + reflection-based ETag write-through
-/// (framework reg-005 workaround).
-/// </summary>
 internal sealed class ReservationInMemoryRepository : IReservationRepository
 {
     private static readonly List<Reservation> s_reservations = new();

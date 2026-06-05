@@ -10,11 +10,6 @@ using BuberDinner.Domain.Reservation.Entities;
 using Mediator;
 using Trellis.Authorization;
 
-/// <summary>
-/// Paginated list of reservations against a single dinner — the host's view of who's coming.
-/// Gated by Host ownership via <see cref="IAuthorizeResource{TResource}"/>: only the host
-/// that owns the dinner's parent host can list its reservations.
-/// </summary>
 public sealed class ListReservationsForDinnerQuery
     : IRequest<Result<Page<Reservation>>>, IAuthorizeResource<Host>, IIdentifyResource<Host, HostId>
 {
@@ -56,12 +51,6 @@ public sealed class ListReservationsForDinnerQueryHandler
     public async ValueTask<Result<Page<Reservation>>> Handle(
         ListReservationsForDinnerQuery request, CancellationToken cancellationToken)
     {
-        // Defense-in-depth: route auth already proved the caller owns the route host.
-        // The dinner must additionally belong to that host (route-hierarchy check, mirrors
-        // the GetMenu/GetDinner pattern from PR 1/2). NotFound on either condition keeps
-        // the leak surface consistent with the rest of the codebase — but the two cases
-        // are detected separately so the Detail string accurately reflects which one fired
-        // (clients and log scrapers shouldn't see "does not belong" when the row is missing).
         var dinner = await _dinnerRepo.FindById(request.DinnerId.Value.ToString(), cancellationToken);
         if (dinner is null)
             return Result.Fail<Page<Reservation>>(

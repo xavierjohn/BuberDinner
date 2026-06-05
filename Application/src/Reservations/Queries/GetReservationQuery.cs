@@ -8,10 +8,6 @@ using BuberDinner.Domain.Reservation.ValueObject;
 using BuberDinner.Domain.User.ValueObjects;
 using Mediator;
 
-/// <summary>
-/// Get a single reservation. Visible only to its owning guest — same NotFound-leak-shield
-/// pattern as <c>GetMenuQuery</c> / <c>GetDinnerQuery</c>.
-/// </summary>
 public sealed class GetReservationQuery : IRequest<Result<Reservation>>
 {
     public ReservationId ReservationId { get; }
