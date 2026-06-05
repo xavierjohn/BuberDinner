@@ -1,0 +1,20 @@
+### Get a dinner by id. Emits a strong ETag for conditional reads (Cookbook Recipe 6).
+### Status transitions through Upcoming -> InProgress -> Ended via the /start and /end POSTs.
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@dinnerId = 019E95A2-5735-71C1-A435-F78C5C2D6182
+
+GET {{host}}/hosts/{{hostId}}/dinners/{{dinnerId}}?api-version=2022-10-01
+Authorization: Bearer {{token}}
+
+### Expected response:
+### HTTP/1.1 200 OK
+### ETag: "<strong-etag>"
+### {
+###   "id": "...", "status": "Upcoming" | "InProgress" | "Ended" | "Cancelled",
+###   "startedAt": null or ISO timestamp,
+###   "endedAt":   null or ISO timestamp,
+###   "cancelledAt": null or ISO timestamp,
+###   "cancellationReason": null or string
+### }

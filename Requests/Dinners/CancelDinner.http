@@ -1,0 +1,30 @@
+### Cancel a dinner that hasn't started yet (`Upcoming` -> `Cancelled`). Takes a JSON body
+### with a non-blank `reason`. Raises `DinnerCancelled` with the reason embedded — so a
+### notification handler can include "We're sorry, this dinner was cancelled because ..."
+### in the message it sends to guests.
+###
+### Semantic distinction (Cookbook Recipe 9 §697): `Cancelled` means "never happened".
+### A dinner that has started and then terminates early transitions to `Ended` instead,
+### NOT `Cancelled`. Cancelling once `InProgress` returns 422 (see Cancel-InvalidTransition.http).
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@dinnerId = 019E95A2-5735-71C1-A435-F78C5C2D6182
+
+POST {{host}}/hosts/{{hostId}}/dinners/{{dinnerId}}/cancel?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "reason": "Host illness"
+}
+
+### Expected response:
+### HTTP/1.1 200 OK
+### ETag: "<new-etag>"
+### {
+###   ..., "status": "Cancelled",
+###   "cancelledAt": "2026-06-05T02:35:48.949Z",
+###   "cancellationReason": "Host illness",
+###   "startedAt": null, "endedAt": null
+### }

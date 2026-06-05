@@ -1,0 +1,49 @@
+### Two failure modes for the lifecycle POSTs, side by side:
+###
+###   1. Cancel after Start  -> 422 with state.machine.invalid.transition
+###   2. Cross-host start    -> 403 Forbidden via IAuthorizeResource<Host>
+###
+### Both failure modes are first-class showcase scenarios for PR 2 and are locked in by
+### the DinnerStateMachineTests integration suite.
+
+@token = yourtoken
+@otherToken = yourothertoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@dinnerId = 019E95A2-5735-71C1-A435-F78C5C2D6182
+
+### 1. Cancel a dinner that's already InProgress -> 422.
+###    The state machine refuses the transition; CancellationReason stays null and the
+###    aggregate stays in InProgress (verified by a subsequent GET).
+
+POST {{host}}/hosts/{{hostId}}/dinners/{{dinnerId}}/cancel?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "reason": "Too late"
+}
+
+### Expected response:
+### HTTP/1.1 422 Unprocessable Entity
+### Content-Type: application/problem+json
+### {
+###   "status": 422,
+###   "detail": "Trigger 'Cancel' is not permitted from state 'InProgress'.",
+###   "code": "invalid-input",
+###   "rules": [{ "code": "state.machine.invalid.transition", ... }]
+### }
+
+
+### 2. Start a dinner as a user who does NOT own the route host -> 403.
+###    Resource-based authorization (UpdateMenuCommand pattern) sets the code to
+###    "dinners.owner" so callers can distinguish ownership failures from other 403s.
+
+POST {{host}}/hosts/{{hostId}}/dinners/{{dinnerId}}/start?api-version=2022-10-01
+Authorization: Bearer {{otherToken}}
+
+### Expected response:
+### HTTP/1.1 403 Forbidden
+### Content-Type: application/problem+json
+### {
+###   "status": 403, "code": "dinners.owner", "kind": "forbidden"
+### }
