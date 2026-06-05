@@ -6,6 +6,7 @@ using BuberDinner.Domain.Dinner.ValueObject;
 using BuberDinner.Domain.Host.ValueObject;
 using BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObject;
+using BuberDinner.Domain.MenuReview.ValueObject;
 using FluentValidation;
 
 public class Menu : Aggregate<MenuId>

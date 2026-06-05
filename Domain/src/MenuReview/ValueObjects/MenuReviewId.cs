@@ -1,4 +1,4 @@
-﻿namespace BuberDinner.Domain.Menu.ValueObject;
+namespace BuberDinner.Domain.MenuReview.ValueObject;
 
 public partial class MenuReviewId : RequiredGuid<MenuReviewId>
 {
