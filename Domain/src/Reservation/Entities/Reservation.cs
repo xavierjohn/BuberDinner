@@ -25,25 +25,29 @@ public sealed class Reservation : Aggregate<ReservationId>
         DinnerId dinnerId,
         UserId guestUserId,
         int guestCount,
-        TimeProvider clock)
+        TimeProvider clock) =>
+        s_inputValidator.ValidateToResult(new CreateInputs(dinnerId, guestUserId, guestCount))
+            .Map(inputs =>
+            {
+                var reservation = new Reservation(
+                    ReservationId.NewUniqueV7(), inputs.DinnerId, inputs.GuestUserId,
+                    inputs.GuestCount, clock.GetUtcNow());
+                reservation.DomainEvents.Add(new ReservationCreated(
+                    reservation.Id, reservation.DinnerId, reservation.GuestUserId,
+                    reservation.GuestCount, reservation.ReservedAt));
+                return reservation;
+            });
+
+    private sealed record CreateInputs(DinnerId DinnerId, UserId GuestUserId, int GuestCount);
+
+    static readonly InlineValidator<CreateInputs> s_inputValidator = new()
     {
-        if (guestCount <= 0)
-            return Result.Fail<Reservation>(
-                Error.InvalidInput.ForField(nameof(GuestCount), "reservation.invalid.guest-count",
-                    "GuestCount must be positive."));
-
-        var reservation = new Reservation(
-            ReservationId.NewUniqueV7(), dinnerId, guestUserId, guestCount, clock.GetUtcNow());
-
-        var validation = s_validator.ValidateToResult(reservation);
-        if (validation.IsFailure)
-            return validation;
-
-        reservation.DomainEvents.Add(new ReservationCreated(
-            reservation.Id, reservation.DinnerId, reservation.GuestUserId,
-            reservation.GuestCount, reservation.ReservedAt));
-        return Result.Ok(reservation);
-    }
+        v => v.RuleFor(x => x.DinnerId).NotEmpty(),
+        v => v.RuleFor(x => x.GuestUserId).NotEmpty(),
+        v => v.RuleFor(x => x.GuestCount).GreaterThan(0)
+              .WithErrorCode("reservation.invalid.guest-count")
+              .WithMessage("GuestCount must be positive."),
+    };
 
     private Reservation(
         ReservationId id,
@@ -87,13 +91,4 @@ public sealed class Reservation : Aggregate<ReservationId>
     private static void ConfigureMachine(StateMachine<ReservationStatus, ReservationTrigger> machine) =>
         machine.Configure(ReservationStatus.Reserved)
                .Permit(ReservationTrigger.Cancel, ReservationStatus.Cancelled);
-
-    static readonly InlineValidator<Reservation> s_validator = new()
-    {
-        v => v.RuleFor(x => x.Id).NotEmpty(),
-        v => v.RuleFor(x => x.DinnerId).NotEmpty(),
-        v => v.RuleFor(x => x.GuestUserId).NotEmpty(),
-        v => v.RuleFor(x => x.GuestCount).GreaterThan(0),
-        v => v.RuleFor(x => x.Status).NotEmpty(),
-    };
 }
