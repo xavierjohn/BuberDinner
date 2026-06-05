@@ -1,0 +1,22 @@
+### Update an existing review. Same FluentValidation rules apply via the Mediator pipeline.
+### Only the owning guest can update — cross-guest attempts return 404 (NotFound-leak-shield).
+
+@token = yourtoken
+@reviewId = 019E98BE-8AD3-7D2C-9DAF-4C0E5D018BA9
+
+PUT {{host}}/menu-reviews/{{reviewId}}?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "rating": 5,
+    "comment": "Even better on second visit"
+}
+
+### Expected response:
+### HTTP/1.1 200 OK
+### ETag: "<new>"
+### { ..., "rating": 5, "comment": "Even better on second visit" }
+###
+### As a different user → 404 with detail "Review does not belong to the calling guest."
+### Rating 0 / blank comment → 422 from FluentValidation, same shape as SubmitReview-ValidationFailure.http.

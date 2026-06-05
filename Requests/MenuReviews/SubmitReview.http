@@ -1,0 +1,27 @@
+### Submit a review for a menu. Validated by FluentValidation at the Mediator pipeline
+### (Cookbook Recipe 2 + Trellis.Mediator.FluentValidation):
+###   - Rating MUST be between 1 and 5
+###   - Comment MUST be non-empty AND <= 1000 chars
+### Failures surface as 422 Problem Details with one FieldViolation per offending property.
+
+@token = yourtoken
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+@dinnerId = 019E9690-0FDC-7AA6-9807-7F0A56F08C42
+
+POST {{host}}/menu-reviews?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "menuId": "{{menuId}}",
+    "dinnerId": "{{dinnerId}}",
+    "rating": 4,
+    "comment": "Loved the brunch — three-egg omelette was perfect."
+}
+
+### Expected response shape:
+### HTTP/1.1 201 Created
+### ETag: "..."
+### Location: /menu-reviews/{reviewId}
+### { "id":"...", "menuId":"...", "dinnerId":"...", "guestUserId":"...",
+###   "rating":4, "comment":"..." }

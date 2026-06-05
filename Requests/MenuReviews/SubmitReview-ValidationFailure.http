@@ -1,0 +1,61 @@
+### Demonstrates FluentValidation rejecting at the Mediator pipeline BEFORE the handler runs.
+### Three scenarios — every failure returns the canonical 422 Problem Details shape, with
+### the `errors` dictionary keyed by the offending property name (FluentValidation rule path).
+
+@token = yourtoken
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+@dinnerId = 019E9690-0FDC-7AA6-9807-7F0A56F08C42
+
+### 1. Rating out of range → 422 errors.Rating
+POST {{host}}/menu-reviews?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "menuId": "{{menuId}}",
+    "dinnerId": "{{dinnerId}}",
+    "rating": 99,
+    "comment": "anything"
+}
+
+### Expected:
+### HTTP/1.1 422 Unprocessable Entity
+### { "status":422, "code":"invalid-input",
+###   "errors": { "Rating": [ "Rating must be between 1 and 5." ] } }
+
+
+### 2. Empty comment → 422 errors.Comment
+POST {{host}}/menu-reviews?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "menuId": "{{menuId}}",
+    "dinnerId": "{{dinnerId}}",
+    "rating": 3,
+    "comment": ""
+}
+
+### Expected:
+### HTTP/1.1 422 Unprocessable Entity
+### { "errors": { "Comment": [ "Comment is required." ] } }
+
+
+### 3. Both wrong → 422 with BOTH errors aggregated
+POST {{host}}/menu-reviews?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "menuId": "{{menuId}}",
+    "dinnerId": "{{dinnerId}}",
+    "rating": 0,
+    "comment": ""
+}
+
+### Expected:
+### HTTP/1.1 422 Unprocessable Entity
+### { "errors": {
+###     "Rating":  ["Rating must be between 1 and 5."],
+###     "Comment": ["Comment is required."]
+###   } }

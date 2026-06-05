@@ -1,0 +1,15 @@
+### Paginated list of reviews for a single menu. Same cursor + envelope shape as
+### PR 3's ListDinners / ListMenus / Reservations.
+
+@token = yourtoken
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+
+GET {{host}}/menu-reviews/for-menu/{{menuId}}?api-version=2022-10-01&limit=10
+Authorization: Bearer {{token}}
+
+### Expected response:
+### HTTP/1.1 200 OK
+### { "items": [ <MenuReviewResponse>, ... ],
+###   "next":  { "cursor":"...", "href":"https://.../menu-reviews/for-menu/{menuId}?cursor=...&limit=10&..." } or null,
+###   "previous": null,
+###   "requestedLimit": 10, "appliedLimit": 10, "deliveredCount": <=10, "wasCapped": false }
