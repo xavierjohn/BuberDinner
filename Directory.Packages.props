@@ -29,6 +29,9 @@
     <PackageVersion Include="Trellis.Http.Abstractions" Version="$(TrellisVersion)" />
     <PackageVersion Include="Trellis.Mediator" Version="$(TrellisVersion)" />
     <PackageVersion Include="Trellis.Primitives" Version="$(TrellisVersion)" />
+    <PackageVersion Include="Trellis.StateMachine" Version="$(TrellisVersion)" />
+    <PackageVersion Include="Stateless" Version="5.20.1" />
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.6.0" />
   </ItemGroup>
   <!-- Test -->
   <ItemGroup>

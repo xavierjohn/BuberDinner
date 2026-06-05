@@ -3,5 +3,7 @@
       <PackageReference Include="Trellis.Core" />
       <PackageReference Include="Trellis.Primitives" />
       <PackageReference Include="Trellis.FluentValidation" />
+      <PackageReference Include="Trellis.StateMachine" />
+      <PackageReference Include="Stateless" />
    </ItemGroup>
 </Project>

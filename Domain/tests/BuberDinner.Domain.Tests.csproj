@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\BuberDinner.Domain.csproj" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
   </ItemGroup>
 
 
