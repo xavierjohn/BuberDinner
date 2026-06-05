@@ -27,8 +27,8 @@ public static class MenuSectionDtoExtensions
         menuSectionDto is null
         ? null
         : MenuSection.TryCreate(
-            MenuSectionId.TryCreate(menuSectionDto.Id).UnwrapOrThrow(nameof(menuSectionDto.Id)),
-            Name.TryCreate(menuSectionDto.Name).UnwrapOrThrow(nameof(menuSectionDto.Name)),
-            Description.TryCreate(menuSectionDto.Description).UnwrapOrThrow(nameof(menuSectionDto.Description)),
-            menuSectionDto.Items.Select(itemDto => itemDto.ToMenuItem()!).ToList()).UnwrapOrThrow(nameof(MenuSection));
+            MenuSectionId.TryCreate(menuSectionDto.Id).GetValueOrThrow(nameof(menuSectionDto.Id)),
+            Name.TryCreate(menuSectionDto.Name).GetValueOrThrow(nameof(menuSectionDto.Name)),
+            Description.TryCreate(menuSectionDto.Description).GetValueOrThrow(nameof(menuSectionDto.Description)),
+            menuSectionDto.Items.Select(itemDto => itemDto.ToMenuItem()!).ToList()).GetValueOrThrow(nameof(MenuSection));
 }

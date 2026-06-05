@@ -20,19 +20,19 @@
         public async Task Can_Register_new_User()
         {
             // Arrange
-            var userId = UserId.TryCreate("xavierjohn2023").UnwrapOrThrow();
-            var firstName = FirstName.TryCreate("Xavier").UnwrapOrThrow();
-            var lastName = LastName.TryCreate("John").UnwrapOrThrow();
-            var email = EmailAddress.TryCreate("xavier@somewhere.com").UnwrapOrThrow();
-            var password = Password.TryCreate("SuperStrongPassword").UnwrapOrThrow();
-            var command = RegisterCommand.TryCreate(userId, firstName, lastName, email, password).UnwrapOrThrow();
+            var userId = UserId.TryCreate("xavierjohn2023").GetValueOrThrow();
+            var firstName = FirstName.TryCreate("Xavier").GetValueOrThrow();
+            var lastName = LastName.TryCreate("John").GetValueOrThrow();
+            var email = EmailAddress.TryCreate("xavier@somewhere.com").GetValueOrThrow();
+            var password = Password.TryCreate("SuperStrongPassword").GetValueOrThrow();
+            var command = RegisterCommand.TryCreate(userId, firstName, lastName, email, password).GetValueOrThrow();
 
             // Act
             Result<Services.Authentication.Common.AuthenticationResult> result = await _sender.Send(command);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            var authResult = result.UnwrapOrThrow();
+            var authResult = result.GetValueOrThrow();
             authResult.Token.Should().NotBeEmpty();
             var user = authResult.User;
             user.FirstName.Should().Be(firstName);

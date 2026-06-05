@@ -19,12 +19,12 @@ public class UserRespositoryTests : IClassFixture<CosmosDbFixture>
     {
         // Arrange
         UserCosmosDbRepository rep = new(_cosmosDbFixture.CosmosClient, new UserCosmosDbContainerSettings());
-        var userId = UserId.TryCreate("xavierjohn2023").UnwrapOrThrow();
-        var firstName = FirstName.TryCreate("Xavier").UnwrapOrThrow();
-        var lastName = LastName.TryCreate("John").UnwrapOrThrow();
-        var email = EmailAddress.TryCreate("xavier@somewhere.com").UnwrapOrThrow();
-        var password = Password.TryCreate("Amiko1232!").UnwrapOrThrow();
-        User user = User.TryCreate(userId, firstName, lastName, email, password).UnwrapOrThrow();
+        var userId = UserId.TryCreate("xavierjohn2023").GetValueOrThrow();
+        var firstName = FirstName.TryCreate("Xavier").GetValueOrThrow();
+        var lastName = LastName.TryCreate("John").GetValueOrThrow();
+        var email = EmailAddress.TryCreate("xavier@somewhere.com").GetValueOrThrow();
+        var password = Password.TryCreate("Amiko1232!").GetValueOrThrow();
+        User user = User.TryCreate(userId, firstName, lastName, email, password).GetValueOrThrow();
 
 
         // Act

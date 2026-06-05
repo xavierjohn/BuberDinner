@@ -44,6 +44,7 @@ Use this table before searching the long type catalog.
 | Model aggregates/entities/events | `Aggregate<TId>`, `Entity<TId>`, `IDomainEvent` | [`Domain-Driven Design`](#domain-driven-design) |
 | Move reusable query predicates out of repositories | `Specification<T>` | [`Specification<T>`](#specificationt) |
 | Define custom required value objects | `partial class X : RequiredString<X>` / `RequiredGuid<X>` / other `Required*` bases | [`Primitive value object base classes`](#primitive-value-object-base-classes) |
+| Extract a success value or throw at a trust boundary (DTO → entity rehydration, JSON deserialization) | `result.GetValueOrThrow($"context message")` / `GetValueOrThrowAsync(...)` | [`GetValueOrThrowExtensions`](#extension-class-catalog-full-signatures) (entry in the extension catalog), [cookbook Recipe 30](trellis-api-cookbook.md#recipe-30--rehydrating-entities-from-persistence-fail-loud-vs-result-track) |
 
 ## Canonical async handler skeleton
 
@@ -521,7 +522,7 @@ Nested `sealed record` cases under `Error`. The base constructor is `private`, s
 | `Error.Forbidden` | `(string PolicyId, ResourceRef? Resource = null)` | The caller is authenticated but not allowed by the named policy. |
 | `Error.Conflict` | `(ResourceRef? Resource, string ReasonCode)` | The request collides with current state (for example duplicate keys or concurrent modification). |
 | `Error.Gone` | `(ResourceRef Resource)` | The resource previously existed but has been permanently removed (tombstone). |
-| `Error.AuthenticationRequired` | `(string? Scheme = null)` | Authentication is missing or could not be established. |
+| `Error.AuthenticationRequired` | `(string? Scheme = null, string? ReasonCode = null)` | Authentication is missing or could not be established. `ReasonCode` (when supplied) distinguishes causes that share the 401 surface — e.g. `"Authentication.InvalidCredentials"` vs `"Authentication.MissingCredentials"` vs `"Authentication.TokenExpired"` — so telemetry, dashboards, and client branching don't have to parse `Detail`. |
 | `Error.Unavailable` | `(string? ReasonCode = null, RetryAdvice? Retry = null)` | A dependency or subsystem is temporarily unavailable; retry may succeed later. |
 | `Error.RateLimited` | `(RetryAdvice? Retry = null)` | The caller exceeded a quota or rate limit. |
 | `Error.Unexpected` | `(string ReasonCode, string? FaultId = null)` | Unhandled internal failure or “shouldn't happen” condition. `FaultId`, when supplied, correlates to telemetry. |
@@ -840,6 +841,7 @@ The result API contains a large generated extension surface. Exact public famili
 | `DiscardExtensions`, `DiscardTaskExtensions`, `DiscardValueTaskExtensions` | Drops the `Result<T>` value entirely (returns `void`/`Task`/`ValueTask`) for intentional fire-and-forget pipelines |
 | `EnsureExtensions`, `EnsureExtensionsAsync`, `EnsureAllExtensions`, `EnsureAllExtensionsAsync` | Predicate-based validation on successful values; includes collection-wide validation |
 | `GetValueOrDefaultExtensions` | Non-throwing value fallback helpers |
+| `GetValueOrThrowExtensions` | Production-safe throwing extractor for trust-boundary crossings (DTO → entity rehydration, JSON deserialization). Mirrors `Maybe<T>.GetValueOrThrow(string?)`; throws `InvalidOperationException` on failure. Sync + `Task<Result<T>>` + `ValueTask<Result<T>>` overloads. See cookbook Recipe 30. |
 | `ResultLinqExtensions`, `ResultLinqExtensionsTaskAsync`, `ResultLinqExtensionsTaskLeftAsync`, `ResultLinqExtensionsTaskRightAsync`, `ResultLinqExtensionsValueTaskAsync`, `ResultLinqExtensionsValueTaskLeftAsync`, `ResultLinqExtensionsValueTaskRightAsync` | LINQ query syntax support via `Select`/`SelectMany`/`Where` for `Result<T>`, `Task<Result<T>>` and `ValueTask<Result<T>>` (mixed sync/async sources and continuations) |
 | `MapExtensions`, `MapExtensionsAsync`, `MapIfExtensions`, `MapOnFailureExtensions` | Success-path mapping, conditional mapping, and failure remapping; tuple overloads generated for arities 2-9 |
 | `MatchExtensions`, `MatchExtensionsAsync`, `MatchTupleExtensions`, `MatchTupleExtensionsAsync` | Terminal branching for normal and tuple results. (The previous `MatchErrorExtensions` API was removed — use `result.Match(_ => ..., e => e switch { Error.NotFound nf => ..., ... })` against the closed catalog.) |
@@ -1438,7 +1440,7 @@ public async Task<Result<Page<OrderListItem>>> Handle(ListOrdersQuery query, Can
 | `Error.Forbidden` | `(string PolicyId, ResourceRef? Resource = null)` | `PolicyId` | `forbidden` |
 | `Error.Conflict` | `(ResourceRef? Resource, string ReasonCode)` | `ReasonCode` | `conflict` |
 | `Error.Gone` | `(ResourceRef Resource)` | `gone` | `gone` |
-| `Error.AuthenticationRequired` | `(string? Scheme = null)` | `authentication-required` | `authentication-required` |
+| `Error.AuthenticationRequired` | `(string? Scheme = null, string? ReasonCode = null)` | `ReasonCode ?? "authentication-required"` | `authentication-required` |
 | `Error.Unavailable` | `(string? ReasonCode = null, RetryAdvice? Retry = null)` | `ReasonCode ?? "unavailable"` | `unavailable` |
 | `Error.RateLimited` | `(RetryAdvice? Retry = null)` | `rate-limited` | `rate-limited` |
 | `Error.Unexpected` | `(string ReasonCode, string? FaultId = null)` | `ReasonCode` | `unexpected` |

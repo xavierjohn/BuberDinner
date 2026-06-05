@@ -25,25 +25,25 @@ public class MenuRepositoryTests : IClassFixture<CosmosDbFixture>
         MenuCosmosDbRepository rep = new(
             _cosmosDbFixture.CosmosClient,
             new MenuCosmosDbContainerSettings());
-        MenuId menuId = MenuId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").UnwrapOrThrow();
-        Name name = Name.TryCreate("Menu Name").UnwrapOrThrow();
-        Description description = Description.TryCreate("Menu Description").UnwrapOrThrow();
-        HostId hostId = HostId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").UnwrapOrThrow();
+        MenuId menuId = MenuId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").GetValueOrThrow();
+        Name name = Name.TryCreate("Menu Name").GetValueOrThrow();
+        Description description = Description.TryCreate("Menu Description").GetValueOrThrow();
+        HostId hostId = HostId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E955").GetValueOrThrow();
         decimal? averageRating = 3.8m;
-        MenuSectionId sectionId = MenuSectionId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E956").UnwrapOrThrow();
-        Name sectionName = Name.TryCreate("Section Name").UnwrapOrThrow();
-        Description sectionDescription = Description.TryCreate("Section Description").UnwrapOrThrow();
-        MenuItemId itemId = MenuItemId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E957").UnwrapOrThrow();
-        Name itemName = Name.TryCreate("Item Name").UnwrapOrThrow();
-        Description itemDescription = Description.TryCreate("Item Description").UnwrapOrThrow();
-        MenuItem item = MenuItem.TryCreate(itemId, itemName, itemDescription).UnwrapOrThrow();
+        MenuSectionId sectionId = MenuSectionId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E956").GetValueOrThrow();
+        Name sectionName = Name.TryCreate("Section Name").GetValueOrThrow();
+        Description sectionDescription = Description.TryCreate("Section Description").GetValueOrThrow();
+        MenuItemId itemId = MenuItemId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E957").GetValueOrThrow();
+        Name itemName = Name.TryCreate("Item Name").GetValueOrThrow();
+        Description itemDescription = Description.TryCreate("Item Description").GetValueOrThrow();
+        MenuItem item = MenuItem.TryCreate(itemId, itemName, itemDescription).GetValueOrThrow();
         MenuSection section = MenuSection.TryCreate(
             sectionId,
             sectionName,
             sectionDescription,
-            new List<MenuItem>() { item }).UnwrapOrThrow();
-        DinnerId dinnerId = DinnerId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E958").UnwrapOrThrow();
-        MenuReviewId menuReviewId = MenuReviewId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E959").UnwrapOrThrow();
+            new List<MenuItem>() { item }).GetValueOrThrow();
+        DinnerId dinnerId = DinnerId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E958").GetValueOrThrow();
+        MenuReviewId menuReviewId = MenuReviewId.TryCreate("2F45ACF9-6E51-4DC7-8732-DBE7F260E959").GetValueOrThrow();
         Menu menu = Menu.TryCreate(
             menuId,
             name,
@@ -52,7 +52,7 @@ public class MenuRepositoryTests : IClassFixture<CosmosDbFixture>
             new List<MenuSection>() { section },
             hostId,
             new List<DinnerId>() { dinnerId },
-            new List<MenuReviewId>() { menuReviewId }).UnwrapOrThrow();
+            new List<MenuReviewId>() { menuReviewId }).GetValueOrThrow();
 
 
         // Act

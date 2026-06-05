@@ -1,4 +1,4 @@
-namespace DomainTests;
+﻿namespace DomainTests;
 
 using BuberDinner.Domain.Tests;
 using BuberDinner.Domain.User.Entities;
@@ -16,11 +16,11 @@ public class UserTests
     public void Required_parameters_are_validated(string field)
     {
         // Arrange
-        UserId? id = field == nameof(User.Id) ? default : UserId.TryCreate("xavierjohn2023").UnwrapOrThrow();
-        FirstName? firstName = field == nameof(User.FirstName) ? default : FirstName.TryCreate("Xavier").UnwrapOrThrow();
-        LastName? lastName = field == nameof(User.LastName) ? default : LastName.TryCreate("John").UnwrapOrThrow();
-        EmailAddress? email = field == nameof(User.Email) ? default : EmailAddress.TryCreate("xavier@somewhere.com").UnwrapOrThrow();
-        Password? password = field == nameof(User.Password) ? default : Password.TryCreate("you can't crack this.").UnwrapOrThrow();
+        UserId? id = field == nameof(User.Id) ? default : UserId.TryCreate("xavierjohn2023").GetValueOrThrow();
+        FirstName? firstName = field == nameof(User.FirstName) ? default : FirstName.TryCreate("Xavier").GetValueOrThrow();
+        LastName? lastName = field == nameof(User.LastName) ? default : LastName.TryCreate("John").GetValueOrThrow();
+        EmailAddress? email = field == nameof(User.Email) ? default : EmailAddress.TryCreate("xavier@somewhere.com").GetValueOrThrow();
+        Password? password = field == nameof(User.Password) ? default : Password.TryCreate("you can't crack this.").GetValueOrThrow();
 
         // Act
         var userResult = User.TryCreate(id!, firstName!, lastName!, email!, password!);
@@ -36,8 +36,8 @@ public class UserTests
     public void Different_passwords_are_not_the_same()
     {
         // Arrange
-        Password pwd1 = Password.TryCreate("Hello").UnwrapOrThrow();
-        Password pwd2 = Password.TryCreate("There").UnwrapOrThrow();
+        Password pwd1 = Password.TryCreate("Hello").GetValueOrThrow();
+        Password pwd2 = Password.TryCreate("There").GetValueOrThrow();
 
         // Act
         bool result1 = pwd1 == pwd2;
@@ -53,8 +53,8 @@ public class UserTests
     public void Two_passwords_with_the_same_content_are_equal()
     {
         // Arrange
-        Password pwd1 = Password.TryCreate("Hello").UnwrapOrThrow();
-        Password pwd2 = Password.TryCreate("Hello").UnwrapOrThrow();
+        Password pwd1 = Password.TryCreate("Hello").GetValueOrThrow();
+        Password pwd2 = Password.TryCreate("Hello").GetValueOrThrow();
 
         // Act
         bool result1 = pwd1 == pwd2;

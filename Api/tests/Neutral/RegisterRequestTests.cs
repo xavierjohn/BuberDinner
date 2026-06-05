@@ -1,4 +1,4 @@
-namespace BuberDinner.Api.Tests.Neutral;
+﻿namespace BuberDinner.Api.Tests.Neutral;
 
 using BuberDinner.Api.Neutral.Models.Authentication;
 using BuberDinner.Api.Tests;
@@ -60,11 +60,11 @@ public class RegisterRequestTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        var registerCommand = result.UnwrapOrThrow();
-        registerCommand.UserId.Should().Be(UserId.TryCreate("id").UnwrapOrThrow());
-        registerCommand.FirstName.Should().Be(FirstName.TryCreate("Xavier").UnwrapOrThrow());
-        registerCommand.LastName.Should().Be(LastName.TryCreate("John").UnwrapOrThrow());
-        registerCommand.Email.Should().Be(EmailAddress.TryCreate("xavier@somewhere.com").UnwrapOrThrow());
-        registerCommand.Password.Should().Be(Password.TryCreate("password").UnwrapOrThrow());
+        var registerCommand = result.GetValueOrThrow();
+        registerCommand.UserId.Should().Be(UserId.TryCreate("id").GetValueOrThrow());
+        registerCommand.FirstName.Should().Be(FirstName.TryCreate("Xavier").GetValueOrThrow());
+        registerCommand.LastName.Should().Be(LastName.TryCreate("John").GetValueOrThrow());
+        registerCommand.Email.Should().Be(EmailAddress.TryCreate("xavier@somewhere.com").GetValueOrThrow());
+        registerCommand.Password.Should().Be(Password.TryCreate("password").GetValueOrThrow());
     }
 }

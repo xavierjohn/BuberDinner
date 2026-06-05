@@ -30,9 +30,9 @@ public static class UserDtoExtensions
         userDto is null
         ? null
         : User.TryCreate(
-            UserId.TryCreate(userDto.Id).UnwrapOrThrow(nameof(userDto.Id)),
-            FirstName.TryCreate(userDto.FirstName).UnwrapOrThrow(nameof(userDto.FirstName)),
-            LastName.TryCreate(userDto.LastName).UnwrapOrThrow(nameof(userDto.LastName)),
-            EmailAddress.TryCreate(userDto.Email).UnwrapOrThrow(nameof(userDto.Email)),
-            Password.TryCreate(userDto.Password).UnwrapOrThrow(nameof(userDto.Password))).UnwrapOrThrow(nameof(User));
+            UserId.TryCreate(userDto.Id).GetValueOrThrow(nameof(userDto.Id)),
+            FirstName.TryCreate(userDto.FirstName).GetValueOrThrow(nameof(userDto.FirstName)),
+            LastName.TryCreate(userDto.LastName).GetValueOrThrow(nameof(userDto.LastName)),
+            EmailAddress.TryCreate(userDto.Email).GetValueOrThrow(nameof(userDto.Email)),
+            Password.TryCreate(userDto.Password).GetValueOrThrow(nameof(userDto.Password))).GetValueOrThrow(nameof(User));
 }

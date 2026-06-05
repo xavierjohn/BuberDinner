@@ -26,7 +26,6 @@
     <Using Include="Trellis" />
     <Using Include="Trellis.Primitives" />
     <Using Include="Trellis.FluentValidation" />
-    <Using Include="BuberDinner.Domain.Common" />
   </ItemGroup>
 
   <!-- Test projects. -->

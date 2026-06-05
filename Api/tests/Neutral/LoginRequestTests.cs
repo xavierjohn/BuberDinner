@@ -1,4 +1,4 @@
-namespace BuberDinner.Api.Tests.Neutral;
+﻿namespace BuberDinner.Api.Tests.Neutral;
 
 using BuberDinner.Api.Neutral.Models.Authentication;
 using BuberDinner.Api.Tests;
@@ -36,8 +36,8 @@ public class LoginRequestTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        var registerCommand = result.UnwrapOrThrow();
-        registerCommand.UserId.Should().Be(UserId.TryCreate("xavierjohn2023").UnwrapOrThrow());
-        registerCommand.Password.Should().Be(Password.TryCreate("password").UnwrapOrThrow());
+        var registerCommand = result.GetValueOrThrow();
+        registerCommand.UserId.Should().Be(UserId.TryCreate("xavierjohn2023").GetValueOrThrow());
+        registerCommand.Password.Should().Be(Password.TryCreate("password").GetValueOrThrow());
     }
 }

@@ -142,7 +142,12 @@ After `dotnet restore`, the consumer repo gets `.github/trellis-api-core.md`, `t
 
 ## Regressions (take-back-to-team material — these need framework-side action)
 
-> **Audit correction (2026-06-04):** an audit pass against the auto-deposited API ref docs in `.github/trellis-api-*.md` invalidated the original tier-1 regression `reg-004` ("RequiredString silently accepts empty strings"). The shipped alpha.337 framework rejects empty strings by default; the `[NotDefault, Trim]` attributes the migration originally added were vestigial no-ops and have been removed. See [`win-009`](#-the-big-deal-architectural-wins) above. **Three regressions remain.** Every remaining entry below satisfies the falsifiability rule: same user intent + observable worsening + not just mechanical churn + concrete repro artifact + the fix is owned by the framework, not by BuberDinner.
+> **Update (2026-06-04, Trellis 3.0.0-alpha.342):** Two of the three live regressions shipped fixes in alpha.342:
+> - **`reg-002`** (FluentValidation drags Mediator) — fixed exactly as Option A: new `Trellis.Mediator.FluentValidation` package; `Trellis.FluentValidation` no longer depends on `Trellis.Mediator`. BuberDinner's Domain project is now Mediator-clean (verified via `dotnet list package --include-transitive`).
+> - **`reg-003`** (production-safe `Result<T>` extractor) — fixed with the better name: `Result<T>.GetValueOrThrow(string?)` ships on `Result<T>`, mirroring `Maybe<T>.GetValueOrThrow`. New cookbook **Recipe 30 — Rehydrating entities from persistence** documents both fail-loud (`GetValueOrThrow`) and Result-track-end-to-end patterns. BuberDinner deleted its local `Domain/src/Common/TrellisResultExtensions.cs` helper and swapped 104 call sites across 12 files; build and tests stay green.
+> - **`reg-001`** (AuthenticationRequired ReasonCode) — still open in alpha.342; not blocking.
+>
+> **Audit correction (2026-06-04):** the original tier-1 `reg-004` ("RequiredString silently accepts empty strings") was invalidated by an earlier audit pass — the framework already ships strict-by-default. See [`win-009`](#-the-big-deal-architectural-wins) above. **Final scoreboard: 2 of 3 live regressions shipped, 1 remains.** Every remaining entry satisfies the falsifiability rule.
 
 ### ~~🚨 Tier 1 (correctness): `[reg-004]` `RequiredString` silently accepts empty strings~~ — RETRACTED
 

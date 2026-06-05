@@ -186,47 +186,47 @@ public class CreateMenuRequestTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        CreateMenuCommand createMenuCommand = result.UnwrapOrThrow();
-        createMenuCommand.Name.Should().Be(Name.TryCreate(request.Name).UnwrapOrThrow());
-        createMenuCommand.Description.Should().Be(Description.TryCreate(request.Description).UnwrapOrThrow());
-        createMenuCommand.HostId.Should().Be(HostId.TryCreate(Guid.Parse(hostId)).UnwrapOrThrow());
+        CreateMenuCommand createMenuCommand = result.GetValueOrThrow();
+        createMenuCommand.Name.Should().Be(Name.TryCreate(request.Name).GetValueOrThrow());
+        createMenuCommand.Description.Should().Be(Description.TryCreate(request.Description).GetValueOrThrow());
+        createMenuCommand.HostId.Should().Be(HostId.TryCreate(Guid.Parse(hostId)).GetValueOrThrow());
         createMenuCommand.Sections.Count.Should().Be(2);
 
         MenuSectionRequest section0Request = request.Sections[0];
         MenuSectionCommand section0Command = createMenuCommand.Sections[0];
-        section0Command.Name.Should().Be(Name.TryCreate(section0Request.Name).UnwrapOrThrow());
-        section0Command.Description.Should().Be(Description.TryCreate(section0Request.Description).UnwrapOrThrow());
+        section0Command.Name.Should().Be(Name.TryCreate(section0Request.Name).GetValueOrThrow());
+        section0Command.Description.Should().Be(Description.TryCreate(section0Request.Description).GetValueOrThrow());
         section0Command.Items.Count.Should().Be(3);
 
         MenuSectionRequest section1Request = request.Sections[1];
         MenuSectionCommand section1Command = createMenuCommand.Sections[1];
-        section1Command.Name.Should().Be(Name.TryCreate(section1Request.Name).UnwrapOrThrow());
-        section1Command.Description.Should().Be(Description.TryCreate(section1Request.Description).UnwrapOrThrow());
+        section1Command.Name.Should().Be(Name.TryCreate(section1Request.Name).GetValueOrThrow());
+        section1Command.Description.Should().Be(Description.TryCreate(section1Request.Description).GetValueOrThrow());
         section1Command.Items.Count.Should().Be(2);
 
         MenuItemRequest item0_0Request = section0Request.Items[0];
         MenuItemCommand item0_0Command = section0Command.Items[0];
-        item0_0Command.Name.Should().Be(Name.TryCreate(item0_0Request.Name).UnwrapOrThrow());
-        item0_0Command.Description.Should().Be(Description.TryCreate(item0_0Request.Description).UnwrapOrThrow());
+        item0_0Command.Name.Should().Be(Name.TryCreate(item0_0Request.Name).GetValueOrThrow());
+        item0_0Command.Description.Should().Be(Description.TryCreate(item0_0Request.Description).GetValueOrThrow());
 
         MenuItemRequest item0_1Request = section0Request.Items[1];
         MenuItemCommand item0_1Command = section0Command.Items[1];
-        item0_1Command.Name.Should().Be(Name.TryCreate(item0_1Request.Name).UnwrapOrThrow());
-        item0_1Command.Description.Should().Be(Description.TryCreate(item0_1Request.Description).UnwrapOrThrow());
+        item0_1Command.Name.Should().Be(Name.TryCreate(item0_1Request.Name).GetValueOrThrow());
+        item0_1Command.Description.Should().Be(Description.TryCreate(item0_1Request.Description).GetValueOrThrow());
 
         MenuItemRequest item0_2Request = section0Request.Items[2];
         MenuItemCommand item0_2Command = section0Command.Items[2];
-        item0_2Command.Name.Should().Be(Name.TryCreate(item0_2Request.Name).UnwrapOrThrow());
-        item0_2Command.Description.Should().Be(Description.TryCreate(item0_2Request.Description).UnwrapOrThrow());
+        item0_2Command.Name.Should().Be(Name.TryCreate(item0_2Request.Name).GetValueOrThrow());
+        item0_2Command.Description.Should().Be(Description.TryCreate(item0_2Request.Description).GetValueOrThrow());
 
         MenuItemRequest item1_0Request = section1Request.Items[0];
         MenuItemCommand item1_0Command = section1Command.Items[0];
-        item1_0Command.Name.Should().Be(Name.TryCreate(item1_0Request.Name).UnwrapOrThrow());
-        item1_0Command.Description.Should().Be(Description.TryCreate(item1_0Request.Description).UnwrapOrThrow());
+        item1_0Command.Name.Should().Be(Name.TryCreate(item1_0Request.Name).GetValueOrThrow());
+        item1_0Command.Description.Should().Be(Description.TryCreate(item1_0Request.Description).GetValueOrThrow());
 
         MenuItemRequest item1_1Request = section1Request.Items[1];
         MenuItemCommand item1_1Command = section1Command.Items[1];
-        item1_1Command.Name.Should().Be(Name.TryCreate(item1_1Request.Name).UnwrapOrThrow());
-        item1_1Command.Description.Should().Be(Description.TryCreate(item1_1Request.Description).UnwrapOrThrow());
+        item1_1Command.Name.Should().Be(Name.TryCreate(item1_1Request.Name).GetValueOrThrow());
+        item1_1Command.Description.Should().Be(Description.TryCreate(item1_1Request.Description).GetValueOrThrow());
     }
 }
