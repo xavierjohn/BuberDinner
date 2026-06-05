@@ -1,16 +1,26 @@
-### List all dinners owned by the route host. Simple (non-paginated) for PR 2 —
-### PR 3 will switch this to `Page<T>` + `Cursor` per Cookbook Recipe 3.
+### List dinners owned by the route host with cursor-based pagination (Cookbook Recipe 3).
+### Default page size (`PageSize.Default = 50`) when `?limit` is omitted; server caps at
+### `PageSize.Max = 100` (returns `wasCapped: true` when clamped).
 
 @token = yourtoken
 @hostId = 019E955C-89A3-7F92-A289-35F8823BC135
 
+### Page 1 — default limit, no cursor.
 GET {{host}}/hosts/{{hostId}}/dinners?api-version=2022-10-01
 Authorization: Bearer {{token}}
 
 ### Expected response:
 ### HTTP/1.1 200 OK
-### Content-Type: application/json
-### [
-###   { "id": "...", "name": "Brunch with friends", "status": "Upcoming", ... },
-###   { "id": "...", "name": "Another dinner",       "status": "Cancelled", ... }
-### ]
+### Link: </hosts/.../dinners?cursor=<base64>&limit=50&api-version=2022-10-01>; rel="next"
+### {
+###   "items": [ { "id": "...", "name": "...", "status": "...", ... }, ... ],
+###   "next": { "cursor": "MDE5ZTk2NjctMTQxZi03ZmQ1...", "href": "/hosts/.../dinners?cursor=...&limit=50&api-version=2022-10-01" },
+###   "previous": null,
+###   "requestedLimit": 50,
+###   "appliedLimit": 50,
+###   "deliveredCount": 50,
+###   "wasCapped": false
+### }
+###
+### `previous` is always null in PR 3 — forward-only seek per Cookbook Recipe 3 §350
+### (Trellis hasn't shipped reverse-seek yet).

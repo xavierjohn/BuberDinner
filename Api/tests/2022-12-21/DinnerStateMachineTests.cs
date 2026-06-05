@@ -171,10 +171,13 @@ public class DinnerStateMachineTests
         var response = await client.GetAsync(DinnersUrl(hostId));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var list = await response.Content.ReadAsAsync<DinnerResponseBody[]>();
-        list!.Length.Should().BeGreaterOrEqualTo(2);
-        list.Should().OnlyContain(d => d.HostId == hostId);
+        // PR 3 wraps the list in a Trellis.Asp.PagedResponse<T> envelope.
+        var page = await response.Content.ReadAsAsync<PagedDinnerEnvelope>();
+        page!.Items.Length.Should().BeGreaterOrEqualTo(2);
+        page.Items.Should().OnlyContain(d => d.HostId == hostId);
     }
+
+    private sealed record PagedDinnerEnvelope(DinnerResponseBody[] Items);
 
     // ------------------------ helpers ------------------------
 
