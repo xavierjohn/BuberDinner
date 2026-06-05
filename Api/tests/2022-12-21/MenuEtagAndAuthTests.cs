@@ -56,6 +56,22 @@ public class MenuEtagAndAuthTests
     }
 
     [Fact, Priority(2)]
+    public async Task Get_menu_under_wrong_host_returns_404()
+    {
+        var (client, _, _) = await NewAuthenticatedClient();
+        var realHostId = (await CreateHostAsync(client, "Real Owner")).Body!.Id;
+        var menuId = await CreateMenuAsync(client, realHostId);
+
+        // A different (well-formed) HostId that happens to not own the menu.
+        var foreignHostId = Guid.NewGuid().ToString();
+
+        var response = await client.GetAsync(MenuUrl(foreignHostId, menuId));
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound,
+            "the hierarchical route enforces that the menu must belong to the named host");
+    }
+
+    [Fact, Priority(2)]
     public async Task Get_menu_with_matching_if_none_match_returns_304()
     {
         var (client, _, _) = await NewAuthenticatedClient();

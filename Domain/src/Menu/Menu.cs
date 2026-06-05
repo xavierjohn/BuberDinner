@@ -82,14 +82,25 @@ public class Menu : Aggregate<MenuId>
 
     /// <summary>
     /// Updates the menu's name and description. Returns a validated <see cref="Result{Menu}"/>
-    /// so callers can compose on the Result track. Caller is responsible for the persistence
-    /// commit (which bumps the optimistic-concurrency ETag) — see Recipe 23 in the cookbook.
+    /// so callers can compose on the Result track. Mutation is applied speculatively and rolled
+    /// back if aggregate-invariant validation fails — important because in-memory repositories
+    /// hand out live aggregate references, so a half-applied mutation would otherwise leak into
+    /// subsequent reads. Caller is responsible for the persistence commit (which bumps the
+    /// optimistic-concurrency ETag) — see Recipe 23 in the cookbook.
     /// </summary>
     public Result<Menu> Update(Name name, Description description)
     {
+        var previousName = Name;
+        var previousDescription = Description;
         Name = name;
         Description = description;
-        return s_validator.ValidateToResult(this);
+        var result = s_validator.ValidateToResult(this);
+        if (result.IsFailure)
+        {
+            Name = previousName;
+            Description = previousDescription;
+        }
+        return result;
     }
 
     static readonly InlineValidator<Menu> s_validator = new()

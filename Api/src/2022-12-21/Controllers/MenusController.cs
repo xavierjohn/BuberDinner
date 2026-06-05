@@ -62,7 +62,7 @@ public class MenusController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
     public async ValueTask<ActionResult<MenuResponse>> GetMenu(HostId hostId, MenuId menuId) =>
-        await _sender.Send(new GetMenuQuery(menuId))
+        await _sender.Send(new GetMenuQuery(hostId, menuId))
             .ToHttpResponseAsync(
                 body: menu => menu.Adapt<MenuResponse>(),
                 configure: opts => opts

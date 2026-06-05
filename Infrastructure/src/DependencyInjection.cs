@@ -61,6 +61,11 @@ public static class DependencyInjection
         services.AddSingleton(CosmosClientFactory.InitializeCosmosClientInstance(cosmosDbClientSettings));
         services.AddScoped<IRepository<User>, UserCosmosDbRepository>();
         services.AddScoped<IRepository<Menu>, MenuCosmosDbRepository>();
+        // TODO: replace with HostCosmosDbRepository when implemented. Until then, fall back to
+        // the in-memory implementation so a Cosmos-configured deploy doesn't crash on the first
+        // POST /hosts or PUT /hosts/.../menus/... (which loads the parent Host for
+        // IAuthorizeResource<Host>). Tracked alongside the broader 5-PR showcase roadmap.
+        services.AddScoped<IRepository<HostEntity>, HostInMemoryRepository>();
         return services;
     }
 
