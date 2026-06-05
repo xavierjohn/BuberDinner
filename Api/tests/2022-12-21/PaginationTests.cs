@@ -167,6 +167,10 @@ public class PaginationTests
         var crossPage = await GetPageAsync<DinnerBody>(
             foreignClient, $"hosts/{foreignHost}/dinners", limit: 2, cursor: ownerPaged.Next!.Cursor);
 
+        crossPage.Items.Count.Should().Be(2,
+            "limit=2 must be respected after the host filter; Bug-pattern: 'Take(N+1) applied " +
+            "BEFORE Where(host=B)' would return fewer than 2 items (Take eats mixed-host rows " +
+            "then host-filter prunes most of them away). Asserting count catches this.");
         crossPage.Items.Should().OnlyContain(d => d.HostId == foreignHost,
             "host filter is applied BEFORE the cursor seek; a stolen cursor cannot leak another host's rows");
         crossPage.Items.Should().NotContain(d => ownerPage.Items.Any(o => o.Id == d.Id),
