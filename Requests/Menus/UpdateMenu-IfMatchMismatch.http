@@ -1,0 +1,74 @@
+### Showcases the three failure modes for PUT /hosts/{hostId}/menus/{menuId}:
+###   1. Missing If-Match     → 428 Precondition Required (RFC 6585 §3)
+###   2. Stale  If-Match      → 412 Precondition Failed   (RFC 9110 §15.5.13)
+###   3. Cross-owner request  → 403 Forbidden             (Resource-based auth, Recipe 7)
+###
+### Send each in sequence; none of them should ever mutate state.
+
+@token = yourtoken
+@otherToken = yourothertoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+
+### 1. PUT WITHOUT If-Match — expect 428 Precondition Required.
+###    The framework's `EvaluatePreconditions()` + `RequireETagAsync` combo enforces
+###    that every PUT carries an explicit revision token. Prevents lost updates.
+
+PUT {{host}}/hosts/{{hostId}}/menus/{{menuId}}?api-version=2022-10-01
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Updated Name",
+    "description": "Updated description"
+}
+
+### Expected response:
+### HTTP/1.1 428 Precondition Required
+### Content-Type: application/problem+json
+
+
+### 2. PUT with a STALE If-Match — expect 412 Precondition Failed.
+###    The handler chain (load → RequireETagAsync → mutate) short-circuits before
+###    the mutation runs, so the existing menu is unchanged.
+
+PUT {{host}}/hosts/{{hostId}}/menus/{{menuId}}?api-version=2022-10-01
+Authorization: Bearer {{token}}
+If-Match: "deadbeefdeadbeefdeadbeefdeadbeef"
+Content-Type: application/json
+
+{
+    "name": "Updated Name",
+    "description": "Updated description"
+}
+
+### Expected response:
+### HTTP/1.1 412 Precondition Failed
+### Content-Type: application/problem+json
+
+
+### 3. PUT as a different user (with a valid token but no ownership of the Host) —
+###    expect 403 Forbidden. The check happens via `IAuthorizeResource<Host>` on
+###    `UpdateMenuCommand`, which compares the Host's `OwnerId` to the Trellis
+###    `Actor.Id` produced from the JWT `sub` claim.
+
+PUT {{host}}/hosts/{{hostId}}/menus/{{menuId}}?api-version=2022-10-01
+Authorization: Bearer {{otherToken}}
+If-Match: "0ada920e5adc4c7ca9b843350fe5f093"
+Content-Type: application/json
+
+{
+    "name": "Pwned",
+    "description": "By a different user"
+}
+
+### Expected response:
+### HTTP/1.1 403 Forbidden
+### Content-Type: application/problem+json
+### {
+###   "type":"https://tools.ietf.org/html/rfc9110#section-15.5.4",
+###   "title":"Forbidden",
+###   "status":403,
+###   "code":"menus.owner",
+###   "kind":"forbidden"
+### }

@@ -1,0 +1,37 @@
+### Update a menu with full optimistic concurrency (RFC 9110 §13.1.1 + RFC 6585).
+### Requires an `If-Match` header with the current ETag (obtain via Menus/GetMenu.http).
+### The handler chain (Cookbook Recipe 23) loads the menu, checks ETag, then mutates —
+### so a stale client never overwrites a newer revision.
+
+@token = yourtoken
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
+@menuId = 019E955C-8A14-7B4C-8B40-F82FFB3B05F1
+@etag = "0ada920e5adc4c7ca9b843350fe5f093"
+
+PUT {{host}}/hosts/{{hostId}}/menus/{{menuId}}?api-version=2022-10-01
+Authorization: Bearer {{token}}
+If-Match: {{etag}}
+Content-Type: application/json
+
+{
+    "name": "Brunch v2",
+    "description": "Updated brunch menu"
+}
+
+### Expected response shape:
+### HTTP/1.1 200 OK
+### ETag: "<new-etag-here>"
+### Content-Type: application/json
+### {
+###   "id":"019e955c-8a14-7b4c-8b40-f82ffb3b05f1",
+###   "name":"Brunch v2",
+###   "description":"Updated brunch menu",
+###   ...
+### }
+###
+### Related failure modes (see UpdateMenu-IfMatchMismatch.http for the wire dumps):
+###  - PUT with no  If-Match → 428 Precondition Required
+###  - PUT with bad If-Match → 412 Precondition Failed
+###  - PUT as a user who doesn't own the parent Host → 403 Forbidden
+###    (code: "menus.owner" — set by Application/Menus/Commands/UpdateMenuCommand.cs
+###     `IAuthorizeResource<Host>.OwnerId == actor.Id` check)

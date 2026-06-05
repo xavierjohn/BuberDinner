@@ -2,15 +2,21 @@
 
 using Asp.Versioning;
 using BuberDinner.Api._2022_12_21.Models.Menus;
+using BuberDinner.Application.Menus.Queries;
+using BuberDinner.Domain.Host.ValueObject;
+using BuberDinner.Domain.Menu;
+using BuberDinner.Domain.Menu.ValueObject;
 using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Trellis;
+using Trellis.Asp;
 
 /// <summary>
 /// CRUD for menu.
 /// </summary>
 [ApiVersion("2022-10-01")]
-[Route("hosts/{hostId}/menus")]
+[Route("hosts/{hostId:HostId}/menus")]
 [Consumes("application/json")]
 [Produces("application/json")]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -36,12 +42,54 @@ public class MenusController : ControllerBase
     /// <param name="hostId">The id of the host creating the menu</param>
     /// <returns>A <see cref="CreateMenuResponse"/> result containing the newly created menu</returns>
     [HttpPost("create")]
-    public async ValueTask<ActionResult<CreateMenuResponse>> CreateMenu(CreateMenuRequest request, string hostId) =>
+    public async ValueTask<ActionResult<CreateMenuResponse>> CreateMenu(CreateMenuRequest request, HostId hostId) =>
         await request
-            .ToCreateMenuCommand(hostId)
+            .ToCreateMenuCommand(hostId.Value.ToString())
             .BindAsync(command => _sender.Send(command))
             .ToHttpResponseAsync(
                 body: menu => menu.Adapt<CreateMenuResponse>(),
-                configure: opts => opts.Created(menu => $"/hosts/{hostId}/menus/{menu.Id}"))
+                configure: opts => opts.Created(menu => $"/hosts/{hostId.Value}/menus/{menu.Id}"))
             .AsActionResultAsync<CreateMenuResponse>();
+
+    /// <summary>
+    /// Get a menu. Emits a strong ETag so clients can revalidate with If-None-Match (304) or
+    /// fail-on-stale with If-Match (412). Per Cookbook Recipe 6.
+    /// </summary>
+    /// <param name="hostId">The id of the host that owns the menu.</param>
+    /// <param name="menuId">The id of the menu to retrieve.</param>
+    [HttpGet("{menuId:MenuId}")]
+    [ProducesResponseType(StatusCodes.Status304NotModified)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
+    public async ValueTask<ActionResult<MenuResponse>> GetMenu(HostId hostId, MenuId menuId) =>
+        await _sender.Send(new GetMenuQuery(hostId, menuId))
+            .ToHttpResponseAsync(
+                body: menu => menu.Adapt<MenuResponse>(),
+                configure: opts => opts
+                    .WithETag(menu => EntityTagValue.Strong(menu.ETag))
+                    .EvaluatePreconditions())
+            .AsActionResultAsync<MenuResponse>();
+
+    /// <summary>
+    /// Update a menu with full optimistic-concurrency protection. Requires an
+    /// <c>If-Match</c> header carrying the current ETag (RFC 9110 §13.1.1 + RFC 6585):
+    /// missing → 428 Precondition Required; stale → 412 Precondition Failed.
+    /// Resource-based authorization gates by Host ownership (Cookbook Recipes 7 + 23).
+    /// </summary>
+    [HttpPut("{menuId:MenuId}")]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
+    [ProducesResponseType(StatusCodes.Status428PreconditionRequired)]
+    public async ValueTask<ActionResult<MenuResponse>> UpdateMenu(
+        HostId hostId,
+        MenuId menuId,
+        [FromBody] UpdateMenuRequest request,
+        CancellationToken cancellationToken) =>
+        await request.ToUpdateMenuCommand(hostId, menuId, ETagHelper.ParseIfMatch(HttpContext.Request))
+            .BindAsync(command => _sender.Send(command, cancellationToken))
+            .ToHttpResponseAsync(
+                body: menu => menu.Adapt<MenuResponse>(),
+                configure: opts => opts.WithETag(menu => EntityTagValue.Strong(menu.ETag)))
+            .AsActionResultAsync<MenuResponse>();
 }

@@ -10,8 +10,8 @@ using FluentValidation;
 
 public class Menu : Aggregate<MenuId>
 {
-    public Name Name { get; }
-    public Description Description { get; }
+    public Name Name { get; private set; }
+    public Description Description { get; private set; }
     public decimal? AverageRating { get; }
     public IReadOnlyList<MenuSection> Sections => _menuSections.AsReadOnly();
     public HostId HostId { get; }
@@ -78,6 +78,29 @@ public class Menu : Aggregate<MenuId>
         Description = description;
         AverageRating = averageRating;
         HostId = hostId;
+    }
+
+    /// <summary>
+    /// Updates the menu's name and description. Returns a validated <see cref="Result{Menu}"/>
+    /// so callers can compose on the Result track. Mutation is applied speculatively and rolled
+    /// back if aggregate-invariant validation fails — important because in-memory repositories
+    /// hand out live aggregate references, so a half-applied mutation would otherwise leak into
+    /// subsequent reads. Caller is responsible for the persistence commit (which bumps the
+    /// optimistic-concurrency ETag) — see Recipe 23 in the cookbook.
+    /// </summary>
+    public Result<Menu> Update(Name name, Description description)
+    {
+        var previousName = Name;
+        var previousDescription = Description;
+        Name = name;
+        Description = description;
+        var result = s_validator.ValidateToResult(this);
+        if (result.IsFailure)
+        {
+            Name = previousName;
+            Description = previousDescription;
+        }
+        return result;
     }
 
     static readonly InlineValidator<Menu> s_validator = new()
