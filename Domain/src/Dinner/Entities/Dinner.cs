@@ -56,35 +56,28 @@ public sealed class Dinner : Aggregate<DinnerId>
         MenuId menuId,
         DateTimeOffset startDateTime,
         DateTimeOffset endDateTime,
-        TimeProvider clock)
-    {
-        // Reject default(DateTimeOffset) (year 0001) so an omitted-in-JSON property doesn't
-        // silently produce an aggregate scheduled at 0001-01-01 that still satisfies the
-        // EndDateTime > StartDateTime relative check below.
-        if (startDateTime == default)
-            return Result.Fail<Dinner>(
-                Error.InvalidInput.ForField(nameof(StartDateTime), "dinner.invalid.start-required",
-                    "StartDateTime is required."));
-        if (endDateTime == default)
-            return Result.Fail<Dinner>(
-                Error.InvalidInput.ForField(nameof(EndDateTime), "dinner.invalid.end-required",
-                    "EndDateTime is required."));
-        if (endDateTime <= startDateTime)
-            return Result.Fail<Dinner>(
-                Error.InvalidInput.ForField(nameof(EndDateTime), "dinner.invalid.schedule",
-                    "EndDateTime must be strictly after StartDateTime."));
+        TimeProvider clock) =>
+        s_inputValidator.ValidateToResult(new CreateInputs(
+            name, description, hostId, menuId, startDateTime, endDateTime))
+            .Map(inputs =>
+            {
+                var dinner = new Dinner(
+                    DinnerId.NewUniqueV7(),
+                    inputs.Name, inputs.Description, inputs.HostId, inputs.MenuId,
+                    inputs.StartDateTime, inputs.EndDateTime);
+                dinner.DomainEvents.Add(new DinnerScheduled(
+                    dinner.Id, dinner.HostId, dinner.MenuId,
+                    dinner.StartDateTime, dinner.EndDateTime, clock.GetUtcNow()));
+                return dinner;
+            });
 
-        var dinner = new Dinner(
-            DinnerId.NewUniqueV7(), name, description, hostId, menuId, startDateTime, endDateTime);
-        var validation = s_validator.ValidateToResult(dinner);
-        if (validation.IsFailure)
-            return validation;
-
-        dinner.DomainEvents.Add(new DinnerScheduled(
-            dinner.Id, dinner.HostId, dinner.MenuId,
-            dinner.StartDateTime, dinner.EndDateTime, clock.GetUtcNow()));
-        return Result.Ok(dinner);
-    }
+    private sealed record CreateInputs(
+        Name Name,
+        Description Description,
+        HostId HostId,
+        MenuId MenuId,
+        DateTimeOffset StartDateTime,
+        DateTimeOffset EndDateTime);
 
     private Dinner(
         DinnerId id,
@@ -178,13 +171,22 @@ public sealed class Dinner : Aggregate<DinnerId>
         // Ended and Cancelled are terminal — no transitions configured.
     }
 
-    static readonly InlineValidator<Dinner> s_validator = new()
+    static readonly InlineValidator<CreateInputs> s_inputValidator = new()
     {
-        v => v.RuleFor(x => x.Id).NotEmpty(),
         v => v.RuleFor(x => x.Name).NotEmpty(),
         v => v.RuleFor(x => x.Description).NotEmpty(),
         v => v.RuleFor(x => x.HostId).NotEmpty(),
         v => v.RuleFor(x => x.MenuId).NotEmpty(),
-        v => v.RuleFor(x => x.Status).NotEmpty(),
+        v => v.RuleFor(x => x.StartDateTime).NotEqual(default(DateTimeOffset))
+              .WithErrorCode("dinner.invalid.start-required")
+              .WithMessage("StartDateTime is required."),
+        v => v.RuleFor(x => x.EndDateTime).NotEqual(default(DateTimeOffset))
+              .WithErrorCode("dinner.invalid.end-required")
+              .WithMessage("EndDateTime is required."),
+        v => v.RuleFor(x => x.EndDateTime)
+              .Must((inputs, end) => end > inputs.StartDateTime)
+              .WithErrorCode("dinner.invalid.schedule")
+              .WithMessage("EndDateTime must be strictly after StartDateTime.")
+              .When(x => x.StartDateTime != default && x.EndDateTime != default),
     };
 }

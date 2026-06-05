@@ -29,16 +29,13 @@ public sealed class GetDinnerQueryHandler : IRequestHandler<GetDinnerQuery, Resu
         _repo = repo;
     }
 
-    public async ValueTask<Result<Dinner>> Handle(GetDinnerQuery request, CancellationToken cancellationToken)
-    {
-        var dinner = await _repo.FindById(request.DinnerId.Value.ToString(), cancellationToken);
-        if (dinner is null)
-            return Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Dinner>(request.DinnerId)));
-        if (dinner.HostId != request.HostId)
-            return Result.Fail<Dinner>(new Error.NotFound(ResourceRef.For<Dinner>(request.DinnerId))
-            {
-                Detail = "Dinner does not belong to the specified host.",
-            });
-        return Result.Ok(dinner);
-    }
+    public async ValueTask<Result<Dinner>> Handle(GetDinnerQuery request, CancellationToken cancellationToken) =>
+        (await _repo.FindById(request.DinnerId.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Dinner>(request.DinnerId)))
+            .Ensure(
+                d => d.HostId == request.HostId,
+                new Error.NotFound(ResourceRef.For<Dinner>(request.DinnerId))
+                {
+                    Detail = "Dinner does not belong to the specified host.",
+                });
 }

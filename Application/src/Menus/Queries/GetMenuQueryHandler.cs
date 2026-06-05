@@ -15,19 +15,13 @@ public sealed class GetMenuQueryHandler : IRequestHandler<GetMenuQuery, Result<M
         _menuRepository = menuRepository;
     }
 
-    public async ValueTask<Result<Menu>> Handle(GetMenuQuery request, CancellationToken cancellationToken)
-    {
-        var menu = await _menuRepository.FindById(request.MenuId.Value.ToString(), cancellationToken);
-        if (menu is null)
-            return Result.Fail<Menu>(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId)));
-        // Hierarchical-route membership check: same as UpdateMenuCommandHandler. Returning
-        // NotFound (not Forbidden) keeps the response shape symmetric and avoids leaking the
-        // existence of menus the caller has no business asking about.
-        if (menu.HostId != request.HostId)
-            return Result.Fail<Menu>(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId))
-            {
-                Detail = "Menu does not belong to the specified host.",
-            });
-        return Result.Ok(menu);
-    }
+    public async ValueTask<Result<Menu>> Handle(GetMenuQuery request, CancellationToken cancellationToken) =>
+        (await _menuRepository.FindById(request.MenuId.Value.ToString(), cancellationToken))
+            .ToResult(new Error.NotFound(ResourceRef.For<Menu>(request.MenuId)))
+            .Ensure(
+                m => m.HostId == request.HostId,
+                new Error.NotFound(ResourceRef.For<Menu>(request.MenuId))
+                {
+                    Detail = "Menu does not belong to the specified host.",
+                });
 }
