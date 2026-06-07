@@ -39,6 +39,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Requests", "Requests", "{0E4C8F09-4F38-4804-8D8A-3E614856A3DD}"
 	ProjectSection(SolutionItems) = preProject
 		Requests\httpenv.json = Requests\httpenv.json
+		Requests\README.md = Requests\README.md
+		Requests\smoke.ps1 = Requests\smoke.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authentication", "Authentication", "{65EC07A7-FE7E-455A-A498-E58B7B078FFC}"
