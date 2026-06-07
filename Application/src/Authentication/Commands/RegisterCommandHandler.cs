@@ -35,12 +35,10 @@ public class RegisterCommandHandler :
         await User.TryCreate(command.UserId, command.FirstName, command.LastName, command.Email, command.Password)
         .TapAsync(user => _userRepository.Add(user, cancellationToken));
 
-    private async ValueTask<Result<string>> ValidateUserDoesNotExist(UserId id, CancellationToken cancellationToken)
-    {
-        var user = await _userRepository.FindById(id, cancellationToken);
-        if (user is not null)
-            return Result.Fail<string>(Errors.User.AlreadyExists(id));
-        return Result.Ok<string>(id);
-    }
+    private ValueTask<Result<string>> ValidateUserDoesNotExist(UserId id, CancellationToken cancellationToken) =>
+        _userRepository.FindById(id, cancellationToken)
+            .MatchAsync(
+                some: _ => Result.Fail<string>(Errors.User.AlreadyExists(id)),
+                none: () => Result.Ok<string>(id));
 
 }

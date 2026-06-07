@@ -58,11 +58,10 @@ public class MenuRepositoryTests : IClassFixture<CosmosDbFixture>
 
         // Act
         await rep.Add(menu, CancellationToken.None);
-        Menu? dbMenu = await rep.FindById(menuId.ToString(), CancellationToken.None);
+        Menu dbMenu = (await rep.FindById(menuId.ToString(), CancellationToken.None))
+            .GetValueOrThrow("Menu was not found after being saved.");
 
         // Assert
-        dbMenu.Should().NotBeNull();
-        if (dbMenu == null) return;
         dbMenu.Should().Be(menu); // For entity only Id is checked for equality.
         dbMenu.Id.Should().Be(menuId);
         dbMenu.Name.Should().Be(name);

@@ -42,11 +42,11 @@ internal class HostInMemoryRepository : IRepository<Host>
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<Host?> FindById(string id, CancellationToken cancellationToken)
+    public ValueTask<Maybe<Host>> FindById(string id, CancellationToken cancellationToken)
     {
         Host? host;
         lock (s_lock)
             host = s_hosts.SingleOrDefault(h => h.Id.Value.ToString() == id);
-        return ValueTask.FromResult(host);
+        return ValueTask.FromResult(Maybe.From(host));
     }
 }

@@ -1,19 +1,70 @@
 ﻿namespace BuberDinner.Infrastructure.Persistence.Cosmos;
 
+using BuberDinner.Application.Abstractions.Persistence;
 using Microsoft.Azure.Cosmos;
 
-internal abstract class CosmosDbRepositoryBase
+/// <summary>
+/// Shared Cosmos DB implementation of <see cref="IRepository{TEntity}"/>. Derived classes
+/// supply only the entity↔DTO conversions and the DTO partition-key extractor — every
+/// SDK touchpoint (container provisioning, upsert, 404→<see cref="Maybe{T}.None"/>) lives
+/// here.
+/// </summary>
+internal abstract class CosmosDbRepositoryBase<TEntity, TDto> : IRepository<TEntity>
+    where TEntity : class
+    where TDto : class
 {
     private readonly CosmosClient _cosmosClient;
     private readonly CosmosDbContainerSettings _containerSettings;
 
-    public CosmosDbRepositoryBase(CosmosClient cosmosClient, CosmosDbContainerSettings containerSettings)
+    protected CosmosDbRepositoryBase(CosmosClient cosmosClient, CosmosDbContainerSettings containerSettings)
     {
         _cosmosClient = cosmosClient;
         _containerSettings = containerSettings;
     }
 
-    protected async Task<Container> GetContainer()
+    protected abstract TDto ToDto(TEntity entity);
+
+    protected abstract TEntity ToEntity(TDto dto);
+
+    protected abstract string GetId(TDto dto);
+
+    public IEnumerable<TEntity> GetAll(CancellationToken cancellationToken) =>
+        throw new NotImplementedException();
+
+    public async ValueTask Add(TEntity entity, CancellationToken cancellationToken)
+    {
+        TDto dto = ToDto(entity);
+        Container container = await GetContainer();
+        await container.UpsertItemAsync(
+            dto,
+            new PartitionKey(GetId(dto)),
+            cancellationToken: cancellationToken);
+    }
+
+    public ValueTask Update(TEntity entity, CancellationToken cancellationToken) =>
+        throw new NotImplementedException();
+
+    public ValueTask Delete(TEntity entity, CancellationToken cancellationToken) =>
+        throw new NotImplementedException();
+
+    public async ValueTask<Maybe<TEntity>> FindById(string id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            Container container = await GetContainer();
+            ItemResponse<TDto> response = await container.ReadItemAsync<TDto>(
+                id,
+                new PartitionKey(id),
+                cancellationToken: cancellationToken);
+            return Maybe.From(ToEntity(response.Resource));
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return Maybe<TEntity>.None;
+        }
+    }
+
+    private async Task<Container> GetContainer()
     {
         await _cosmosClient.CreateDatabaseIfNotExistsAsync(_containerSettings.DatabaseName);
         Database database = _cosmosClient.GetDatabase(_containerSettings.DatabaseName);

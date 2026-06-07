@@ -73,14 +73,14 @@ internal class MenuInMemoryRepository : IMenuRepository
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<Menu?> FindById(string id, CancellationToken cancellationToken)
+    public ValueTask<Maybe<Menu>> FindById(string id, CancellationToken cancellationToken)
     {
         Menu? menu;
         lock (s_lock)
             menu = s_menus.SingleOrDefault(m => m.Id.Value.ToString() == id);
         if (menu is not null && s_etags.TryGetValue(id, out var etag))
             AggregateETagWriter.SetETag(menu, etag);
-        return ValueTask.FromResult(menu);
+        return ValueTask.FromResult(Maybe.From(menu));
     }
 
     private static void BumpETag(Menu menu)

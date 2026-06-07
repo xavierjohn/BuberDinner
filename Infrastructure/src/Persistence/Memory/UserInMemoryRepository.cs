@@ -28,6 +28,6 @@ internal class UserInMemoryRepository : IRepository<User>
         throw new NotImplementedException();
     }
 
-    public ValueTask<User?> FindById(string id, CancellationToken cancellationToken) =>
-        ValueTask.FromResult(s_users.SingleOrDefault(u => u.Id == id));
+    public ValueTask<Maybe<User>> FindById(string id, CancellationToken cancellationToken) =>
+        ValueTask.FromResult(Maybe.From(s_users.SingleOrDefault(u => u.Id == id)));
 }

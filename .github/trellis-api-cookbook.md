@@ -4,7 +4,7 @@ namespaces: [Trellis, Trellis.Asp, Trellis.EntityFrameworkCore, Trellis.Mediator
 types: [recipes]
 related_docs: [trellis-api-core.md, trellis-api-asp.md, trellis-api-efcore.md, trellis-api-mediator.md]
 version: v3
-last_verified: 2026-05-31
+last_verified: 2026-06-05
 audience: [llm]
 ---
 # Trellis Cross-Package Cookbook
@@ -106,6 +106,10 @@ Use this table before writing code. If a task matches a row, read that recipe fi
 | Fix analyzer warnings | [Recipe 11](#recipe-11--anti-pattern--fix-gallery-the-analyzers-in-action) |
 | Wire the composition root | [Recipe 12](#recipe-12--di-wiring-playbook-addtrellis-composition-builder) |
 | Rehydrate an entity from a database row (fail-loud vs Result-track) | [Recipe 30](#recipe-30--rehydrating-entities-from-persistence-fail-loud-vs-result-track) |
+| Avoid the pipeline-then-handler duplicate load when a command both authorizes and mutates the same resource | [Recipe 31](#recipe-31--avoid-duplicate-load-with-iauthorizedresourcetcommand-tresource) |
+| Hide existence of sensitive resources from unauthorized callers — translate `Forbidden`/`AuthenticationRequired` to `NotFound` | [Recipe 32](#recipe-32--hide-existence-with-authfailureexposurepolicyhideasnotfound) |
+| Configure the strict `AddJwtBearer` validation profile + key-rotation runbook for a gateway-minted internal JWT | [Moved: xavierjohn/Trellis.Microservices](#recipes-33-34--moved-to-xavierjohntrellismicroservices) (Recipe 1 in the microservices cookbook) |
+| Stand up the gateway side of the Path B microservices pattern (YARP transform that mints the internal JWT) | [Moved: xavierjohn/Trellis.Microservices](#recipes-33-34--moved-to-xavierjohntrellismicroservices) (Recipe 2 in the microservices cookbook) |
 
 ### Mistake-regression routing
 
@@ -503,6 +507,78 @@ services.AddResourceAuthorization(
 **What it shows.** Lead with `IAuthorizeResource<TResource>` + `IIdentifyResource<TResource, TId>` for the owner-on-loaded-resource case — that pair covers most domain authorization decisions, and the framework wires up `SharedResourceLoaderById<TResource, TId>` automatically so no per-command loader is needed. Fall back to `IAuthorize` for static permission gates that do not require a resource load. `IAuthorizeResource<TResource>` runs *after* the resource loader produces the loaded resource, then calls `Authorize(actor, resource)`; `IAuthorize` enforces an AND-permission gate via `AuthorizationBehavior<,>` before the handler runs.
 
 For the AOT-safe per-command registration shape (`AddResourceAuthorization<TMessage, TResource, TResponse>()`) and the equivalent `TrellisServiceBuilder.UseResourceAuthorization<TMessage, TResource, TResponse>()` slot, see [`trellis-api-servicedefaults.md`](trellis-api-servicedefaults.md#trellisservicebuilder). For multi-hop authorization (the resource the actor must own is reached via one or more navigation hops), see [Recipe 24](#recipe-24--indirect-multi-hop-resource-authorization).
+
+**Microservices.** The setup above works identically behind a reverse proxy / API gateway — the simplest microservices pattern is **token pass-through**: the gateway validates the incoming external JWT (Auth0 / Entra / Keycloak / etc.) and forwards it as-is, and each microservice configures `AddJwtBearer(o => o.Authority = "https://idp")` against the SAME external IDP. No new Trellis packages required.
+
+```csharp
+// Microservice composition — token pass-through path.
+// Gateway validated the JWT; this service validates again against the same IDP and
+// hydrates the Actor from the standard claims.
+builder.Services.AddAuthentication("Bearer").AddJwtBearer(o =>
+{
+    o.Authority = "https://your-idp.example";   // SAME IDP the gateway validated against
+    o.Audience = "your-service";                // pin per-service audience
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true, ValidIssuer = "https://your-idp.example",
+        ValidateAudience = true, ValidAudience = "your-service",
+        ValidateLifetime = true, RequireSignedTokens = true,
+        ClockSkew = TimeSpan.FromSeconds(30),
+    };
+});
+
+builder.Services.AddTrellis(o => o
+    .UseClaimsActorProvider(c => { c.ActorIdClaim = "sub"; c.PermissionsClaim = "permissions"; })
+    .UseResourceAuthorization()
+    .UseResourceAuthorization<UpdateOrderCommand, Order, Result<Unit>>());
+```
+
+This pattern works today with current Trellis. Choose it when the external IDP is stable, all microservices share the same trust root, and you don't need per-cluster permission projection or shorter-than-IDP token lifetimes.
+
+**Path B — Trellis internal JWT (`AddTrellisInternalJwtActorProvider` from `Trellis.Microservices.AspNetCore`).** When the constraints above don't hold — you need per-cluster audience isolation, gateway-side permission projection, shorter token lifetimes than the external IDP allows, or you want downstream services decoupled from the external IDP's claim shape — switch to the Trellis internal-JWT contract. A trusted gateway (typically `Trellis.Yarp`, but any gateway implementing the same minting contract works) re-mints a fresh per-cluster JWT carrying the FULL resolved `Actor` shape, including `ForbiddenPermissions` and ABAC `Attributes`. The minter, downstream actor provider, and shared contract constants ship in the [`xavierjohn/Trellis.Microservices`](https://github.com/xavierjohn/Trellis.Microservices) repository (packages: `Trellis.Yarp`, `Trellis.Microservices.AspNetCore`, `Trellis.Microservices.Abstractions`). Downstream microservices add `Trellis.Microservices.AspNetCore` and call `services.AddTrellisInternalJwtActorProvider(...)` directly:
+
+```csharp
+// Microservice composition — Path B (Trellis internal JWT).
+// Gateway minted a fresh internal JWT for this cluster; this service validates it against
+// the gateway's signing key and hydrates the FULL Actor surface (including forbidden
+// permissions + ABAC attributes) from the gateway-controlled claim shape.
+using Trellis.Microservices.AspNetCore;  // ServiceCollectionExtensions.AddTrellisInternalJwtActorProvider
+
+builder.Services.AddAuthentication("Bearer").AddJwtBearer(o =>
+{
+    o.Authority = "https://gateway.internal";
+    o.Audience = "incidents-service";
+    o.MapInboundClaims = false;                       // keep raw JWT claim names (e.g. "tid", not the Microsoft tenant URI)
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true, ValidIssuer = "https://gateway.internal",
+        ValidateAudience = true, ValidAudience = "incidents-service",
+        ValidateLifetime = true, RequireSignedTokens = true,
+        ValidAlgorithms = ["RS256"],                  // gateway uses asymmetric signing
+        ClockSkew = TimeSpan.FromSeconds(30),         // tight skew for internal network
+        TryAllIssuerSigningKeys = false,              // never fall back to "try every key" — see microservices cookbook Recipe 1
+    };
+});
+
+builder.Services.AddTrellisInternalJwtActorProvider(c =>
+{
+    c.RequiredAttributes = ["tenant_id"];          // fail closed on missing tenant
+    c.AttributeClaimMap["tenant_id"] = "tid";
+    c.AttributeClaimMap["mfa"] = "amr_normalized";
+    c.ExpectedIssuer = "https://gateway.internal"; // defense-in-depth runtime check
+    c.ExpectedAudience = "incidents-service";
+});
+
+builder.Services.AddTrellis(o => o
+    .UseResourceAuthorization()
+    .UseResourceAuthorization<UpdateOrderCommand, Order, Result<Unit>>());
+```
+
+The internal-JWT contract requires the gateway to mint three sentinel claims (`trellis_actor_contract_version=1`, `trellis_permissions_count`, `trellis_forbidden_permissions_count`) so a misbehaving proxy cannot strip the deny set silently — the deny-overrides-allow contract integrity invariant. The strict validation profile shown above is mandatory; the [microservices cookbook](https://github.com/xavierjohn/Trellis.Microservices/blob/main/docs/docfx_project/api_reference/trellis-api-microservices-cookbook.md) Recipe 1 spells out the air-gapped (static-key-ring) variant, the tenant-isolation defense-in-depth check, and the key-rotation runbook; Recipe 2 covers the gateway-side end-to-end.
+
+**Path C — OAuth2 token exchange / OBO** is out of scope for Trellis v1. Use `Microsoft.Identity.Web`'s OBO support directly when an enterprise multi-tenant SaaS needs RFC 8693 token exchange against the IDP.
+
+The three-way decision matrix (when to choose each path) is documented in the upcoming `authorization-microservices.md` article.
 
 ---
 
@@ -2626,6 +2702,214 @@ return Result.Ok(user);
 ```
 
 ---
+
+## Recipe 31 — Avoid duplicate load with `IAuthorizedResource<TCommand, TResource>`
+
+**Problem.** A command implements `IAuthorizeResource<Order>` (or `IAuthorizeResourceVia<Team>`); the resource-authorization pipeline loads the resource to run `Authorize(actor, resource)`; then the handler loads the **same** resource again from its repository to mutate it. For non-EF stores this is wasted I/O — a doubled CosmosDB read (and doubled RU billing), a doubled Dapper roundtrip, a doubled outbound HTTP call. Even for EF (where the change-tracker identity map returns the same tracked instance) the second LINQ query still fires.
+
+**Fix.** Inject `IAuthorizedResource<TCommand, TResource>` and call `GetRequiredResource()` instead of re-fetching via the repository. The framework returns the **same instance** the loader produced for this dispatch.
+
+```csharp
+// ❌ Wrong — handler reloads the resource the pipeline already loaded.
+public sealed class CancelOrderHandler(IOrderRepository orders) // duplicate-load source
+    : ICommandHandler<CancelOrderCommand, Result<Unit>>
+{
+    public async ValueTask<Result<Unit>> Handle(CancelOrderCommand cmd, CancellationToken ct)
+    {
+        var found = await orders.FindByIdAsync(cmd.OrderId, ct);   // SECOND lookup — wasteful
+        if (!found.TryGetValue(out var order))
+            return Result.Fail<Unit>(new Error.NotFound(ResourceRef.For<Order>(cmd.OrderId)));
+        order.Cancel();
+        return Result.Ok(Unit.Value);
+    }
+}
+
+// ✅ Correct — handler reads the loaded resource from the accessor.
+public sealed class CancelOrderHandler(IAuthorizedResource<CancelOrderCommand, Order> authorized)
+    : ICommandHandler<CancelOrderCommand, Result<Unit>>
+{
+    public ValueTask<Result<Unit>> Handle(CancelOrderCommand cmd, CancellationToken ct)
+    {
+        // The pipeline loaded this Order to run cmd.Authorize(actor, order); we mutate the
+        // SAME instance. No second DB roundtrip; for EF the entity is already tracked and the
+        // mutation flows through the unit-of-work commit at the end of the request.
+        authorized.GetRequiredResource().Cancel();
+        return new(Result.Ok(Unit.Value));
+    }
+}
+```
+
+**Command and loader are unchanged.** Existing `IAuthorizeResource<Order>` + `IIdentifyResource<Order, OrderId>` + `SharedResourceLoaderById<Order, OrderId>` registrations stay exactly as in Recipe 7. The accessor is **auto-registered** by `AddResourceAuthorization(...)` for every closed `(TMessage, TResource)` pair the scan sees, and by the explicit `AddResourceAuthorization<TMessage, TResource, TResponse>()` / `AddRelatedResourceAuthorization<...>()` helpers for AOT consumers. No additional composition-root call is required.
+
+**Via commands** (multi-hop authorization via `IAuthorizeResourceVia<TOwner>`) expose the **leaf** through the accessor — the resource the message identifies via `IIdentifyResource<TLeaf, TLeafId>`, which is the typical mutation target. The owner accessor is intentionally **not** exposed in v4; handlers that need owner state read it from their repository.
+
+```csharp
+public sealed record UploadScorecardCommand(MatchId MatchId, Scorecard Scorecard)
+    : ICommand<Result<Unit>>,
+      IIdentifyResource<Match, MatchId>,
+      IAuthorizeResourceVia<Team>
+{
+    public MatchId GetResourceId() => MatchId;
+    public IResult Authorize(Actor actor, IReadOnlyList<Team> teams) =>
+        Result.Ensure(teams.Any(t => t.CreatedByActorId == actor.Id),
+            new Error.Forbidden("not_team_owner"));
+}
+
+public sealed class UploadScorecardHandler(
+    IAuthorizedResource<UploadScorecardCommand, Match> match)   // LEAF accessor
+    : ICommandHandler<UploadScorecardCommand, Result<Unit>>
+{
+    public ValueTask<Result<Unit>> Handle(UploadScorecardCommand cmd, CancellationToken ct)
+    {
+        match.GetRequiredResource().UploadScorecard(cmd.Scorecard);   // mutate the leaf
+        return new(Result.Ok(Unit.Value));
+    }
+}
+```
+
+**When NOT to inject the accessor.** The framework cannot enforce mutation-readiness — it just returns whatever the loader returned. If your loader returns any of the following, **do not inject the accessor**; reload via your repository instead:
+
+- A projection type (e.g. `OrderHeader` for cheap authorization, not the full `Order` aggregate).
+- A no-tracking EF entity that the handler must mutate (the mutation will not persist).
+- A stale read-replica POCO when the handler needs strong consistency.
+- An HTTP DTO that cannot be persisted back through any local repository.
+
+In those cases the loader's job is "decide who owns the resource for the authorization check"; the handler's job is "fetch the canonical mutation-ready aggregate". They are different shapes and the accessor would couple them incorrectly.
+
+**Concurrency.** The accessor is safe across nested `mediator.Send` and concurrent `Task.WhenAll` dispatch of the same closed pair within one DI scope. Implementation uses a per-async-flow linked frame list with an `IsActive` flag — each push allocates a new frame (no shared mutable state between sibling forks), and dispose flips the frame's `IsActive` flag (visible to orphan child tasks that captured the frame at fork time but outlived the parent dispatch). The framework guarantees an orphan task cannot read the resource after the parent's dispatch ends. (Verified by `AuthorizedResourceHolderTests.ParallelPushes_OfDifferentResources_DoNotCrossContaminate` and `OrphanChildTask_CapturesFrameAtFork_ButReadsNothingAfterParentDispose`.)
+
+**Failure modes.** `GetRequiredResource()` throws `InvalidOperationException` outside a populated dispatch — typical causes:
+- the handler was invoked directly (e.g. from a unit test) without going through the mediator pipeline;
+- the message lacks resource-authorization registration (`AddResourceAuthorization` was never called for it);
+- authentication failed, the loader failed, or `Authorize` was denied (none of which populate the accessor — denied authorizations cannot expose the loaded resource).
+
+For optional reads use `TryGetResource(out var resource)` which returns `false` instead of throwing.
+
+**What it shows.** Eliminates the duplicate load that motivated the v4 accessor. For non-EF stores (CosmosDB, Dapper, HTTP-backed loaders) this is a measurable perf win — half the I/O on every authorized command. For EF it is also a win (skips the second LINQ query — the identity map only handles entity-instance deduplication, not the SQL roundtrip). The framework guarantee is identity, not mutation-readiness — the cookbook caution above is the user's responsibility.
+
+**Related recipes.** [Recipe 7](#recipe-7--authorization-iactorprovider--iauthorize--resource-based-auth) for the authorization model itself; [Recipe 24](#recipe-24--indirect-multi-hop-resource-authorization) for the via case the accessor composes with.
+
+---
+
+## Recipe 32 — Hide existence with `AuthFailureExposurePolicy.HideAsNotFound`
+
+**Problem.** A `Forbidden` response on `GET /incidents/{id}` tells the unauthorized caller "this resource exists and you may not access it". For some resources — incident reports, security findings, internal correspondence, private profiles — that disclosure is itself the leak. The boundary needs to return 404 (indistinguishable from "the resource does not exist") to unauthorized actors.
+
+**Fix.** Opt the resource into `AuthFailureExposurePolicy.HideAsNotFound` via `ResourceAuthorizationOptions`. The resource-authorization pipeline translates `Error.Forbidden` and `Error.AuthenticationRequired` to `new Error.NotFound(ResourceRef)`; the boundary maps the synthetic `NotFound` to HTTP 404. Other error kinds (`Unexpected`, `Unavailable`, `NotFound` from the loader, transport faults) pass through unchanged — operational signal is never hidden.
+
+```csharp
+// Composition root.
+builder.Services.AddTrellis(options => options
+    .UseResourceAuthorization()                                      // pipeline enabled
+    .UseResourceAuthorization<GetIncidentQuery, Incident, Result<IncidentDto>>()
+    .UseResourceAuthorization(o => o.HideExistence<Incident>()));    // opt-in per resource
+```
+
+```csharp
+// Command and loader are unchanged from Recipe 7.
+public sealed record GetIncidentQuery(IncidentId Id)
+    : IQuery<Result<IncidentDto>>,
+      IAuthorizeResource<Incident>,
+      IIdentifyResource<Incident, IncidentId>
+{
+    public IncidentId GetResourceId() => Id;
+    public IResult Authorize(Actor actor, Incident incident) =>
+        Result.Ensure(incident.AssigneeId == actor.Id || actor.HasPermission("incidents:read-any"),
+            new Error.Forbidden("incidents.read-denied"));
+}
+```
+
+**On the wire.** Unauthorized request → `404 Not Found` with `ResourceRef` `{ "Type": "Incident", "Id": "inc-42" }`. The synthetic `NotFound` is indistinguishable from the real 404 a missing incident would produce.
+
+**Multiple resources.** `HideExistence<T>()` returns the options for fluent chaining, and repeated `UseResourceAuthorization(Action<>)` calls compose (each delegate runs against the same options instance in registration order — verified by `UseResourceAuthorization_ConfigureDelegate_CalledTwice_ComposesBothConfigurations`). All four styles below produce the same merged policy; pick the one that reads best for your composition root.
+
+```csharp
+// Style 1 — fluent chain in one configure delegate (small fixed list).
+.UseResourceAuthorization(o => o
+    .HideExistence<Incident>()
+    .HideExistence<SecurityFinding>()
+    .HideExistence<PrivateProfile>())
+
+// Style 2 — statement body when each entry warrants its own line / comment.
+.UseResourceAuthorization(o =>
+{
+    o.HideExistence<Incident>();
+    o.HideExistence<SecurityFinding>();          // SOC 2 — existence itself is sensitive
+    o.HideExistence<PrivateProfile>();
+    o.HideExistence<AccessKey, KeyPublicView>(); // projection-loader overload
+})
+
+// Style 3 — separate calls (each module contributes its own resources).
+.UseResourceAuthorization(o => o.HideExistence<Incident>())          // Incidents module
+.UseResourceAuthorization(o => o.HideExistence<SecurityFinding>())   // Security module
+.UseResourceAuthorization(o => o.HideExistence<PrivateProfile>())    // Profile module
+```
+
+**Default is `Propagate`.** No behavior changes for resources that don't opt in. Existing consumers continue to see `Forbidden` and `AuthenticationRequired` verbatim. Set `DefaultExposurePolicy = AuthFailureExposurePolicy.HideAsNotFound` to flip the default for an entire service, then use `Propagate<TResource>()` to mark individual resources as safe-to-disclose.
+
+```csharp
+.UseResourceAuthorization(o =>
+{
+    o.DefaultExposurePolicy = AuthFailureExposurePolicy.HideAsNotFound;
+    o.Propagate<PublicProfile>();      // genuinely public resource — leak is harmless
+});
+```
+
+**Projection-loader overload.** When the loader returns an internal projection for authorization but the wire-public type is different, use the two-type overload:
+
+```csharp
+// Loader returns IncidentOwnership (small projection for auth check), but the public REST
+// resource is Incident. The synthetic NotFound must reference "Incident" on the wire.
+.UseResourceAuthorization(o => o.HideExistence<IncidentOwnership, Incident>());
+```
+
+The pipeline extracts the ID from `IIdentifyResource<Incident, IncidentId>` first (the public-resource identifier), falling back to `IIdentifyResource<IncidentOwnership, ?>` if only the projection identifier is declared on the message. The synthetic `NotFound.ResourceRef.Type` is the public type name.
+
+**Via commands** key on `TLeaf`. `HideExistence<Match>()` hides authorization failures on commands implementing `IAuthorizeResourceVia<Team>` + `IIdentifyResource<Match, MatchId>`. The synthetic `NotFound` references `Match` (the resource the command identifies), never `Team` (the authorization implementation detail).
+
+**Pipeline interaction caveat.** When a command implements both `IAuthorize` (static permissions) and `IAuthorizeResource<T>`, the canonical pipeline runs `AuthorizationBehavior` **before** `ResourceAuthorizationBehavior`. An unauthenticated caller fails the static gate first — that `AuthenticationRequired` is **not** translated to `NotFound`, because `AuthorizationBehavior` has no concept of the resource it's protecting. Commands that need full existence-hiding (anonymous probes return 404, not 401) must omit `IAuthorize` and let `HideAsNotFound` cover the resource-authorization branch alone.
+
+**Cache safety.** Hidden 404s look identical to real 404s on the wire. A shared cache will serve an unauthorized actor's synthetic 404 to a later authorized actor — incorrectly. Mark responses for hidden resources with `Cache-Control: private` or `no-store`:
+
+```csharp
+endpoints.MapGet("/incidents/{id}", async (...) =>
+    (await mediator.Send(new GetIncidentQuery(...)))
+        .Build()
+        .WithCacheControl(CacheControl.NoStore())   // safe under HideAsNotFound
+        .ToHttpResponse());
+```
+
+**Observability.** Every translation emits a structured log at `Information`:
+
+```
+EventId: 1 (EventName "ExistenceHidden")
+Resource-authorization failure hidden as NotFound for GetIncidentQuery: original Kind=forbidden Code=incidents.read-denied → public resource Incident
+```
+
+The log carries the **original** `Kind` and `Code`, so SecOps can audit who tried to access what and the underlying denial reason without exposing the disclosure on the wire. Example SIEM query (KQL):
+
+```kusto
+Trellis_Logs
+| where EventName == "ExistenceHidden"
+| summarize count() by MessageName, OriginalCode, PublicResourceType, bin(TimeGenerated, 5m)
+```
+
+**Translation scope.** Only `Error.Forbidden` and `Error.AuthenticationRequired` are translated. The behavior's internal null-payload defense (a misbehaving loader returning `Result.Ok(null)`) also synthesises `Error.Forbidden` and IS translated — the same disclosure risk applies. `Error.NotFound` from the loader, `Error.Unexpected`, `Error.Unavailable`, and transport faults all pass through verbatim: hiding transient infrastructure failures behind 404 would destroy operational signal and lead clients and caches to treat them as permanent absence.
+
+**Via commands and intermediate hop failures.** The pass-through guarantee above applies to the **leaf** loader's return value (the resource the command identifies). For multi-hop authorization (`IAuthorizeResourceVia<TOwner>` with one or more intermediate / owner loads), `ResourceAuthorizationViaBehavior` follows the v1 multi-hop security model: any intermediate or owner load failure — regardless of underlying error kind — is collapsed to `new Error.Forbidden("resource.authorization-via.load-failed")` **before** exposure-policy translation runs, to avoid leaking the existence of related resources whose presence the actor may not be authorized to learn. Under `HideAsNotFound`, that synthetic Forbidden translates to `NotFound` like any other Forbidden, so an `Unavailable` from a downstream owner service surfaces as `404` to the consumer. The `ExistenceHidden` log carries `OriginalCode = "resource.authorization-via.load-failed"`, which tells SecOps that a hop failed but not the underlying downstream-failure kind — consumers needing finer-grained downstream-failure visibility for the related-resource graph should use the direct `IAuthorizeResource<TResource>` model and surface the downstream cause from their loader instead of opting into the multi-hop fan-out.
+
+**Related recipes.** [Recipe 7](#recipe-7--authorization-iactorprovider--iauthorize--resource-based-auth) for the authorization model; [Recipe 24](#recipe-24--indirect-multi-hop-resource-authorization) for via commands; [Recipe 31](#recipe-31--avoid-duplicate-load-with-iauthorizedresourcetcommand-tresource) for the resource-handoff accessor that composes with this policy.
+
+---
+
+
+## Recipes 33-34 — Moved to xavierjohn/Trellis.Microservices
+
+> **Moved.** Recipes 33 ("Strict ``AddJwtBearer`` validation profile for ``UseTrellisInternalJwtActor``") and 34 ("Microservices behind YARP, end-to-end") moved to the new [`xavierjohn/Trellis.Microservices`](https://github.com/xavierjohn/Trellis.Microservices) repository in v3, alongside the carved-out `Trellis.Microservices.AspNetCore` and moved `Trellis.Yarp` packages. They are now Recipe 1 and Recipe 2 of the [microservices cookbook](https://github.com/xavierjohn/Trellis.Microservices/blob/main/docs/docfx_project/api_reference/trellis-api-microservices-cookbook.md).
+>
+> **Why moved.** The recipes document the consumer-side strict ``AddJwtBearer`` profile (Recipe 1) and the end-to-end YARP gateway + downstream walkthrough (Recipe 2), both of which depend on types that now live exclusively in the new repo. Keeping them here would create dangling cross-doc references.
+>
+> **Migration for early adopters.** If you were calling ``services.AddTrellis(b => b.UseTrellisInternalJwtActor(...))``, switch to ``services.AddTrellisInternalJwtActorProvider(...)`` after installing [`Trellis.Microservices.AspNetCore`](https://www.nuget.org/packages/Trellis.Microservices.AspNetCore) and replacing the ``using Trellis.Asp.Authorization;`` directive with ``using Trellis.Microservices.AspNetCore;``. The ``UseTrellisInternalJwtActor`` slot was removed from ``TrellisServiceBuilder`` in this same v3 cleanup (breaking change — see CHANGELOG).
 
 ## Cross-references
 
