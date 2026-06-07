@@ -6,7 +6,7 @@
 ### (Section.Name is empty AND MenuItem.Description is empty).
 
 @token = yourtoken
-@hostId = 4F82063C-AE9D-4F5B-B676-DD781C14EFA0
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
 
 POST {{host}}/hosts/{{hostId}}/menus/create?api-version=2022-10-01
 Authorization: Bearer {{token}}

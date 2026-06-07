@@ -1,7 +1,30 @@
+### Login an existing user with the JWT-based AuthenticationController (api-version-neutral).
+### The handler validates the userId + password and returns a Bearer token to use on
+### every subsequent /hosts, /hosts/{...}/menus, /hosts/{...}/dinners, /reservations,
+### and /menu-reviews call.
+
 POST {{host}}/authentication/login
 Content-Type: application/json
 
 {
-    "userId":"xavierjohn2023",
-    "password":"Amiko1232!"
+    "userId": "xavierjohn2023",
+    "password": "Amiko1232!"
 }
+
+### Expected response shape:
+### HTTP/1.1 200 OK
+### Content-Type: application/json
+### {
+###   "userId": "xavierjohn2023",
+###   "firstName": "Xavier",
+###   "lastName": "John",
+###   "email": "someone@somewhere.com",
+###   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+### }
+###
+### Failure modes:
+###   - Wrong password / unknown user -> 401 Unauthorized with
+###     code: "Authentication.InvalidCredentials" (see Login-InvalidCredentials.http).
+###
+### Copy the `token` into `@token = ...` at the top of the other .http files (they
+### send it as `Authorization: Bearer {{token}}`).
