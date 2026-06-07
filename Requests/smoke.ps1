@@ -58,7 +58,6 @@ function Send {
         Headers              = $headers
         SkipCertificateCheck = $true
         SkipHttpErrorCheck   = $true
-        UseBasicParsing      = $true
         TimeoutSec           = 30
     }
     if ($body) { $req.Body = $body; $req.ContentType = 'application/json' }
@@ -173,9 +172,13 @@ Send 'Menus/UpdateMenu-IfMatchMismatch.http (cross-owner -> 403)' 'PUT' "/hosts/
 Send 'Menus/ListMenus.http' 'GET' "/hosts/$hostId1/menus?api-version=2022-10-01&limit=5" $auth1 $null @(200) | Out-Null
 
 # ---------- Phase 3: Dinners ----------
+# Use future-relative dates so the suite doesn't rot when 2026-07-01 passes.
+$startDateTime = (Get-Date).ToUniversalTime().AddDays(30).ToString('o')
+$endDateTime   = (Get-Date).ToUniversalTime().AddDays(30).AddHours(3).ToString('o')
+
 $scheduleBody = @{
     name = 'Brunch with friends'; description = 'Casual Sunday brunch'
-    menuId = $menuId1; startDateTime = '2026-07-01T18:00:00Z'; endDateTime = '2026-07-01T21:00:00Z'
+    menuId = $menuId1; startDateTime = $startDateTime; endDateTime = $endDateTime
 }
 $r = Send 'Dinners/ScheduleDinner.http' 'POST' "/hosts/$hostId1/dinners?api-version=2022-10-01" $auth1 $scheduleBody @(201)
 $dinnerId1 = (FromJson $r.Body).id
@@ -195,7 +198,7 @@ Send 'Dinners/ListDinners-MalformedCursor.http' 'GET' "/hosts/$hostId1/dinners?a
 foreach ($i in 2..6) {
     $body = @{
         name = "Dinner $i"; description = "d$i"; menuId = $menuId1
-        startDateTime = '2026-07-01T18:00:00Z'; endDateTime = '2026-07-01T21:00:00Z'
+        startDateTime = $startDateTime; endDateTime = $endDateTime
     }
     Send "Dinners/Schedule extra #$i" 'POST' "/hosts/$hostId1/dinners?api-version=2022-10-01" $auth1 $body @(201) | Out-Null
 }
@@ -215,7 +218,7 @@ Send 'Dinners/EndDinner.http' 'POST' "/hosts/$hostId1/dinners/$dinnerId1/end?api
 # CancelDinner.http requires a fresh Upcoming dinner.
 $body = @{
     name = 'Sunday brunch v2'; description = 'Will be cancelled'; menuId = $menuId1
-    startDateTime = '2026-07-01T18:00:00Z'; endDateTime = '2026-07-01T21:00:00Z'
+    startDateTime = $startDateTime; endDateTime = $endDateTime
 }
 $r = Send 'Dinners Schedule for cancel' 'POST' "/hosts/$hostId1/dinners?api-version=2022-10-01" $auth1 $body @(201)
 $dinnerToCancel = (FromJson $r.Body).id
@@ -224,7 +227,7 @@ Send 'Dinners/CancelDinner.http' 'POST' "/hosts/$hostId1/dinners/$dinnerToCancel
 # ---------- Phase 4: Reservations ----------
 $body = @{
     name = 'Brunch for reservations'; description = 'Reservation testing'; menuId = $menuId1
-    startDateTime = '2026-07-01T18:00:00Z'; endDateTime = '2026-07-01T21:00:00Z'
+    startDateTime = $startDateTime; endDateTime = $endDateTime
 }
 $r = Send 'Dinners Schedule for reservations' 'POST' "/hosts/$hostId1/dinners?api-version=2022-10-01" $auth1 $body @(201)
 $dinnerRes = (FromJson $r.Body).id
@@ -260,7 +263,7 @@ Send 'Dinners/ListReservationsForDinner.http' 'GET' "/hosts/$hostId1/dinners/$di
 # Reviews require: caller reserved the dinner AND dinner is Ended.
 $body = @{
     name = 'Brunch for reviews'; description = 'Review testing'; menuId = $menuId1
-    startDateTime = '2026-07-01T18:00:00Z'; endDateTime = '2026-07-01T21:00:00Z'
+    startDateTime = $startDateTime; endDateTime = $endDateTime
 }
 $r = Send 'Dinners Schedule for review' 'POST' "/hosts/$hostId1/dinners?api-version=2022-10-01" $auth1 $body @(201)
 $dinnerRev = (FromJson $r.Body).id

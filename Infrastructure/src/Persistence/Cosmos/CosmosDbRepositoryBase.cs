@@ -34,7 +34,7 @@ internal abstract class CosmosDbRepositoryBase<TEntity, TDto> : IRepository<TEnt
     public async ValueTask Add(TEntity entity, CancellationToken cancellationToken)
     {
         TDto dto = ToDto(entity);
-        Container container = await GetContainer();
+        Container container = await GetContainer(cancellationToken);
         await container.UpsertItemAsync(
             dto,
             new PartitionKey(GetId(dto)),
@@ -51,7 +51,7 @@ internal abstract class CosmosDbRepositoryBase<TEntity, TDto> : IRepository<TEnt
     {
         try
         {
-            Container container = await GetContainer();
+            Container container = await GetContainer(cancellationToken);
             ItemResponse<TDto> response = await container.ReadItemAsync<TDto>(
                 id,
                 new PartitionKey(id),
@@ -64,13 +64,16 @@ internal abstract class CosmosDbRepositoryBase<TEntity, TDto> : IRepository<TEnt
         }
     }
 
-    private async Task<Container> GetContainer()
+    private async Task<Container> GetContainer(CancellationToken cancellationToken)
     {
-        await _cosmosClient.CreateDatabaseIfNotExistsAsync(_containerSettings.DatabaseName);
+        await _cosmosClient.CreateDatabaseIfNotExistsAsync(
+            _containerSettings.DatabaseName,
+            cancellationToken: cancellationToken);
         Database database = _cosmosClient.GetDatabase(_containerSettings.DatabaseName);
         await database.CreateContainerIfNotExistsAsync(
             _containerSettings.ContainerName,
-            _containerSettings.PartitionKeyPath);
+            _containerSettings.PartitionKeyPath,
+            cancellationToken: cancellationToken);
         return database.GetContainer(_containerSettings.ContainerName);
     }
 }

@@ -9,7 +9,6 @@ using BuberDinner.Domain.Dinner.ValueObject;
 using BuberDinner.Domain.Menu;
 using BuberDinner.Domain.Menu.ValueObject;
 using BuberDinner.Domain.MenuReview.Entities;
-using BuberDinner.Domain.Reservation.Entities;
 using BuberDinner.Domain.Reservation.ValueObject;
 using BuberDinner.Domain.User.ValueObjects;
 using Mediator;
