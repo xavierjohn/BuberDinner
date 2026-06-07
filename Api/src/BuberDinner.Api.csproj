@@ -16,7 +16,8 @@
     <PackageReference Include="Mapster" />
     <PackageReference Include="Mapster.DependencyInjection" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
     <Using Include="Trellis.Asp" />
   </ItemGroup>
 

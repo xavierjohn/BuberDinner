@@ -21,7 +21,7 @@ BuberDinner is a reference application for evaluating and learning the Trellis V
 |---|---|
 | Runtime | .NET 10, pinned by `global.json` to SDK `10.0.300` with `rollForward: latestFeature`. |
 | Trellis | `3.0.0-alpha.342` through central package management in `Directory.Packages.props`. |
-| HTTP/API | ASP.NET Core 10 controllers, API versioning, Swashbuckle/OpenAPI UI, JWT bearer auth. |
+| HTTP/API | ASP.NET Core 10 controllers, API versioning, `Microsoft.AspNetCore.OpenApi` + Scalar API reference, JWT bearer auth. |
 | CQRS | NuGet `Mediator` (`Mediator.Abstractions` + `Mediator.SourceGenerator`), not MediatR. |
 | Validation | FluentValidation in domain factories and command-boundary validators. |
 | Persistence | In-memory repositories by default; Cosmos support remains behind the `Persistence=CosmosDb` setting and falls back to in-memory for aggregates not yet implemented there. |
@@ -61,7 +61,7 @@ dotnet test
 dotnet run --project Api\src\BuberDinner.Api.csproj
 ```
 
-The `InMemory` launch profile starts the API at `https://localhost:7059`. Unless `Persistence=CosmosDb` is set, the app uses in-memory repositories and is ready for local exploration. The root route hosts the OpenAPI UI configured by `UseSwaggerUI()`.
+The `InMemory` launch profile starts the API at `https://localhost:7059`. Unless `Persistence=CosmosDb` is set, the app uses in-memory repositories and is ready for local exploration. The OpenAPI documents are served at `/openapi/{version}.json` and the Scalar API reference UI is hosted at `/scalar`.
 
 ## Tour: the Trellis V3 showcase arc
 
@@ -193,7 +193,7 @@ Important failure modes are first-class examples, not edge cases hidden in tests
 Domain/          Pure C#: aggregates, value objects, events, state machines, and domain FluentValidation rules.
 Application/     Mediator commands/queries/handlers, resource loaders, validators, event handlers, repository interfaces.
 Infrastructure/  In-memory repositories, persistence DTOs, optional Cosmos seam, JWT token generation.
-Api/             ASP.NET Core controllers, OpenAPI/Swagger, auth, versioning, and Trellis composition root.
+Api/             ASP.NET Core controllers, OpenAPI + Scalar API reference, auth, versioning, and Trellis composition root.
 Requests/        30 .http files that exercise happy paths and failure modes end-to-end.
 Docs/            Migration notes, PR walkthroughs, and per-aggregate domain notes.
 .github/         Bundled Trellis API reference docs used by the showcase; not application runtime code.

@@ -1,6 +1,8 @@
-﻿using BuberDinner.Api;
+using Asp.Versioning.ApiExplorer;
+using BuberDinner.Api;
 using BuberDinner.Application;
 using BuberDinner.Infrastructure;
+using Scalar.AspNetCore;
 using Trellis.Asp.Idempotency;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,21 +15,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(
-        options =>
-        {
-            options.RoutePrefix = string.Empty;
-            var descriptions = app.DescribeApiVersions();
+    var apiVersionDescriptions = app.Services
+        .GetRequiredService<IApiVersionDescriptionProvider>()
+        .ApiVersionDescriptions;
 
-            // build a swagger endpoint for each discovered API version
-            foreach (var description in descriptions)
-            {
-                var url = $"/swagger/{description.GroupName}/swagger.json";
-                var name = description.GroupName.ToUpperInvariant();
-                options.SwaggerEndpoint(url, name);
-            }
-        });
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        foreach (var description in apiVersionDescriptions)
+        {
+            options.AddDocument(description.GroupName, description.GroupName.ToUpperInvariant());
+        }
+
+        options.AddPreferredSecuritySchemes("Bearer");
+    });
+
     app.UseExceptionHandler("/error");
     app.UseHttpsRedirection();
     app.UseRouting();
