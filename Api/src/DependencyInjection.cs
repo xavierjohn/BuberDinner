@@ -1,6 +1,7 @@
-﻿namespace BuberDinner.Api;
+namespace BuberDinner.Api;
 
 using System.Reflection;
+using Asp.Versioning.ApiExplorer;
 using BuberDinner.Application.Dinners.Events;
 using BuberDinner.Application.Hosts.Authorization;
 using BuberDinner.Application.MenuReviews.Events;
@@ -18,9 +19,6 @@ using BuberDinner.Domain.Reservation.ValueObject;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Trellis;
 using Trellis.Asp.Idempotency;
 using Trellis.Asp.Routing;
@@ -73,37 +71,28 @@ internal static class DependencyInjection
                 .AddMvc()
                 .AddApiExplorer();
 
-        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-        services.AddSwaggerGen(options =>
+        services.AddVersionedOpenApi();
+
+        return services;
+    }
+
+    private static IServiceCollection AddVersionedOpenApi(this IServiceCollection services)
+    {
+        // Resolve API version descriptions once at startup so we can register
+        // one OpenAPI document per discovered version.
+        using var bootstrap = services.BuildServiceProvider();
+        var provider = bootstrap.GetRequiredService<IApiVersionDescriptionProvider>();
+
+        foreach (var description in provider.ApiVersionDescriptions)
         {
-            options.OperationFilter<SwaggerDefaultValues>();
-            var fileName = typeof(Program).Assembly.GetName().Name + ".xml";
-            var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
-            options.IncludeXmlComments(filePath);
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            var versionDescription = description;
+            services.AddOpenApi(versionDescription.GroupName, options =>
             {
-                In = ParameterLocation.Header,
-                Description = "Specify token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "bearer",
+                options.AddDocumentTransformer(new VersionedInfoDocumentTransformer(versionDescription));
+                options.AddDocumentTransformer<BearerSecurityDocumentTransformer>();
             });
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer",
-                        },
-                    },
-                    Array.Empty<string>()
-                },
-            });
-        });
+        }
+
         return services;
     }
 
