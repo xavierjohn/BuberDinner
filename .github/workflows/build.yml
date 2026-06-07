@@ -13,14 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         global-json-file: global.json
-            
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # depth is needed for nbgv
+
     - uses: dotnet/nbgv@master
       with:
         setAllVars: true
