@@ -43,13 +43,56 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Requests", "Requests", "{0E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authentication", "Authentication", "{65EC07A7-FE7E-455A-A498-E58B7B078FFC}"
 	ProjectSection(SolutionItems) = preProject
+		Requests\Authentication\Login-InvalidCredentials.http = Requests\Authentication\Login-InvalidCredentials.http
 		Requests\Authentication\Login.http = Requests\Authentication\Login.http
 		Requests\Authentication\Register.http = Requests\Authentication\Register.http
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dinners", "Dinners", "{6DD8972D-CE48-4836-BF69-05971E28D5E9}"
 	ProjectSection(SolutionItems) = preProject
+		Requests\Dinners\CancelDinner.http = Requests\Dinners\CancelDinner.http
+		Requests\Dinners\EndDinner.http = Requests\Dinners\EndDinner.http
+		Requests\Dinners\GetDinner.http = Requests\Dinners\GetDinner.http
+		Requests\Dinners\Lifecycle-InvalidTransition.http = Requests\Dinners\Lifecycle-InvalidTransition.http
+		Requests\Dinners\ListDinners-MalformedCursor.http = Requests\Dinners\ListDinners-MalformedCursor.http
+		Requests\Dinners\ListDinners-OversizedLimit.http = Requests\Dinners\ListDinners-OversizedLimit.http
+		Requests\Dinners\ListDinners-WithCursor.http = Requests\Dinners\ListDinners-WithCursor.http
 		Requests\Dinners\ListDinners.http = Requests\Dinners\ListDinners.http
+		Requests\Dinners\ListReservationsForDinner.http = Requests\Dinners\ListReservationsForDinner.http
+		Requests\Dinners\ScheduleDinner.http = Requests\Dinners\ScheduleDinner.http
+		Requests\Dinners\StartDinner.http = Requests\Dinners\StartDinner.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosts", "Hosts", "{B39ADBC1-0899-4B70-B6BF-297EFE9D9210}"
+	ProjectSection(SolutionItems) = preProject
+		Requests\Hosts\CreateHost.http = Requests\Hosts\CreateHost.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MenuReviews", "MenuReviews", "{E83B8EBA-1DE9-4F62-8B4A-9B4DDCB24459}"
+	ProjectSection(SolutionItems) = preProject
+		Requests\MenuReviews\ListReviewsForMenu.http = Requests\MenuReviews\ListReviewsForMenu.http
+		Requests\MenuReviews\SubmitReview-ValidationFailure.http = Requests\MenuReviews\SubmitReview-ValidationFailure.http
+		Requests\MenuReviews\SubmitReview.http = Requests\MenuReviews\SubmitReview.http
+		Requests\MenuReviews\UpdateReview.http = Requests\MenuReviews\UpdateReview.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Menus", "Menus", "{E2C31BAA-CA51-4C5F-82FD-24AC96C1D6B8}"
+	ProjectSection(SolutionItems) = preProject
+		Requests\Menus\CreateMenu-InvalidNested.http = Requests\Menus\CreateMenu-InvalidNested.http
+		Requests\Menus\CreateMenu.http = Requests\Menus\CreateMenu.http
+		Requests\Menus\GetMenu-NotModified.http = Requests\Menus\GetMenu-NotModified.http
+		Requests\Menus\GetMenu.http = Requests\Menus\GetMenu.http
+		Requests\Menus\ListMenus.http = Requests\Menus\ListMenus.http
+		Requests\Menus\UpdateMenu-IfMatchMismatch.http = Requests\Menus\UpdateMenu-IfMatchMismatch.http
+		Requests\Menus\UpdateMenu.http = Requests\Menus\UpdateMenu.http
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reservations", "Reservations", "{7B98C97D-B481-4A98-815C-9C2E105AF805}"
+	ProjectSection(SolutionItems) = preProject
+		Requests\Reservations\CancelReservation.http = Requests\Reservations\CancelReservation.http
+		Requests\Reservations\CreateReservation-FailureModes.http = Requests\Reservations\CreateReservation-FailureModes.http
+		Requests\Reservations\CreateReservation.http = Requests\Reservations\CreateReservation.http
+		Requests\Reservations\ListMyReservations.http = Requests\Reservations\ListMyReservations.http
 	EndProjectSection
 EndProject
 Global
@@ -105,6 +148,10 @@ Global
 		{B862E6F8-8D28-41C9-8682-678CC30692ED} = {DE739636-E2CB-4361-99A4-AC3BB029CCAF}
 		{65EC07A7-FE7E-455A-A498-E58B7B078FFC} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
 		{6DD8972D-CE48-4836-BF69-05971E28D5E9} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
+		{B39ADBC1-0899-4B70-B6BF-297EFE9D9210} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
+		{E83B8EBA-1DE9-4F62-8B4A-9B4DDCB24459} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
+		{E2C31BAA-CA51-4C5F-82FD-24AC96C1D6B8} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
+		{7B98C97D-B481-4A98-815C-9C2E105AF805} = {0E4C8F09-4F38-4804-8D8A-3E614856A3DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {339F67B3-D073-4BDF-9C41-45665718976B}
