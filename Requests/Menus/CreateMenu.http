@@ -1,9 +1,10 @@
 ### Create a menu (happy path).
-### Requires a Bearer token from Authentication/Register.http or Authentication/Login.http.
-### Expected: 201 Created with a Location header pointing at /hosts/{hostId}/menus/{menuId}.
+### Requires a Bearer token from Authentication/Register.http or Authentication/Login.http
+### and a {{hostId}} from Hosts/CreateHost.http (the calling user must own the host —
+### resource auth via IAuthorizeResource<Host> per Cookbook Recipe 7).
 
 @token = yourtoken
-@hostId = 4F82063C-AE9D-4F5B-B676-DD781C14EFA0
+@hostId = 019E955C-89A3-7F92-A289-35F8823BC135
 
 POST {{host}}/hosts/{{hostId}}/menus/create?api-version=2022-10-01
 Authorization: Bearer {{token}}
@@ -32,3 +33,26 @@ Content-Type: application/json
         }
     ]
 }
+
+### Expected response shape:
+### HTTP/1.1 201 Created
+### Location: /hosts/{hostId}/menus/{menuId}
+### Content-Type: application/json
+### {
+###   "id":             "019e955c-8a14-7b4c-8b40-f82ffb3b05f1",
+###   "name":           "Muffins R Us",
+###   "description":    "Menu for Muffins R Us",
+###   "averageRating":  null,
+###   "sections":       [ { "id":"...", "name":"Muffins", "description":"...", "items":[ ... ] }, ... ],
+###   "hostId":         "019e955c-89a3-7f92-a289-35f8823bc135",
+###   "dinnerIds":      [],
+###   "menuReviewIds":  []
+### }
+###
+### Capture the response `id` into `@menuId = ...` in Menus/GetMenu.http, UpdateMenu.http,
+### and ListMenus.http for subsequent reads/updates.
+###
+### Failure modes:
+###   - Invalid nested section / item (empty name or description) -> 422 with per-field
+###     violations (see CreateMenu-InvalidNested.http).
+###   - Caller does not own the route host -> 403 with code "menus.owner".

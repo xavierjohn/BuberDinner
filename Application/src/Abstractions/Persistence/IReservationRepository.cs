@@ -13,5 +13,5 @@ public interface IReservationRepository : IRepository<Reservation>
 
     IReadOnlyList<Reservation> GetPageForGuest(UserId guestUserId, Trellis.PageSize pageSize, System.Guid? afterId);
 
-    ValueTask<Reservation?> FindByDinnerAndGuest(DinnerId dinnerId, UserId guestUserId, CancellationToken cancellationToken);
+    ValueTask<Maybe<Reservation>> FindByDinnerAndGuest(DinnerId dinnerId, UserId guestUserId, CancellationToken cancellationToken);
 }

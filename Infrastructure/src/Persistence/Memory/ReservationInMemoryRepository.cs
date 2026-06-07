@@ -54,14 +54,14 @@ internal sealed class ReservationInMemoryRepository : IReservationRepository
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<Reservation?> FindById(string id, CancellationToken cancellationToken)
+    public ValueTask<Maybe<Reservation>> FindById(string id, CancellationToken cancellationToken)
     {
         Reservation? reservation;
         lock (s_lock)
             reservation = s_reservations.SingleOrDefault(r => r.Id.Value.ToString() == id);
         if (reservation is not null && s_etags.TryGetValue(id, out var etag))
             AggregateETagWriter.SetETag(reservation, etag);
-        return ValueTask.FromResult(reservation);
+        return ValueTask.FromResult(Maybe.From(reservation));
     }
 
     public IReadOnlyList<Reservation> GetPageForDinner(DinnerId dinnerId, Trellis.PageSize pageSize, System.Guid? afterId)
@@ -90,13 +90,13 @@ internal sealed class ReservationInMemoryRepository : IReservationRepository
         }
     }
 
-    public ValueTask<Reservation?> FindByDinnerAndGuest(DinnerId dinnerId, UserId guestUserId, CancellationToken cancellationToken)
+    public ValueTask<Maybe<Reservation>> FindByDinnerAndGuest(DinnerId dinnerId, UserId guestUserId, CancellationToken cancellationToken)
     {
         Reservation? reservation;
         lock (s_lock)
             reservation = s_reservations.FirstOrDefault(r =>
                 r.DinnerId == dinnerId && r.GuestUserId == guestUserId);
-        return ValueTask.FromResult(reservation);
+        return ValueTask.FromResult(Maybe.From(reservation));
     }
 
     private static void BumpETag(Reservation reservation)

@@ -53,14 +53,14 @@ internal sealed class MenuReviewInMemoryRepository : IMenuReviewRepository
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<MenuReview?> FindById(string id, CancellationToken cancellationToken)
+    public ValueTask<Maybe<MenuReview>> FindById(string id, CancellationToken cancellationToken)
     {
         MenuReview? review;
         lock (s_lock)
             review = s_reviews.SingleOrDefault(r => r.Id.Value.ToString() == id);
         if (review is not null && s_etags.TryGetValue(id, out var etag))
             AggregateETagWriter.SetETag(review, etag);
-        return ValueTask.FromResult(review);
+        return ValueTask.FromResult(Maybe.From(review));
     }
 
     public IReadOnlyList<MenuReview> GetPageForMenu(MenuId menuId, Trellis.PageSize pageSize, System.Guid? afterId)

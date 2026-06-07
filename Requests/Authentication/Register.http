@@ -1,11 +1,37 @@
+### Register a new user with the JWT-based AuthenticationController (api-version-neutral).
+### On success the response carries a Bearer token; the same token is what the JWT
+### claims pipeline parses into `Actor.Id = sub` for resource-based authorization on
+### every subsequent /hosts, /hosts/{...}/menus, /hosts/{...}/dinners, /reservations,
+### and /menu-reviews call.
 
 POST {{host}}/authentication/register
 Content-Type: application/json
 
 {
     "userId": "xavierjohn2023",
-    "firstName":"Xavier",
-    "lastName":"John",
-    "email":"someone@somewhere.com",
-    "password":"Amiko1232!"
+    "firstName": "Xavier",
+    "lastName": "John",
+    "email": "someone@somewhere.com",
+    "password": "Amiko1232!"
 }
+
+### Expected response shape:
+### HTTP/1.1 200 OK
+### Content-Type: application/json
+### {
+###   "userId": "xavierjohn2023",
+###   "firstName": "Xavier",
+###   "lastName": "John",
+###   "email": "someone@somewhere.com",
+###   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+### }
+###
+### Failure modes:
+###   - Re-registering the same userId -> 409 / 422 with code `user.already_exists`
+###     (per Errors.User.AlreadyExists, surfaced by ValidateUserDoesNotExist in
+###     RegisterCommandHandler).
+###   - Invalid payload (empty fields, bad email, weak password) -> 422 with a per-field
+###     Problem Details body from the Required* primitives' TryCreate validators.
+###
+### Copy the `token` from the response into `@token = ...` at the top of the other
+### .http files (they send it as `Authorization: Bearer {{token}}`).

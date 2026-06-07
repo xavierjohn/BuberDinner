@@ -1,0 +1,72 @@
+<Solution>
+  <Folder Name="/API/">
+    <Project Path="Api/src/BuberDinner.Api.csproj" />
+    <Project Path="Api/tests/BuberDinner.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Application/">
+    <Project Path="Application/src/BuberDinner.Application.csproj" />
+    <Project Path="Application/tests/BuberDinner.Application.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="Domain/src/BuberDinner.Domain.csproj" />
+    <Project Path="Domain/tests/BuberDinner.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/src/BuberDinner.Infrastructure.csproj" />
+    <Project Path="Infrastructure/tests/BuberDinner.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Requests/">
+    <File Path="Requests/httpenv.json" />
+    <File Path="Requests/README.md" />
+    <File Path="Requests/smoke.ps1" />
+  </Folder>
+  <Folder Name="/Requests/Authentication/">
+    <File Path="Requests/Authentication/Login-InvalidCredentials.http" />
+    <File Path="Requests/Authentication/Login.http" />
+    <File Path="Requests/Authentication/Register.http" />
+  </Folder>
+  <Folder Name="/Requests/Dinners/">
+    <File Path="Requests/Dinners/CancelDinner.http" />
+    <File Path="Requests/Dinners/EndDinner.http" />
+    <File Path="Requests/Dinners/GetDinner.http" />
+    <File Path="Requests/Dinners/Lifecycle-InvalidTransition.http" />
+    <File Path="Requests/Dinners/ListDinners-MalformedCursor.http" />
+    <File Path="Requests/Dinners/ListDinners-OversizedLimit.http" />
+    <File Path="Requests/Dinners/ListDinners-WithCursor.http" />
+    <File Path="Requests/Dinners/ListDinners.http" />
+    <File Path="Requests/Dinners/ListReservationsForDinner.http" />
+    <File Path="Requests/Dinners/ScheduleDinner.http" />
+    <File Path="Requests/Dinners/StartDinner.http" />
+  </Folder>
+  <Folder Name="/Requests/Hosts/">
+    <File Path="Requests/Hosts/CreateHost.http" />
+  </Folder>
+  <Folder Name="/Requests/MenuReviews/">
+    <File Path="Requests/MenuReviews/ListReviewsForMenu.http" />
+    <File Path="Requests/MenuReviews/SubmitReview-ValidationFailure.http" />
+    <File Path="Requests/MenuReviews/SubmitReview.http" />
+    <File Path="Requests/MenuReviews/UpdateReview.http" />
+  </Folder>
+  <Folder Name="/Requests/Menus/">
+    <File Path="Requests/Menus/CreateMenu-InvalidNested.http" />
+    <File Path="Requests/Menus/CreateMenu.http" />
+    <File Path="Requests/Menus/GetMenu-NotModified.http" />
+    <File Path="Requests/Menus/GetMenu.http" />
+    <File Path="Requests/Menus/ListMenus.http" />
+    <File Path="Requests/Menus/UpdateMenu-IfMatchMismatch.http" />
+    <File Path="Requests/Menus/UpdateMenu.http" />
+  </Folder>
+  <Folder Name="/Requests/Reservations/">
+    <File Path="Requests/Reservations/CancelReservation.http" />
+    <File Path="Requests/Reservations/CreateReservation-FailureModes.http" />
+    <File Path="Requests/Reservations/CreateReservation.http" />
+    <File Path="Requests/Reservations/ListMyReservations.http" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>

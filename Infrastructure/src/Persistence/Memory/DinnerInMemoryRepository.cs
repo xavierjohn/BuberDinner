@@ -87,14 +87,14 @@ internal class DinnerInMemoryRepository : IDinnerRepository
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<Dinner?> FindById(string id, CancellationToken cancellationToken)
+    public ValueTask<Maybe<Dinner>> FindById(string id, CancellationToken cancellationToken)
     {
         Dinner? dinner;
         lock (s_lock)
             dinner = s_dinners.SingleOrDefault(d => d.Id.Value.ToString() == id);
         if (dinner is not null && s_etags.TryGetValue(id, out var etag))
             AggregateETagWriter.SetETag(dinner, etag);
-        return ValueTask.FromResult(dinner);
+        return ValueTask.FromResult(Maybe.From(dinner));
     }
 
     private static void BumpETag(Dinner dinner)

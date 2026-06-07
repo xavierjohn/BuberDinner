@@ -56,26 +56,26 @@ public sealed class SubmitMenuReviewCommandHandler
                 request.Rating, request.Comment, _clock))
             .TapAsync(review => _reviewRepository.Add(review, cancellationToken));
 
-    private async ValueTask<Result<Menu>> LoadMenuAsync(MenuId menuId, CancellationToken cancellationToken) =>
-        (await _menuRepository.FindById(menuId.Value.ToString(), cancellationToken))
-            .ToResult(new Error.NotFound(ResourceRef.For<Menu>(menuId)));
+    private ValueTask<Result<Menu>> LoadMenuAsync(MenuId menuId, CancellationToken cancellationToken) =>
+        _menuRepository.FindById(menuId.Value.ToString(), cancellationToken)
+            .ToResultAsync(new Error.NotFound(ResourceRef.For<Menu>(menuId)));
 
-    private async ValueTask<Result<Dinner>> LoadDinnerAsync(DinnerId dinnerId, CancellationToken cancellationToken) =>
-        (await _dinnerRepository.FindById(dinnerId.Value.ToString(), cancellationToken))
-            .ToResult(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)));
+    private ValueTask<Result<Dinner>> LoadDinnerAsync(DinnerId dinnerId, CancellationToken cancellationToken) =>
+        _dinnerRepository.FindById(dinnerId.Value.ToString(), cancellationToken)
+            .ToResultAsync(new Error.NotFound(ResourceRef.For<Dinner>(dinnerId)));
 
-    private async ValueTask<Result<Dinner>> EnsureCallerReservedAsync(
+    private ValueTask<Result<Dinner>> EnsureCallerReservedAsync(
         Dinner dinner, UserId guestUserId, CancellationToken cancellationToken) =>
-        (await _reservationRepository.FindByDinnerAndGuest(dinner.Id, guestUserId, cancellationToken))
-            .ToResult(new Error.NotFound(ResourceRef.For<Dinner>(dinner.Id))
+        _reservationRepository.FindByDinnerAndGuest(dinner.Id, guestUserId, cancellationToken)
+            .ToResultAsync(new Error.NotFound(ResourceRef.For<Dinner>(dinner.Id))
             {
                 Detail = "Caller did not reserve this dinner.",
             })
-            .Ensure(
+            .EnsureAsync(
                 r => r.Status == ReservationStatus.Reserved,
                 new Error.NotFound(ResourceRef.For<Dinner>(dinner.Id))
                 {
                     Detail = "Caller did not reserve this dinner.",
                 })
-            .Map(_ => dinner);
+            .MapAsync(_ => dinner);
 }
